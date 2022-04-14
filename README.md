@@ -1,1 +1,1 @@
-# Ecuries_NextJS
+# Bachelor2__Ecuries
