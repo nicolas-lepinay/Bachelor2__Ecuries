@@ -1,0 +1,84 @@
+@import 'variables';
+
+.nav {
+    display: flex;
+    height: 120px;
+    padding: 0 4rem;
+    position: fixed;
+    width: 100VW;
+    z-index: 1000;
+}
+
+.nav > ul {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    list-style: none;
+    width: 100%;
+    & li {
+        color: white;
+        font-weight: 500;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        text-shadow: 0px 0px 12px rgba(0, 0, 0, 0.6);
+        &:first-child {
+            font-size: 0.9rem;
+        }
+        & h3 {
+            cursor: pointer;
+            font-size: 1.3rem;
+            font-weight: 500;
+            letter-spacing: 9px;
+        }
+        &:last-child {
+            align-items: center;
+            display: flex;
+            gap: 4rem;
+        }
+    }
+}
+
+.current_path {
+    color: $primary-color;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.menu_toggle {
+    align-items: flex-end;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    margin-top: 5px;
+    & span {
+        background: $primary-color;
+        border-radius: 1px;
+        height: 3px;
+        margin-bottom: 7px;
+        width: 35px;
+        &:first-child {
+            width: 25px;
+        }
+        &:last-child {
+            width: 30px;
+        }
+    }
+}
+
+
+@media (max-width: 1100px) {
+    .nav > ul li {
+        &:first-child {
+            display: none;
+        }
+    }
+}
+
+@media (max-width: 850px) {
+    .nav > ul li {
+        & h3 {
+            font-size: 0.8rem;
+        }
+    }
+}
+
