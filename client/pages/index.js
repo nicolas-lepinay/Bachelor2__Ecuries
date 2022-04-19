@@ -42,9 +42,87 @@ export default function Home() {
             </div>
         </section>
 
-        <section>
-            <h5>SUITE</h5>
-        </section>
+        <section className={styles.section_services}>
+            <div className={styles.services__grid_container}>
+                <div className={styles.services__vignette}>
+                    <div className={styles.vignette_frame}></div>
+                    <img src='/accueil/home_services_vignette1.jpg' className={styles.services__image}/>
+                    <div className={styles.middle}>
+                        <div className={styles.title}>
+                            <div className={styles.wrapper}>
+                                <span/>
+                                <h5>Travail &</h5>
+                                <span/>
+                            </div>
+                            <h1>Leçons</h1>
+                        </div>
+                        <button className={styles.button}>Voir plus</button>
+                    </div>
+                </div>
+
+                <div className={styles.services__vignette}>
+                    <div className={styles.vignette_frame}></div>
+                    <img src='/accueil/home_services_vignette2.jpg' className={styles.services__image}/>
+                    <div className={styles.middle}>
+                        <div className={styles.title}>
+                            <div className={styles.wrapper}>
+                                <span/>
+                                <h5>Débourrage &</h5>
+                                <span/>
+                            </div>
+                            <h1>Éducation</h1>
+                        </div>
+                        <button className={styles.button}>Voir plus</button>
+                    </div>
+                </div>
+
+                <div className={styles.services__vignette}>
+                    <div className={styles.vignette_frame}></div>
+                    <img src='/accueil/home_services_vignette3.jpg' className={styles.services__image}/>
+                    <div className={styles.middle}>
+                        <div className={styles.title}>
+                            <div className={styles.wrapper}>
+                                <span/>
+                                <h5>Évaluation</h5>
+                                <span/>
+                            </div>
+                            <h1>Complète</h1>
+                        </div>
+                        <button className={styles.button}>Voir plus</button>
+                    </div>
+                </div>
+            </div>
+        </section> 
+
+        <section className={styles.section_features}>
+            <div className={styles.single_feature}>
+                <h1>14</h1>
+                <span/>
+                <h5>Membres</h5>
+                <h3>d'équipe</h3>
+            </div>
+
+            <div className={styles.single_feature}>
+                <h1>18</h1>
+                <span/>
+                <h5>hectares</h5>
+                <h3>de prairie</h3>
+            </div>
+
+            <div className={styles.single_feature}>
+                <h1>7</h1>
+                <span/>
+                <h5>entreprises</h5>
+                <h3>partenaires</h3>
+            </div>
+
+            <div className={styles.single_feature}>
+                <h1>13</h1>
+                <span/>
+                <h5>années</h5>
+                <h3>d'expérience</h3>
+            </div>
+        </section> 
     </>
   )
 }
