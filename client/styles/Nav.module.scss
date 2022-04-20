@@ -110,6 +110,10 @@
     transition: all 0.8s ease-in-out;
 }
 
+.invisible {
+    visibility: hidden;
+}
+
 
 @media (max-width: 1100px) {
     .nav > ul li {

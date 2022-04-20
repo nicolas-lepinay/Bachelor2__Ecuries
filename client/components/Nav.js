@@ -1,13 +1,15 @@
+// Next :
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+
+// 🌌 React :
 import { useEffect, useState } from "react";
 
-// CSS :
+// 💅 CSS :
 import styles from '../styles/Nav.module.scss'
 
 function Nav() {
     const router = useRouter()
-    const route = router.route
     const [path, setPath] = useState("")
     const [active, setActive] = useState(false)
 
@@ -30,10 +32,10 @@ function Nav() {
         <>
             <nav className={styles.nav}>
                 <ul>
-                    <li>
+                    <li className={path == 'Mon compte' ? styles.invisible : undefined}>
                         <Link href='mailto:ecuriesdepersevere@hotmail.fr'>Nous contacter</Link>
                     </li>
-                    <li>
+                    <li className={path == 'Mon compte' ? styles.invisible : undefined}>
                         <h3>Écuries de Persévère</h3>
                     </li>
                     <li>
@@ -47,10 +49,10 @@ function Nav() {
                 </ul>
             </nav>
 
-            <div className={active ? styles.contentActive : styles.content}>
+            <div className={active ? styles.contentActive : styles.content} onClick={() => setActive(false)}>
                 <ul>
                     {navigation.map( (item) => (
-                        <li className={item.name == path && styles.current_path}>                        
+                        <li className={item.name == path ? styles.current_path : undefined} key={item.href}>                        
                             <Link href={item.href}>{item.name}</Link>
                         </li>
                     ))}
