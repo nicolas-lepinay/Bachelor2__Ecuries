@@ -1,21 +1,78 @@
-// 🌌 React :
-import { useState } from "react";
+// 🌀 Next :
+import getConfig from 'next/config'
+import { useRouter } from 'next/router'
 
-// FontAwesome :
+// 🌌 React :
+import { useState, useContext } from "react";
+
+// 🦸 User Context :
+// import { UserContext } from '../../context/UserContext';
+
+// 💖 FontAwesome :
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 
 // 💅 CSS :
 import styles from '../../styles/Login.module.scss'
 
+// 🅰️ Axios :
+import axios from 'axios';
+
+// 🍪 Nookies :
+import { setCookie, parseCookies } from 'nookies'
+
 function index() {
 
-    // Active for panel slide :
+    // ⚙️ Get API endpoint:
+    const { publicRuntimeConfig } = getConfig()
+
+    // 🚗 Router :
+    const router = useRouter()
+    
+    // 🦸 User:
+    // const { user, setUser } = useContext(UserContext);
+    
+    // ➡️ Active state for panel slide:
     const [active, setActive] = useState(false);
 
-    // Sliding panel animation :
-    const slidePanel = () => {
-        setActive(!active);
+    // ✉️ Login info:
+    const [loginEmail, setLoginEmail] = useState('');
+    const [loginPassword, setLoginPassword] = useState('');
+
+    // ⛔ Login erros:
+    const [noAccount, setNoAccount] = useState(false)
+    const [unconfirmedAccount, setUnconfirmedAccount] = useState(false)
+
+    // 🗝️ Login function:
+    const handleLogin = async (e) => {
+        e.preventDefault();   
+        
+        // Clear error messages:
+        setNoAccount(false)
+        setUnconfirmedAccount(false)
+
+        const loginInfo = {
+            identifier: loginEmail,
+            password: loginPassword
+        }
+        try {
+            const res = await axios.post(`${publicRuntimeConfig.API_URL}/auth/local?populate=*`, loginInfo)
+            const authData = await res.data
+            if(authData.user.confirmed === true) {
+                const currentUser = { ...authData.user, jwt: authData.jwt}
+                // setUser(currentUser) // Set user context
+                // localStorage.setItem("persevere_user", JSON.stringify(currentUser)) // Send user to local storage
+                setCookie(null, 'user', JSON.stringify(currentUser), { maxAge: 30 * 24 * 60 * 60, path: '/', })
+                console.log(`LOGIN | Connexion réussie. Bienvenue, ${currentUser.username}.`)
+                router.push('/mon-compte')
+            } else {
+                console.log("LOGIN | Ce compte n'a pas encore été confirmé par un administrateur.")
+                setUnconfirmedAccount(true)
+            }
+        } catch(err) {
+            setNoAccount(true)
+            console.log("LOGIN | Une erreur est survenue lors de la tentative de connexion. | " + err)
+        }
     }
 
     return (
@@ -24,15 +81,15 @@ function index() {
                 <div className={styles.form_wrapper__signup}>
                     {/* <!-- | FORM SIGN-UP | --> */}
                     <form className={styles.form}>
-                        <h1 className={styles.title}>Inscription</h1>
+                        <h1 className={styles.title}>S'inscrire</h1>
         
                         {/* <!-- USERNAME INPUT --> */}
                         <div className={styles.input_with_icon}>
                             <FontAwesomeIcon icon={faUser} className={styles.material_icon} />
                             <input className={styles.input}
                                 type="text" 
-                                placeholder="Choose a username" 
-                                pattern="^[ a-zA-Z0-9._]{3,20}" title="Only letters, numbers, spaces, dots and underscores. Length required: 3 ~ 20" 
+                                placeholder="Nom complet" 
+                                pattern="^[ a-zA-Z0-9.]{3,40}" title="Seuls les lettres, espaces et points sont acceptés. Entre 3 et 40 caractères." 
                                 required 
                             />
                         </div>
@@ -42,8 +99,8 @@ function index() {
                             <FontAwesomeIcon icon={faEnvelope} className={styles.material_icon} />
                             <input className={styles.input}
                                 type="email" 
-                                placeholder="Enter your email address" 
-                                maxlength="40" 
+                                placeholder="Adresse e-mail" 
+                                maxLength="40" 
                                 required 
                             />
                         </div>
@@ -53,10 +110,10 @@ function index() {
                             <FontAwesomeIcon icon={faLock} className={styles.material_icon} />
                             <input className={styles.input}
                                 type="password"
-                                placeholder="Choose a password" 
+                                placeholder="Mot de passe" 
                                 required 
-                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,30}" 
-                                title="At least 6 characters, including a number, an uppercase letter and a lowercase letter." 
+                                // pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,30}" 
+                                // title="At least 6 characters, including a number, an uppercase letter and a lowercase letter." 
                             />
                         </div>
         
@@ -65,35 +122,44 @@ function index() {
                             <FontAwesomeIcon icon={faLock} className={styles.material_icon} />
                             <input className={styles.input}
                                 type="password" 
-                                placeholder="Confirm your password" 
+                                placeholder="Confirmer votre mot de passe" 
                                 required 
                             />
                         </div>
-        
-                        <button className={styles.button}
-                            type="submit"
-                            whileTap={{ scale: 0.92 }}
-                        >Continuer
-                        </button>
+
+                        <button className={styles.button}type="submit">Continuer</button>
                     </form>
                 </div>
 
                 <div className={styles.form_wrapper__signin}>
                     {/* <!-- | FORM SIGN-IN | --> */}
-                    <form className={styles.form}>
-                        <h1 className={styles.title}>Connexion</h1>
+                    <form className={styles.form} onSubmit={handleLogin}>
+                        <h1 className={styles.title}>Se connecter</h1>
         
                         <div className={styles.input_with_icon}>
-                            <FontAwesomeIcon icon={faUser} className={styles.material_icon} />
-                            <input className={styles.input} type="text" placeholder="Username or email address" required/>
+                            <FontAwesomeIcon icon={faEnvelope} className={styles.material_icon} />
+                            <input 
+                                className={styles.input}
+                                onChange={ (e) => setLoginEmail(e.target.value)} 
+                                type="email" 
+                                placeholder="Adresse e-mail" 
+                                required/>
                         </div>
         
                         <div className={styles.input_with_icon}>
                             <FontAwesomeIcon icon={faLock} className={styles.material_icon} />
-                            <input className={styles.input} type="password" placeholder="Enter your password" required/>
+                            <input 
+                                className={styles.input} 
+                                onChange={ (e) => setLoginPassword(e.target.value)} 
+                                type="password" 
+                                placeholder="Mot de passe" 
+                                required/>
                         </div>
+
+                        {noAccount && <p className={styles.error_message}>Aucun compte correspondant n'a été trouvé.</p>}
+                        {unconfirmedAccount && <p className={styles.error_message}>Ce compte n'a pas encore été validé par un administrateur.</p>}
         
-                        <button className={styles.button} type="submit" whileTap={{ scale: 0.92 }}>Continuer</button>
+                        <button className={styles.button} type="submit">Continuer</button>
                     </form>
                 </div>
 
@@ -115,6 +181,23 @@ function index() {
             </div>
         </div>
     )
+}
+
+export async function getServerSideProps(ctx) {
+
+    const cookie = parseCookies(ctx).user
+
+    if(cookie) {
+        return {
+            redirect: {
+              permanent: false,
+              destination: '/mon-compte',
+            }
+        }
+    }
+    return {
+        props: {},
+    }
 }
 
 export default index

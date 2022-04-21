@@ -74,6 +74,9 @@
       "relation": "oneToMany",
       "target": "api::comment.comment",
       "mappedBy": "user"
+    },
+    "status": {
+      "type": "string"
     }
   }
 }

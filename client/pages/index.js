@@ -1,6 +1,7 @@
+// 🌀 Next :
 import Image from 'next/image'
 
-// CSS :
+// 💅 CSS :
 import styles from '../styles/Home.module.scss'
 
 export default function Home() {
