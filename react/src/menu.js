@@ -33,14 +33,14 @@ export const homeMenu = {
 export const dashboardMenu = {
 	dashboard: {
 		id: 'dashboard',
-		text: 'Dashboard',
+		text: 'Accueil',
 		path: '/',
 		icon: 'Dashboard',
 		subMenu: null,
 	},
 	dashboardBooking: {
 		id: 'dashboard-booking',
-		text: 'Dashboard Booking',
+		text: 'Planning Pro',
 		path: 'dashboard-booking',
 		icon: 'emoji_transportation',
 		subMenu: null,
@@ -80,7 +80,7 @@ export const demoPages = {
 			},
 			fluidSingle: {
 				id: 'fluidSingle',
-				text: 'Fluid',
+				text: 'Accueil',
 				path: 'single-pages/fluid',
 				icon: 'ViewDay',
 			},
@@ -980,3 +980,27 @@ export const productsMenu = {
 	companyC: { id: 'companyC', text: 'Company C', path: '/', subMenu: null },
 	companyD: { id: 'companyD', text: 'Company D', path: '/', subMenu: null },
 };
+
+// ------------- MY CUSTOM MENU -------------
+
+// 1. dashboardMenu
+// 2. loginPage
+// 3. logoutPage
+
+export const loginPage = {
+    login: {
+		id: 'login',
+		text: 'Se connecter',
+		path: 'se-connecter',
+		icon: 'Login',
+	},
+}
+
+export const logoutPage = {
+    logout: {
+		id: 'logout',
+		text: 'Se déconnecter',
+		path: 'se-deconnecter',
+		icon: 'Logout',
+	}
+}

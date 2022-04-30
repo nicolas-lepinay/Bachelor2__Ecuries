@@ -7,13 +7,14 @@ import { ToastProvider } from 'react-toast-notifications';
 import { TourProvider } from '@reactour/tour';
 import ThemeContext from '../contexts/themeContext';
 import { UserContext } from "../contexts/UserContext"
+import { ProvideAuth } from '../hooks/useAuth';
 
 import Footer from '../layout/Footer/Footer';
 
 import Aside from '../layout/Aside/Aside';
 import Wrapper from '../layout/Wrapper/Wrapper';
 import Portal from '../layout/Portal/Portal';
-import { demoPages, layoutMenu } from '../menu';
+import { dashboardMenu, demoPages, layoutMenu } from '../menu';
 import { Toast, ToastContainer } from '../components/bootstrap/Toasts';
 import useDarkMode from '../hooks/useDarkMode';
 import COLORS from '../common/data/enumColors';
@@ -71,47 +72,52 @@ const App = () => {
 	//	Add paths to the array that you don't want to be "Aside".
 	const withOutAsidePages = [demoPages.login.path, demoPages.signUp.path, layoutMenu.blank.path];
 
-    const dummy = {
-        username: "Mr. Dummy",
-    }
-
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("persevere_user")) || null);
     const currentUser = useMemo( () => ({user, setUser}), [user, setUser] );
 
 	return (
         <UserContext.Provider value={currentUser}>
-            <ThemeProvider theme={theme}>
-                <ToastProvider components={{ ToastContainer, Toast }}>
-                    <TourProvider
-                        steps={steps}
-                        styles={styles}
-                        showNavigation={false}
-                        showBadge={false}>
-                        <div
-                            ref={ref}
-                            className='app'
-                            style={{
-                                backgroundColor: fullScreenStatus && 'var(--bs-body-bg)',
-                                zIndex: fullScreenStatus && 1,
-                                overflow: fullScreenStatus && 'scroll',
-                            }}>
-                            <Routes>
-                                {withOutAsidePages.map((path) => (
-                                    <Route key={path} path={path} />
-                                ))}
+            <ProvideAuth>
+                <ThemeProvider theme={theme}>
+                    <ToastProvider components={{ ToastContainer, Toast }}>
+                        <TourProvider
+                            steps={steps}
+                            styles={styles}
+                            showNavigation={false}
+                            showBadge={false}>
+                            <div
+                                ref={ref}
+                                className='app'
+                                style={{
+                                    backgroundColor: fullScreenStatus && 'var(--bs-body-bg)',
+                                    zIndex: fullScreenStatus && 1,
+                                    overflow: fullScreenStatus && 'scroll',
+                                }}>
+                                <Routes>
+                                    {/* {withOutAsidePages.map((path) => (
+                                        <>
+                                            {!user && <Route key={path} path={path} />}
+                                            {user && <Route key={path} path={path} element={<Navigate replace to={dashboardMenu.dashboard.path} />} />}
+                                        </>
+                                    ))}
+                                    {!user && <Route path='*' element={<Navigate replace to={demoPages.login.path} />} />}
+                                    {user && <Route path='*' element={<Aside />} />} */}
 
-                                {user && <Route path='*' element={<Aside />} />}
-                                {!user && <Route path='*' element={<Navigate replace to={demoPages.login.path} />} />}
+                                    {withOutAsidePages.map((path) => (
+                                        <Route key={path} path={path} />
+                                    ))}
+							        <Route path='*' element={<Aside />} />
 
-                            </Routes>
-                            <Wrapper />
-                        </div>
-                        <Portal id='portal-notification'>
-                            {/* <ReactNotifications /> */}
-                        </Portal>
-                    </TourProvider>
-                </ToastProvider>
-            </ThemeProvider>
+                                </Routes>
+                                <Wrapper />
+                            </div>
+                            {/* <Portal id='portal-notification'>
+                                <ReactNotifications />
+                            </Portal> */}
+                        </TourProvider>
+                    </ToastProvider>
+                </ThemeProvider>
+            </ProvideAuth>
         </UserContext.Provider>
 	);
 };

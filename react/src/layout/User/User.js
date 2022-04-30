@@ -2,23 +2,32 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
+
+// 🛠️ Hooks :
+import useAuth from '../../hooks/useAuth';
+import useDarkMode from '../../hooks/useDarkMode';
+
 import USERS from '../../common/data/userDummyData';
-import { demoPages } from '../../menu';
+import { demoPages, logoutPage } from '../../menu';
 import { DropdownItem, DropdownMenu } from '../../components/bootstrap/Dropdown';
 import Button from '../../components/bootstrap/Button';
-import useDarkMode from '../../hooks/useDarkMode';
+
+
 import Collapse from '../../components/bootstrap/Collapse';
 import { NavigationLine } from '../Navigation/Navigation';
 import Icon from '../../components/icon/Icon';
 import useNavigationItemHandle from '../../hooks/useNavigationItemHandle';
 
 const User = () => {
+    // ⚙️ Strapi's API URL :
+    const API_URL = process.env.REACT_APP_API_URL;
+
 	const navigate = useNavigate();
 	const handleItem = useNavigationItemHandle();
+    const auth = useAuth(); // 🦸 Auth :
 	const { darkModeStatus, setDarkModeStatus } = useDarkMode();
 
 	const [collapseStatus, setCollapseStatus] = useState(false);
-
 	const { t } = useTranslation(['translation', 'menu']);
 
 	return (
@@ -29,8 +38,8 @@ const User = () => {
 				onClick={() => setCollapseStatus(!collapseStatus)}>
 				<div className='user-avatar'>
 					<img
-						srcSet={USERS.JOHN.srcSet}
-						src={USERS.JOHN.src}
+						srcSet={`${API_URL}${auth?.user?.avatar?.formats?.thumbnail?.url}`}
+                        src={`${API_URL}${auth?.user?.avatar?.formats?.thumbnail?.url}`}
 						alt='Avatar'
 						width={128}
 						height={128}
@@ -38,10 +47,10 @@ const User = () => {
 				</div>
 				<div className='user-info'>
 					<div className='user-name d-flex align-items-center'>
-						{`${USERS.JOHN.name} ${USERS.JOHN.surname}`}
+						{`${auth?.user?.name} ${auth?.user?.surname}`}
 						<Icon icon='Verified' className='ms-1' color='info' />
 					</div>
-					<div className='user-sub-title'>{USERS.JOHN.position}</div>
+					<div className='user-sub-title'>{auth?.user?.position}</div>
 				</div>
 			</div>
 			<DropdownMenu>
@@ -58,10 +67,10 @@ const User = () => {
 				</DropdownItem>
 				<DropdownItem>
 					<Button
-						icon={darkModeStatus ? 'DarkMode' : 'LightMode'}
+						icon={darkModeStatus ? 'LightMode' : 'DarkMode'}
 						onClick={() => setDarkModeStatus(!darkModeStatus)}
 						aria-label='Toggle fullscreen'>
-						{darkModeStatus ? 'Dark Mode' : 'Light Mode'}
+						{darkModeStatus ? 'Mode clair' : 'Mode sombre'}
 					</Button>
 				</DropdownItem>
 			</DropdownMenu>
@@ -81,7 +90,7 @@ const User = () => {
 							<span className='navigation-link navigation-link-pill'>
 								<span className='navigation-link-info'>
 									<Icon icon='AccountBox' className='navigation-icon' />
-									<span className='navigation-text'>{t('menu:Profile')}</span>
+									<span className='navigation-text'>Paramètres</span>
 								</span>
 							</span>
 						</div>
@@ -95,12 +104,12 @@ const User = () => {
 							<span className='navigation-link navigation-link-pill'>
 								<span className='navigation-link-info'>
 									<Icon
-										icon={darkModeStatus ? 'DarkMode' : 'LightMode'}
-										color={darkModeStatus ? 'info' : 'warning'}
+										icon={darkModeStatus ? 'LightMode' : 'DarkMode'}
+										color={darkModeStatus ? 'warning' : 'info'}
 										className='navigation-icon'
 									/>
 									<span className='navigation-text'>
-										{darkModeStatus ? t('menu:DarkMode') : t('menu:LightMode')}
+										{darkModeStatus ? 'Mode clair' : 'Mode sombre'}
 									</span>
 								</span>
 							</span>
@@ -113,11 +122,11 @@ const User = () => {
 						<div
 							role='presentation'
 							className='navigation-item cursor-pointer'
-							onClick={() => navigate(`../${demoPages.login.path}`)}>
+							onClick={() => navigate(`../${logoutPage.logout.path}`)}>
 							<span className='navigation-link navigation-link-pill'>
 								<span className='navigation-link-info'>
 									<Icon icon='Logout' className='navigation-icon' />
-									<span className='navigation-text'>{t('menu:Logout')}</span>
+									<span className='navigation-text'>Déconnexion</span>
 								</span>
 							</span>
 						</div>

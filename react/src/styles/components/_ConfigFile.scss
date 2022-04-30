@@ -54,7 +54,8 @@ $avatar: (
 $header: (
 	height: 5rem,
 	background-color: $white,
-	dark-background-color: shade-color($dark-body-bg, 70),
+	// dark-background-color: shade-color($dark-body-bg, 70),
+    dark-background-color: $dark-body-bg,
 	color: #808191,
 	color-dark: $dark,
 	opacity: 0.5,
@@ -90,7 +91,8 @@ $header: (
 $subheader: (
 	height: 4rem,
 	background-color: $white,
-	dark-background-color: shade-color($dark-body-bg, 70),
+	// dark-background-color: shade-color($dark-body-bg, 70),
+    dark-background-color: $dark-body-bg,
 	color: $body-color,
 	color-dark: $dark,
 	opacity: 0.5,

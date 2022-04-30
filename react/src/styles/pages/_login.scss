@@ -81,6 +81,7 @@ $primary-color: #d3a16a;
     }
 
     .title {
+        color: rgb(46, 46, 46);
         font-family: 'Playfair Display', serif;
         font-size: 2.5rem;
         font-weight: 600;
@@ -98,17 +99,23 @@ $primary-color: #d3a16a;
         position: relative;
     }
 
+    .row {
+        align-content: center;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
     .input {
         background-color: white;
         border-color: transparent;
         border: 1px solid rgb(241, 238, 255);
         border-radius: 3px;
-        color: rgb(0, 0, 0);
+        color: rgb(0, 0, 0)!important;
         font-family: 'Montserrat', sans-serif;
         font-size: 0.8rem;
         font-weight: 500;
         letter-spacing: 1px;
-        // margin: 10px 0px;
         min-width: 350px;
         max-width: 40vw;
         outline: none;
@@ -117,6 +124,14 @@ $primary-color: #d3a16a;
         &::placeholder {
             font-size: 0.7rem;
             text-transform: uppercase;
+        }
+    }
+
+    .checkbox_label {
+        color: black;
+        margin-left: -6rem;
+        & .checkbox_input {
+            margin: 0 1rem;
         }
     }
 
@@ -130,6 +145,7 @@ $primary-color: #d3a16a;
         font-size: 12px;
         letter-spacing: 2px;
         margin: 1rem 0;
+        min-width: 185px;
         padding: 12px 45px;
         text-transform: uppercase;
         outline: none;
@@ -137,21 +153,15 @@ $primary-color: #d3a16a;
         &:hover {
             background-color: #c79662;
         }
-        &__ghost {
+        &:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        &.ghost {
             background-color: transparent;
             border: 2px solid white;
-            border-radius: 50px;
             color: white;
-            cursor: pointer;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 12px;
             font-weight: 600;
-            letter-spacing: 2px;
-            margin: 1rem 0;
-            padding: 12px 45px;
-            text-transform: uppercase;
-            outline: none;
-            transition: all 0.3s ease-in-out;
             &:hover {
                 background-color: rgba(255, 255, 255, 0.1);
             }
@@ -171,14 +181,13 @@ $primary-color: #d3a16a;
 
     .overlay {
         background: black;
-        color: white;
         height: 100%;
         left: -100%;
         position: relative;
         width: 200%;
         transform: translateX(0);
         transition: all 0.6s ease-in-out;
-            &:before {
+        &:before {
             content: ' ';
             display: block;
             position: absolute;
@@ -191,7 +200,10 @@ $primary-color: #d3a16a;
             background-repeat: no-repeat;
             background-position: 0 0;
             background-size: cover;
-            }
+        }
+        & * {
+            color: white;
+        }
     }
 
     .panel__left, 
@@ -228,11 +240,17 @@ $primary-color: #d3a16a;
         width: 16px;
     }
 
+    .error_message,
+    .confirmation_message {
+        font-size: 1.1rem;
+        font-weight: 500;
+        padding: 16px 0;
+    }
     .error_message {
         color: rgb(255, 0, 34);
-        font-size: 1rem;
-        font-weight: 600;
-        padding: 16px 0;
+    }
+    .confirmation_message {
+        color: rgb(4, 105, 0);
     }
 
     @media (max-width: 1000px) {
@@ -242,6 +260,9 @@ $primary-color: #d3a16a;
         }
         .input {
             min-width: 100%;
+        }
+        .checkbox_label {
+            margin-left: 0;
         }
     }
 }

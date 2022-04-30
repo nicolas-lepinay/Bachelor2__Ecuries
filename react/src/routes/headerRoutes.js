@@ -1,5 +1,5 @@
 import React from 'react';
-import { componentsMenu, dashboardMenu, demoPages, layoutMenu } from '../menu';
+import { componentsMenu, dashboardMenu, demoPages, layoutMenu, loginPage } from '../menu';
 import DashboardHeader from '../pages/common/Headers/DashboardHeader';
 import DashboardBookingHeader from '../pages/common/Headers/DashboardBookingHeader';
 import ProfilePageHeader from '../pages/common/Headers/ProfilePageHeader';
@@ -15,6 +15,7 @@ import UtilitiesHeader from '../pages/common/Headers/UtilitiesHeader';
 import IconHeader from '../pages/common/Headers/IconHeader';
 import ExtrasHeader from '../pages/common/Headers/ExtrasHeader';
 import DefaultHeader from '../pages/common/Headers/DefaultHeader';
+import CustomDefaultHeader from '../pages/common/Headers/CustomDefaultHeader';
 
 const headers = [
 	{ path: layoutMenu.pageLayout.subMenu.onlySubheader.path, element: null, exact: true },
@@ -195,4 +196,19 @@ const headers = [
 	},
 ];
 
-export default headers;
+// ------------- MY CUSTOM VERSION -------------
+
+const customHeaders = [
+    { 
+        path: loginPage.login.path, 
+        element: null, 
+        exact: true },
+
+    {
+		path: `*`,
+		element: <CustomDefaultHeader />,
+	},
+]
+
+// export default headers;
+export default customHeaders;

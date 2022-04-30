@@ -1,11 +1,18 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useRef, useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import classNames from 'classnames';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+
+// 🛠️ Hooks :
+import useAuth from '../../hooks/useAuth';
+import useDarkMode from '../../hooks/useDarkMode';
+import useAsideTouch from '../../hooks/useAsideTouch';
+
 import Brand from '../Brand/Brand';
 import Navigation, { NavigationLine } from '../Navigation/Navigation';
 import User from '../User/User';
-import { componentsMenu, dashboardMenu, demoPages, layoutMenu } from '../../menu';
+import { dashboardMenu, logoutPage, loginPage } from '../../menu';
 import ThemeContext from '../../contexts/themeContext';
 import Card, { CardBody } from '../../components/bootstrap/Card';
 
@@ -14,8 +21,6 @@ import HandWebp from '../../assets/img/hand.webp';
 import Icon from '../../components/icon/Icon';
 import Button from '../../components/bootstrap/Button';
 import Tooltips from '../../components/bootstrap/Tooltips';
-import useDarkMode from '../../hooks/useDarkMode';
-import useAsideTouch from '../../hooks/useAsideTouch';
 
 const Aside = () => {
 	const { asideStatus, setAsideStatus } = useContext(ThemeContext);
@@ -27,6 +32,8 @@ const Aside = () => {
 	const constraintsRef = useRef(null);
 
 	const [doc, setDoc] = useState(false);
+
+    const auth = useAuth(); // 🦸 Auth :
 
 	const { t } = useTranslation(['translation', 'menu']);
 
@@ -50,7 +57,10 @@ const Aside = () => {
 				</div>
 				<div className='aside-body'>
 					<Navigation menu={dashboardMenu} id='aside-dashboard' />
-					{!doc && (
+                    {/* <NavigationLine />
+                    <Navigation menu={logoutPage} id='aside-demo-pages' /> */}
+
+					{/* {!doc && (
 						<>
 							<NavigationLine />
 							<Navigation menu={demoPages} id='aside-demo-pages' />
@@ -65,7 +75,7 @@ const Aside = () => {
 							<Navigation menu={componentsMenu} id='aside-menu-two' />
 							<NavigationLine />
 						</>
-					)}
+					)} */}
 
 					{asideStatus && doc && (
 						<Card className='m-3 '>
@@ -96,7 +106,7 @@ const Aside = () => {
 					)}
 				</div>
 				<div className='aside-foot'>
-					<nav aria-label='aside-bottom-menu'>
+					{/* <nav aria-label='aside-bottom-menu'>
 						<div className='navigation'>
 							<div
 								role='presentation'
@@ -129,7 +139,7 @@ const Aside = () => {
 								</span>
 							</div>
 						</div>
-					</nav>
+					</nav> */}
 					<User />
 				</div>
 			</motion.aside>

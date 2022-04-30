@@ -1,6 +1,7 @@
 // 🌀 Next :
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import getConfig from 'next/config'
 
 // 🌌 React :
 import { useEffect, useState } from "react";
@@ -9,6 +10,10 @@ import { useEffect, useState } from "react";
 import styles from '../styles/Nav.module.scss'
 
 function Nav() {
+
+    // ⚙️ Get React App's URL :
+    const { publicRuntimeConfig } = getConfig()
+
     const router = useRouter()
     const [path, setPath] = useState("")
     const [active, setActive] = useState(false)
@@ -19,7 +24,7 @@ function Nav() {
         { href: '/nos-installations', name: 'Installations' },
         { href: '/nos-prestations', name: 'Prestations' },
         { href: '/contact', name: 'Contact' },
-        { href: '/se-connecter', name: 'Mon compte' },
+        // { href: publicRuntimeConfig.REACT_APP_URL, name: 'Mon compte' },
     ]
 
     useEffect( () => {
@@ -56,6 +61,9 @@ function Nav() {
                             <Link href={item.href}>{item.name}</Link>
                         </li>
                     ))}
+                    <li>                        
+                        <a href={publicRuntimeConfig.REACT_APP_URL} target='_blank'>Mon compte</a>
+                    </li>
                 </ul>
             </div>
         </>

@@ -8,3 +8,14 @@
 	scroll-margin-top: map.get($header, height) + map.get($subheader, height) +
 		map.get($page, padding-y);
 }
+
+.new-line {
+    white-space: pre-line;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    box-shadow: 0 0 0 100rem white inset!important;
+    -webkit-text-fill-color: rgb(0, 0, 0)!important;
+}

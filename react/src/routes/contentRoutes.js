@@ -1,10 +1,12 @@
 import React, { lazy } from 'react';
-import { componentsMenu, dashboardMenu, demoPages, layoutMenu } from '../menu';
+import { componentsMenu, dashboardMenu, demoPages, layoutMenu, loginPage, logoutPage } from '../menu';
 // import Login from '../pages/presentation/auth/Login';
 import Login from '../pages/auth/Login';
+import Logout from '../pages/auth/Logout';
 
 const LANDING = {
-	DASHBOARD: lazy(() => import('../pages/dashboard/DashboardPage')),
+	// DASHBOARD: lazy(() => import('../pages/dashboard/DashboardPage')),
+    DASHBOARD: lazy(() => import('../pages/dashboard/LandingPage')),
 	DASHBOARD_BOOKING: lazy(() => import('../pages/dashboard/DashboardBookingPage')),
 	SUMMARY: lazy(() => import('../pages/SummaryPage')),
 };
@@ -888,6 +890,37 @@ const documentation = [
 		exact: true,
 	},
 ];
-const contents = [...presentation, ...documentation];
+
+// const contents = [...presentation, ...documentation];
+
+// ------------- MY CUSTOM VERSION -------------
+
+const dashboard = [
+    {
+        path: dashboardMenu.dashboard.path,
+		element: <LANDING.DASHBOARD />,
+		exact: true,
+    },
+	{
+		path: dashboardMenu.dashboardBooking.path,
+		element: <LANDING.DASHBOARD_BOOKING />,
+		exact: true,
+	},
+];
+
+const auth = [
+    {
+        path: loginPage.login.path,
+        element: <Login />,
+        exact: true,
+    },
+    {
+        path: logoutPage.logout.path,
+        element: <Logout />,
+        exact: true,
+    }
+];
+
+const contents = [...dashboard, ...auth];
 
 export default contents;
