@@ -47,13 +47,13 @@ export const dashboardMenu = {
 	},
 	crmDashboard: {
 		id: 'crmDashboard',
-		text: 'CRM Dashboard',
+		text: 'Planning chevaux',
 		path: 'crm/dashboard',
 		icon: 'RecentActors',
 	},
 	summary: {
 		id: 'summary',
-		text: 'Summary',
+		text: 'Autre',
 		path: 'summary',
 		icon: 'sticky_note_2',
 		subMenu: null,

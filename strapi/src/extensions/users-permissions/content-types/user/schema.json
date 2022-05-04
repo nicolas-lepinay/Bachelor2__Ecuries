@@ -63,18 +63,6 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "posts": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::post.post",
-      "mappedBy": "User"
-    },
-    "comments": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::comment.comment",
-      "mappedBy": "user"
-    },
     "status": {
       "type": "string"
     },
@@ -84,7 +72,7 @@
     "surname": {
       "type": "string"
     },
-    "position": {
+    "occupation": {
       "type": "string"
     },
     "avatar": {
@@ -97,6 +85,29 @@
     },
     "phone": {
       "type": "string"
+    },
+    "horses": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::horse.horse",
+      "mappedBy": "user"
+    },
+    "address": {
+      "type": "component",
+      "repeatable": false,
+      "component": "address.address"
+    },
+    "appointments_clients": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::appointment.appointment",
+      "mappedBy": "clients"
+    },
+    "appointments_employees": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::appointment.appointment",
+      "mappedBy": "employees"
     }
   }
 }

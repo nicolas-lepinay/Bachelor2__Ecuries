@@ -14,7 +14,11 @@ import { faUser, faEnvelope, faLock, faPhone } from "@fortawesome/free-solid-svg
 
 
 function Login() {
-    
+
+    // ⚙️ PRO ID AND CLIENT ID :
+    const PRO_ID = process.env.REACT_APP_PRO_ID;
+    const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
+
     // 🦸 Auth :
     const auth = useAuth();
 
@@ -56,7 +60,7 @@ function Login() {
             email: signupEmail,
             phone: signupPhone,
             password: signupPassword,
-            role: { id: isPro ? 4 : 5 }
+            role: { id: isPro ? PRO_ID : CLIENT_ID }
         }
         auth.register(signupInfo)
     }

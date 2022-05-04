@@ -1,5 +1,4 @@
-import React, { useContext, useRef, useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import React, { useContext, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -12,13 +11,13 @@ import useAsideTouch from '../../hooks/useAsideTouch';
 import Brand from '../Brand/Brand';
 import Navigation, { NavigationLine } from '../Navigation/Navigation';
 import User from '../User/User';
-import { dashboardMenu, logoutPage, loginPage } from '../../menu';
+import { dashboardMenu } from '../../menu';
 import ThemeContext from '../../contexts/themeContext';
 import Card, { CardBody } from '../../components/bootstrap/Card';
 
 import Hand from '../../assets/img/hand.png';
 import HandWebp from '../../assets/img/hand.webp';
-import Icon from '../../components/icon/Icon';
+// import Icon from '../../components/icon/Icon';
 import Button from '../../components/bootstrap/Button';
 import Tooltips from '../../components/bootstrap/Tooltips';
 
@@ -35,9 +34,12 @@ const Aside = () => {
 
     const auth = useAuth(); // 🦸 Auth :
 
+	const { darkModeStatus } = useDarkMode();
+
 	const { t } = useTranslation(['translation', 'menu']);
 
-	const { darkModeStatus } = useDarkMode();
+    if(!auth.user)
+        return null;
 
 	return (
 		<>

@@ -201,7 +201,7 @@ const EmployeeList = () => {
 																	{`${user.name} ${user.surname}`}
 																</div>
 																<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-																	{user.position}
+																	{user.occupation}
 																</small>
 															</div>
 

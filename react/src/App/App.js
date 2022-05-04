@@ -111,9 +111,9 @@ const App = () => {
                                 </Routes>
                                 <Wrapper />
                             </div>
-                            {/* <Portal id='portal-notification'>
+                            <Portal id='portal-notification'>
                                 <ReactNotifications />
-                            </Portal> */}
+                            </Portal>
                         </TourProvider>
                     </ToastProvider>
                 </ThemeProvider>

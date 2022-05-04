@@ -1,12 +1,9 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React from 'react';
 import { useFormik } from 'formik';
 import moment from 'moment';
 import classNames from 'classnames';
 import { useMeasure } from 'react-use';
-import { useNavigate } from 'react-router-dom';
 
-// 🦸 User Context :
-import { UserContext } from '../../contexts/UserContext';
 // 🛠️ useAuth hook :
 import useAuth from '../../hooks/useAuth';
 
@@ -23,32 +20,15 @@ import Card, {
 	CardTabItem,
 	CardTitle,
 } from '../../components/bootstrap/Card';
-import UserImageWebp from '../../assets/img/wanna/wanna1.webp';
-import UserImage from '../../assets/img/wanna/wanna1.png';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Input from '../../components/bootstrap/forms/Input';
 import showNotification from '../../components/extras/showNotification';
 import Icon from '../../components/icon/Icon';
 import Alert from '../../components/bootstrap/Alert';
 import Avatar from '../../components/Avatar';
-import Progress from '../../components/bootstrap/Progress';
+import defaultAvatar from '../../assets/img/wanna/defaultAvatar.webp';
 
-import Pic from '../../assets/img/wanna/richie/richie.png';
-import Pic2 from '../../assets/img/wanna/richie/richie2.png';
-import Pic3 from '../../assets/img/wanna/richie/richie3.png';
-import Pic4 from '../../assets/img/wanna/richie/richie4.png';
-import Pic5 from '../../assets/img/wanna/richie/richie5.png';
-import Pic6 from '../../assets/img/wanna/richie/richie6.png';
-import Pic7 from '../../assets/img/wanna/richie/richie7.png';
-import Pic8 from '../../assets/img/wanna/richie/richie8.png';
-import Modal, { ModalBody, ModalHeader, ModalTitle } from '../../components/bootstrap/Modal';
-import { demoPages } from '../../menu';
-import WannaImg1 from '../../assets/img/wanna/slide/scene-1.png';
-import WannaImg2 from '../../assets/img/wanna/slide/scene-2.png';
-import WannaImg5 from '../../assets/img/wanna/slide/scene-5.png';
-import WannaImg6 from '../../assets/img/wanna/slide/scene-6.png';
-import Carousel from '../../components/bootstrap/Carousel';
-import CarouselSlide from '../../components/bootstrap/CarouselSlide';
+import { dashboardMenu } from '../../menu';
 import useDarkMode from '../../hooks/useDarkMode';
 
 const LandingPage = () => {
@@ -58,85 +38,114 @@ const LandingPage = () => {
     const API_URL = process.env.REACT_APP_API_URL;
 
     // 🦸 User:
-    const { user, setUser } = useContext(UserContext);
-
     const auth = useAuth();
 
-	const navigate = useNavigate();
-	const formik = useFormik({
+    const formikProfile = useFormik({
 		initialValues: {
-			formPrefix: 'Prof.',
-			formName: auth.user.name,
-			formMiddleName: '',
-			formSurName: auth.user.surname,
-			formEmailAddress: auth.user.email,
-			formPhone: '2575637401',
-			formAddressLine: '711-2880 Nulla St.',
-			formAddressLine2: 'Mankato',
-			formCity: 'Mississippi',
-			formState: 'USA',
-			formZIP: '96522',
-			formCurrentPassword: '',
-			formNewPassword: '',
-			formConfirmNewPassword: '',
+			name: auth.user.name,
+			surname: auth.user.surname,
+			occupation: auth.user.occupation,
+			email: auth.user.email,
+			phone: auth.user.phone,
 		},
 		onSubmit: (values) => {
-			// eslint-disable-next-line no-console
+            // Delete empty fields :
+            for (const key in values) {
+                if (values[key] === '' || !values[key]) {
+                  delete values[key];
+                }
+            }
+            // Update user :
+            auth.updateUser(values);
+
+            // Success or error message :
 			showNotification(
 				<span className='d-flex align-items-center'>
 					<Icon icon='Info' size='lg' className='me-1' />
-					<span>Updated Information</span>
-				</span>,
-				JSON.stringify(values, null, 2),
+					<span>{auth.error ? auth.error.message : 'Vos informations ont été mises à jour.' }</span>
+				</span>
 			);
 		},
 	});
-	const [ref, { height }] = useMeasure();
 
-	const colors = ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'dark'];
-	const [selectedImage, setSelectedImage] = useState(null);
-	const [gallerySeeAll, setGallerySeeAll] = useState(false);
+    const formikAddress = useFormik({
+		initialValues: {
+            id: auth.user.address?.id,
+			street: auth.user.address?.street,
+			city: auth.user.address?.city,
+			country: auth.user.address?.country,
+			zipcode: auth.user.address?.zipcode,
+		},
+		onSubmit: (values) => {
+            // Delete empty fields :
+            for (const key in values) {
+                if (values[key] === '' || !values[key]) {
+                  delete values[key];
+                }
+            }
+            // Update user :
+            auth.updateUser({ address: { ...values} });
 
-	const images = [
-		{ id: 'Pic', img: Pic },
-		{ id: 'Pic2', img: Pic2 },
-		{ id: 'Pic3', img: Pic3 },
-		{ id: 'Pic4', img: Pic4 },
-		{ id: 'Pic5', img: Pic5 },
-		{ id: 'Pic6', img: Pic6 },
-		{ id: 'Pic7', img: Pic7 },
-		{ id: 'Pic8', img: Pic8 },
-	];
+            // Success or error message :
+			showNotification(
+				<span className='d-flex align-items-center'>
+					<Icon icon='Info' size='lg' className='me-1' />
+					<span>{auth.error ? auth.error.message : 'Votre adresse a été mise à jour.' }</span>
+				</span>
+			);
+		},
+	});
 
-	const _gallery = (
-		<div className='row g-4'>
-			{images.map((item, index) => (
-				<div key={item.id} className='col-xxl-2 col-lg-3 col-md-6'>
-					<button
-						type='button'
-						onClick={() => setSelectedImage(item.img)}
-						className={classNames(
-							'ratio ratio-1x1',
-							'rounded-2',
-							'border-0',
-							`bg-l${darkModeStatus ? 'o25' : '25'}-${colors[index % 7]}`,
-							`bg-l${darkModeStatus ? 'o50' : '10'}-${colors[index % 7]}-hover`,
-						)}>
-						<img
-							src={item.img}
-							alt={item.id}
-							width='100%'
-							height='auto'
-							className='object-fit-contain p-4'
-						/>
-					</button>
-				</div>
-			))}
-		</div>
-	);
+    const formikPassword = useFormik({
+		initialValues: {
+			currentPassword: '',
+			newPassword: '',
+			confirmNewPassword: '',
+		},
+		onSubmit: (values) => {
+            for (const key in values) {
+                if (values[key] === '') {
+                  values = null;
+                  return
+                }
+            }
+            // Check if current password is correct :
+            auth.login({ 
+                identifier: auth.user.email, 
+                password: values.currentPassword 
+            })
+            if(auth.error) {
+                showNotification(
+                    <span className='d-flex align-items-center'>
+                        <Icon icon='Info' size='lg' className='me-1' />
+                        <span>Le mot de passe actuel est incorrect.</span>
+                    </span>
+                );
+            } else {
+                if(values.newPassword !== values.confirmNewPassword) {
+                    showNotification(
+                        <span className='d-flex align-items-center'>
+                            <Icon icon='Info' size='lg' className='me-1' />
+                            <span>Les mots de passe ne correspondent pas.</span>
+                        </span>
+                    );
+                } else {
+                    auth.update({ password: values.newPassword })
+                    showNotification(
+                        <span className='d-flex align-items-center'>
+                            <Icon icon='Info' size='lg' className='me-1' />
+                            <span>Votre mot de passe a été mis à jour.</span>
+                        </span>
+                    );
+                }
+            }
+		},
+	});
+
+    const [ref, { height }] = useMeasure();
 
 	return (
-		<PageWrapper title={demoPages.singlePages.subMenu.fluidSingle.text}>
+		<PageWrapper title={dashboardMenu.dashboard.text}>
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-xxl-4 col-xl-6'>
@@ -147,21 +156,18 @@ const LandingPage = () => {
 										<div className='d-flex align-items-center'>
 											<div className='flex-shrink-0'>
 												<Avatar
-													srcSet={`${API_URL}${auth.user.avatar.formats.thumbnail.url}`}
-													src={`${API_URL}${auth.user.avatar.formats.thumbnail.url}`}
+													srcSet={auth.user.avatar ? `${API_URL}${auth.user?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+													src={auth.user.avatar ? `${API_URL}${auth.user?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
 													className='rounded-circle'
 												/>
 											</div>
 											<div className='flex-grow-1 ms-3'>
 												<div className='h2 fw-bold'>
-													{formik.values.formName || 'Name'}
-													{formik.values.formMiddleName &&
-														` ${formik.values.formMiddleName.charAt(
-															0,
-														)}.`}{' '}
-													{formik.values.formSurName || 'Surname'}
+													{auth.user.name || 'Prénom'}
+                                                    {' '}
+													{auth.user.surname || 'Nom'}
 												</div>
-												<div className='h5 text-muted'>{auth.user?.position}</div>
+												<div className='h5 text-muted'>{auth.user.occupation}</div>
 											</div>
 										</div>
 									</div>
@@ -174,11 +180,11 @@ const LandingPage = () => {
 													</div>
 													<div className='flex-grow-1 ms-3'>
 														<div className='fw-bold fs-5 mb-0'>
-															{formik.values.formEmailAddress ||
+															{auth.user.email ||
 																'Nope'}
 														</div>
 														<div className='text-muted'>
-															Email Address
+															Adresse e-mail
 														</div>
 													</div>
 												</div>
@@ -194,9 +200,9 @@ const LandingPage = () => {
 													</div>
 													<div className='flex-grow-1 ms-3'>
 														<div className='fw-bold fs-5 mb-0'>
-															{formik.values.formPhone || 'Nope'}
+															{auth.user.phone || '01 23 45 67 89'}
 														</div>
-														<div className='text-muted'>Phone</div>
+														<div className='text-muted'>Téléphone</div>
 													</div>
 												</div>
 											</div>
@@ -205,7 +211,8 @@ const LandingPage = () => {
 								</div>
 							</CardBody>
 						</Card>
-						<Card>
+
+						{/* <Card>
 							<CardBody>
 								<div className='d-flex justify-content-between'>
 									<p>Complete Your Profile</p>
@@ -213,11 +220,356 @@ const LandingPage = () => {
 								</div>
 								<Progress value={90} />
 							</CardBody>
-						</Card>
+						</Card> */}
+
 						<Card>
 							<CardHeader>
+								<CardLabel>
+									<CardTitle>À propos</CardTitle>
+								</CardLabel>
+							</CardHeader>
+							<CardBody>
+								<p>
+                                    Auprès des chevaux depuis sa naissance, Karine a grandi dans les troupeaux 
+                                    de poneys et chevaux de l’élevage familial. En selle depuis ses 3 ans, Karine 
+                                    a reçu une formation complète auprès de nombreux cavaliers de haut niveau : 
+                                    Pascale Massot-Dandoy, Philippe Limousin, Alain Franckville, Serge Balbin, 
+                                    Patrick Le Rolland, Wilfried Pierrot. 
+								</p>
+                                <p>
+                                    Elle évoluera en compétition de dressage jusqu’à intégrer l’équipe de France 
+                                    de dressage espoir de l’âge de 14 à 18 ans.
+                                </p>
+							</CardBody>
+						</Card>
+					</div>
+
+					<div className='col-xxl-8 col-xl-6'>
+						{/* <Card
+							className={classNames('shadow-3d-info', 'mb-5', {
+								'bg-lo10-info': darkModeStatus,
+								'bg-l25-info': !darkModeStatus,
+							})}>
+							<Carousel
+								isHoverPause
+								isRide
+								height={height || 305}
+								isDark={darkModeStatus}>
+								<CarouselSlide>
+									<div className='row align-items-center h-100'>
+										<div
+											className='col-6 carousel-slide-bg'
+											style={{ backgroundImage: `url(${WannaImg1})` }}
+										/>
+										<div className='col-6'>
+											<h2>New Products</h2>
+											<p className='lead'>New products ready for sale.</p>
+											<Button
+												color={darkModeStatus ? 'light' : 'dark'}
+												onClick={() =>
+													navigate(
+														`../${demoPages.sales.subMenu.productsGrid.path}`,
+													)
+												}>
+												Click
+											</Button>
+										</div>
+									</div>
+								</CarouselSlide>
+								<CarouselSlide background={WannaImg5} />
+								<CarouselSlide>
+									<div className='row align-items-center h-100'>
+										<div className='col-6 text-end'>
+											<h2>Customize</h2>
+											<h5>You can design your own screens</h5>
+											<Button
+												color={darkModeStatus ? 'light' : 'dark'}
+												onClick={() =>
+													navigate(
+														`../${demoPages.sales.subMenu.dashboard.path}`,
+													)
+												}>
+												Click
+											</Button>
+										</div>
+										<div
+											className='col-6 carousel-slide-bg'
+											style={{ backgroundImage: `url(${WannaImg2})` }}
+										/>
+									</div>
+								</CarouselSlide>
+								<CarouselSlide background={WannaImg6} />
+							</Carousel>
+						</Card> */}
+
+						{/* <Card>
+							<CardHeader>
+								<CardLabel icon='PhotoSizeSelectActual' iconColor='info'>
+									<CardTitle>Photos and Videos</CardTitle>
+								</CardLabel>
+								<CardActions>
+									<Button
+										color='info'
+										isLight
+										onClick={() => setGallerySeeAll(true)}>
+										See All
+									</Button>
+								</CardActions>
+							</CardHeader>
+							<CardBody>{_gallery}</CardBody>
+						</Card> */}
+
+						<Card hasTab>
+							<CardTabItem id='profile' title='Profil' icon='Contacts'>
+								<Alert isLight className='border-0' shadow='md' icon='LocalPolice'>
+									Vos informations personnelles.
+								</Alert>
+
+								<Card
+									className='rounded-2'
+									tag='form'
+									onSubmit={formikProfile.handleSubmit}>
+									<CardHeader>
+										<CardLabel icon='Person'>
+											<CardTitle>Mes informations</CardTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody>
+										<div className='row g-4'>
+
+											<FormGroup
+												className='col-md-3'
+												id='name'
+												label='Prénom'>
+												<Input
+													placeholder='Prénom'
+													autoComplete='given-name'
+													onChange={formikProfile.handleChange}
+													value={formikProfile.values.name}
+												/>
+											</FormGroup>
+
+											<FormGroup
+												className='col-md-3'
+												id='surname'
+												label='Nom de famille'>
+												<Input
+													placeholder='Nom de famille'
+													autoComplete='family-name'
+													onChange={formikProfile.handleChange}
+													value={formikProfile.values.surname}
+												/>
+											</FormGroup>
+
+                                            <FormGroup
+												className='col-md-2'
+												id='role'
+												label='Rôle'>
+												<Input
+													placeholder='Rôle'
+													value={auth.user.role.name}
+                                                    disabled
+												/>
+											</FormGroup>
+
+                                            <FormGroup
+												className='col-md-4'
+												id='occupation'
+												label='Profession'>
+												<Input
+													placeholder='Profession'
+													onChange={formikProfile.handleChange}
+													value={formikProfile.values.occupation}
+												/>
+											</FormGroup>
+
+											<FormGroup
+												className='col-lg-6'
+												id='email'
+												label='Adresse e-mail'>
+												<Input
+													type='email'
+													placeholder='john@domain.com'
+													autoComplete='email'
+													onChange={formikProfile.handleChange}
+													value={formikProfile.values.email}
+												/>
+											</FormGroup>
+											<FormGroup
+												className='col-lg-6'
+												id='phone'
+												label='Téléphone'>
+												<Input
+													type='tel'
+													placeholder='+33 6 12 34 56 78'
+													autoComplete='tel'
+													mask='+99 9 99 99 99 99'
+													onChange={formikProfile.handleChange}
+													value={formikProfile.values.phone}
+												/>
+											</FormGroup>
+										</div>
+									</CardBody>
+									<CardFooter>
+										<CardFooterRight>
+											<Button type='submit' color='primary' icon='Save'>
+												Appliquer
+											</Button>
+										</CardFooterRight>
+									</CardFooter>
+								</Card>
+								{/* <Alert
+									isLight
+									className='border-0'
+									shadow='md'
+									icon='Public'
+									color='warning'>
+									As soon as you save the information, it will be shown to
+									everyone automatically.
+								</Alert> */}
+							</CardTabItem>
+							<CardTabItem id='address' title='Adresse' icon='HolidayVillage'>
+								<Card
+									className='rounded-2'
+									tag='form'
+									onSubmit={formikAddress.handleSubmit}>
+									<CardHeader>
+										<CardLabel icon='HolidayVillage'>
+											<CardTitle>Mon adresse</CardTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody>
+										<div className='row g-4'>
+											<FormGroup
+												className='col-10'
+												id='street'
+												label='Rue'>
+												<Input
+													placeholder='Adresse de la rue'
+													autoComplete='address-line1'
+													onChange={formikAddress.handleChange}
+													value={formikAddress.values.street}
+												/>
+											</FormGroup>
+
+											<FormGroup
+												className='col-md-4'
+												id='city'
+												label='Ville'>
+												<Input
+													placeholder='Ville'
+													autoComplete='address-level2'
+													onChange={formikAddress.handleChange}
+													value={formikAddress.values.city}
+												/>
+											</FormGroup>
+											<FormGroup
+												className='col-md-4'
+												id='country'
+												label='Pays'>
+												<Input
+													placeholder='Pays'
+													autoComplete='country-name'
+													onChange={formikAddress.handleChange}
+													value={formikAddress.values.country}
+												/>
+											</FormGroup>
+
+											<FormGroup
+												className='col-md-2'
+												id='zipcode'
+												label='Code postal'>
+												<Input
+													placeholder='Code postal'
+													autoComplete='postal-code'
+                                                    pattern="[0-9]+"
+													onChange={formikAddress.handleChange}
+													value={formikAddress.values.zipcode}
+												/>
+											</FormGroup>
+										</div>
+									</CardBody>
+									<CardFooter>
+										<CardFooterRight>
+											<Button type='submit' color='info' icon='Save'>
+												Appliquer
+											</Button>
+										</CardFooterRight>
+									</CardFooter>
+								</Card>
+							</CardTabItem>
+							<CardTabItem id='profile2' title='Mot de passe' icon='Lock'>
+								<Card
+									className='rounded-2'
+									tag='form'
+									onSubmit={formikPassword.handleSubmit}>
+									<CardHeader>
+										<CardLabel icon='Lock'>
+											<CardTitle>Mon mot de passe</CardTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody>
+										<div className='row g-4'>
+											<FormGroup
+												className='col-lg-4'
+												id='currentPassword'
+												label='Mot de passe actuel'>
+												<Input
+													type='password'
+													placeholder='Mot de passe actuel'
+													autoComplete='current-password'
+													onChange={formikPassword.handleChange}
+													value={formikPassword.values.formCurrentPassword}
+												/>
+											</FormGroup>
+											<div className='w-100 m-0' />
+											<FormGroup
+												className='col-lg-4'
+												id='newPassword'
+												label='Nouveau mot de passe'>
+												<Input
+													type='password'
+													placeholder='Nouveau mot de passe'
+													autoComplete='new-password'
+													onChange={formikPassword.handleChange}
+													value={formikPassword.values.formNewPassword}
+												/>
+											</FormGroup>
+											<div className='w-100 m-0' />
+											<FormGroup
+												className='col-lg-4'
+												id='confirmNewPassword'
+												label='Confirmer le mot de passe'>
+												<Input
+													type='password'
+													placeholder='Confirmer le mot de passe'
+													autoComplete='new-password'
+													onChange={formikPassword.handleChange}
+													value={formikPassword.values.formConfirmNewPassword}
+												/>
+											</FormGroup>
+										</div>
+									</CardBody>
+									<CardFooter>
+										<CardFooterRight>
+											<Button 
+                                                type='submit' 
+                                                color='info' 
+                                                icon='Save' 
+                                                disabled={formikPassword.values.currentPassword === '' || formikPassword.values.newPassword === '' || formikPassword.values.confirmNewPassword === ''}
+                                                >
+												Sauvegarder
+											</Button>
+										</CardFooterRight>
+									</CardFooter>
+								</Card>
+							</CardTabItem>
+						</Card>
+
+                        <Card>
+							<CardHeader>
 								<CardLabel icon='ShowChart' iconColor='secondary'>
-									<CardTitle>Statics</CardTitle>
+									<CardTitle>Statistiques</CardTitle>
 								</CardLabel>
 								<CardActions>
 									Only in <strong>{moment().format('MMM')}</strong>.
@@ -304,374 +656,19 @@ const LandingPage = () => {
 								</div>
 							</CardBody>
 						</Card>
-						<Card>
-							<CardHeader>
-								<CardLabel>
-									<CardTitle>About Me</CardTitle>
-								</CardLabel>
-							</CardHeader>
-							<CardBody>
-								<p>
-									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean
-									vitae velit efficitur nulla dignissim commodo nec vitae odio.
-									Proin ut risus metus. Aenean dui lectus, laoreet at ornare et,
-									pellentesque id mauris. Morbi a molestie elit. Nunc eget mi in
-									lectus rutrum venenatis. Duis dapibus porta justo, nec dapibus
-									tellus condimentum ultrices. In hac habitasse platea dictumst.
-									Nulla facilisi. Aenean consequat gravida felis vitae vestibulum.
-									Suspendisse lacinia ex sed tellus imperdiet, ut lacinia odio
-									rutrum.
-								</p>
-								<p>
-									Pellentesque vel sem bibendum, tristique urna a, lacinia tortor.
-									Suspendisse dapibus lectus id venenatis tincidunt. Proin tempor
-									lorem non arcu rutrum interdum. Cras sit amet ultricies lacus,
-									vitae luctus nunc. Sed commodo hendrerit augue, et aliquet sem
-									commodo in. Pellentesque in diam eros. Sed quis sapien eros. Sed
-									eleifend at arcu vitae sagittis.
-								</p>
-								<p>
-									Morbi at fringilla lorem. Nulla eu odio a ante vulputate
-									finibus. Duis congue finibus nibh fermentum egestas. Maecenas
-									risus neque, dapibus vitae porttitor vel, efficitur ac dolor.
-									Sed nec ante ac orci dictum laoreet vitae eget odio. Proin at
-									consequat ipsum.
-								</p>
-							</CardBody>
-						</Card>
-					</div>
-					<div className='col-xxl-8 col-xl-6'>
-						<Card
-							className={classNames('shadow-3d-info', 'mb-5', {
-								'bg-lo10-info': darkModeStatus,
-								'bg-l25-info': !darkModeStatus,
-							})}>
-							<Carousel
-								isHoverPause
-								isRide
-								height={height || 305}
-								isDark={darkModeStatus}>
-								<CarouselSlide>
-									<div className='row align-items-center h-100'>
-										<div
-											className='col-6 carousel-slide-bg'
-											style={{ backgroundImage: `url(${WannaImg1})` }}
-										/>
-										<div className='col-6'>
-											<h2>New Products</h2>
-											<p className='lead'>New products ready for sale.</p>
-											<Button
-												color={darkModeStatus ? 'light' : 'dark'}
-												onClick={() =>
-													navigate(
-														`../${demoPages.sales.subMenu.productsGrid.path}`,
-													)
-												}>
-												Click
-											</Button>
-										</div>
-									</div>
-								</CarouselSlide>
-								<CarouselSlide background={WannaImg5} />
-								<CarouselSlide>
-									<div className='row align-items-center h-100'>
-										<div className='col-6 text-end'>
-											<h2>Customize</h2>
-											<h5>You can design your own screens</h5>
-											<Button
-												color={darkModeStatus ? 'light' : 'dark'}
-												onClick={() =>
-													navigate(
-														`../${demoPages.sales.subMenu.dashboard.path}`,
-													)
-												}>
-												Click
-											</Button>
-										</div>
-										<div
-											className='col-6 carousel-slide-bg'
-											style={{ backgroundImage: `url(${WannaImg2})` }}
-										/>
-									</div>
-								</CarouselSlide>
-								<CarouselSlide background={WannaImg6} />
-							</Carousel>
-						</Card>
-						<Card>
-							<CardHeader>
-								<CardLabel icon='PhotoSizeSelectActual' iconColor='info'>
-									<CardTitle>Photos and Videos</CardTitle>
-								</CardLabel>
-								<CardActions>
-									<Button
-										color='info'
-										isLight
-										onClick={() => setGallerySeeAll(true)}>
-										See All
-									</Button>
-								</CardActions>
-							</CardHeader>
-							<CardBody>{_gallery}</CardBody>
-						</Card>
-						<Card hasTab>
-							<CardTabItem id='profile' title='Profile' icon='Contacts'>
-								<Alert isLight className='border-0' shadow='md' icon='LocalPolice'>
-									The information is not shared with third parties.
-								</Alert>
-
-								<Card
-									className='rounded-2'
-									tag='form'
-									onSubmit={formik.handleSubmit}>
-									<CardHeader>
-										<CardLabel icon='Person'>
-											<CardTitle>Personal Information</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody>
-										<div className='row g-4'>
-											<FormGroup
-												className='col-md-2'
-												id='formPrefix'
-												label='Prefix'>
-												<Input
-													placeholder='Dr.'
-													autoComplete='honorific-prefix'
-													onChange={formik.handleChange}
-													value={formik.values.formPrefix}
-												/>
-											</FormGroup>
-											<FormGroup
-												className='col-md-3'
-												id='formName'
-												label='Name'>
-												<Input
-													placeholder='Timothy'
-													autoComplete='given-name'
-													onChange={formik.handleChange}
-													value={formik.values.formName}
-												/>
-											</FormGroup>
-											<FormGroup
-												className='col-md-3'
-												id='formMiddleName'
-												label='Middle Name'>
-												<Input
-													placeholder='John'
-													autoComplete='additional-name'
-													onChange={formik.handleChange}
-													value={formik.values.formMiddleName}
-												/>
-											</FormGroup>
-											<FormGroup
-												className='col-md-4'
-												id='formSurName'
-												label='Sur Name'>
-												<Input
-													placeholder='Doe'
-													autoComplete='family-name'
-													onChange={formik.handleChange}
-													value={formik.values.formSurName}
-												/>
-											</FormGroup>
-											<FormGroup
-												className='col-lg-6'
-												id='formEmailAddress'
-												label='Email Address'>
-												<Input
-													type='email'
-													placeholder='john@domain.com'
-													autoComplete='email'
-													onChange={formik.handleChange}
-													value={formik.values.formEmailAddress}
-												/>
-											</FormGroup>
-											<FormGroup
-												className='col-lg-6'
-												id='formPhone'
-												label='Phone'>
-												<Input
-													type='tel'
-													placeholder='+1 (999) 999-9999'
-													autoComplete='tel'
-													mask='+1 (999) 999-9999'
-													onChange={formik.handleChange}
-													value={formik.values.formPhone}
-												/>
-											</FormGroup>
-										</div>
-									</CardBody>
-									<CardFooter>
-										<CardFooterRight>
-											<Button type='submit' color='primary' icon='Save'>
-												Save
-											</Button>
-										</CardFooterRight>
-									</CardFooter>
-								</Card>
-								<Alert
-									isLight
-									className='border-0'
-									shadow='md'
-									icon='Public'
-									color='warning'>
-									As soon as you save the information, it will be shown to
-									everyone automatically.
-								</Alert>
-							</CardTabItem>
-							<CardTabItem id='address' title='Address' icon='HolidayVillage'>
-								<Card
-									className='rounded-2'
-									tag='form'
-									onSubmit={formik.handleSubmit}>
-									<CardHeader>
-										<CardLabel icon='HolidayVillage'>
-											<CardTitle>Address Information</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody>
-										<div className='row g-4'>
-											<FormGroup
-												className='col-12'
-												id='formAddressLine'
-												label='Address Line'>
-												<Input
-													placeholder='Address Line'
-													autoComplete='address-line1'
-													onChange={formik.handleChange}
-													value={formik.values.formAddressLine}
-												/>
-											</FormGroup>
-											<FormGroup
-												className='col-12'
-												id='formAddressLine2'
-												label='Address Line 2'>
-												<Input
-													placeholder='Address Line 2'
-													autoComplete='address-line2'
-													onChange={formik.handleChange}
-													value={formik.values.formAddressLine2}
-												/>
-											</FormGroup>
-											<FormGroup
-												className='col-md-6'
-												id='formCity'
-												label='City'>
-												<Input
-													placeholder='City'
-													autoComplete='address-level2'
-													onChange={formik.handleChange}
-													value={formik.values.formCity}
-												/>
-											</FormGroup>
-											<FormGroup
-												className='col-md-4'
-												id='formState'
-												label='State'>
-												<Input
-													placeholder='State'
-													autoComplete='country-name'
-													onChange={formik.handleChange}
-													value={formik.values.formState}
-												/>
-											</FormGroup>
-											<FormGroup
-												className='col-md-2'
-												id='formZIP'
-												label='ZIP Code'>
-												<Input
-													placeholder='ZIP'
-													autoComplete='postal-code'
-													onChange={formik.handleChange}
-													value={formik.values.formZIP}
-												/>
-											</FormGroup>
-										</div>
-									</CardBody>
-									<CardFooter>
-										<CardFooterRight>
-											<Button type='submit' color='info' icon='Save'>
-												Save
-											</Button>
-										</CardFooterRight>
-									</CardFooter>
-								</Card>
-							</CardTabItem>
-							<CardTabItem id='profile2' title='Password' icon='Lock'>
-								<Card
-									className='rounded-2'
-									tag='form'
-									onSubmit={formik.handleSubmit}>
-									<CardHeader>
-										<CardLabel icon='Lock'>
-											<CardTitle>Change Password</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody>
-										<div className='row g-4'>
-											<FormGroup
-												className='col-lg-4'
-												id='formCurrentPassword'
-												label='Current Password'>
-												<Input
-													type='password'
-													placeholder='Current Password'
-													autoComplete='current-password'
-													onChange={formik.handleChange}
-													value={formik.values.formCurrentPassword}
-												/>
-											</FormGroup>
-											<div className='w-100 m-0' />
-											<FormGroup
-												className='col-lg-4'
-												id='formNewPassword'
-												label='New Password'>
-												<Input
-													type='password'
-													placeholder='New Password'
-													autoComplete='new-password'
-													onChange={formik.handleChange}
-													value={formik.values.formNewPassword}
-												/>
-											</FormGroup>
-											<div className='w-100 m-0' />
-											<FormGroup
-												className='col-lg-4'
-												id='formConfirmNewPassword'
-												label='Confirm New Password'>
-												<Input
-													type='password'
-													placeholder='Confirm New Password'
-													autoComplete='new-password'
-													onChange={formik.handleChange}
-													value={formik.values.formConfirmNewPassword}
-												/>
-											</FormGroup>
-										</div>
-									</CardBody>
-									<CardFooter>
-										<CardFooterRight>
-											<Button type='submit' color='info' icon='Save'>
-												Change Password
-											</Button>
-										</CardFooterRight>
-									</CardFooter>
-								</Card>
-							</CardTabItem>
-						</Card>
 					</div>
 				</div>
 
-				<Modal setIsOpen={setSelectedImage} isOpen={!!selectedImage} isCentered>
+				{/* <Modal setIsOpen={setSelectedImage} isOpen={!!selectedImage} isCentered>
 					<ModalHeader setIsOpen={setSelectedImage}>
 						<ModalTitle id='preview'>Preview</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
 						<img src={selectedImage} alt='eneme' />
 					</ModalBody>
-				</Modal>
+				</Modal> */}
 
-				<Modal
+				{/* <Modal
 					setIsOpen={setGallerySeeAll}
 					isOpen={gallerySeeAll}
 					fullScreen
@@ -680,7 +677,7 @@ const LandingPage = () => {
 						<ModalTitle id='gallery-full'>Gallery</ModalTitle>
 					</ModalHeader>
 					<ModalBody>{_gallery}</ModalBody>
-				</Modal>
+				</Modal> */}
 			</Page>
 		</PageWrapper>
 	);

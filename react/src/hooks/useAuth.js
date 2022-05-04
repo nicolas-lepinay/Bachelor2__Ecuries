@@ -24,7 +24,7 @@ function useProvideAuth() {
             const data = await res.data;
             if(data.user.confirmed === true) {
                 let user = { ...data.user, jwt: data.jwt };
-                const fullUser = await axios.get(`${API_URL}/api/users?filters[id]=${user.id}`); // Adds avatar and role
+                const fullUser = await axios.get(`${API_URL}/api/users?filters[id]=${user.id}`); // Get all fields (avatar, role, adress, horses, etc.)
                 const fullUserData = fullUser.data[0];
                 user = { ...user, ...fullUserData};
                 setUser(user);
@@ -87,18 +87,26 @@ function useProvideAuth() {
     const updateUser = async (updatedData) => {
         setLoading(true)
         try {
-            const updatedUser = await axios.put(`${API_URL}/api/users/${user?.id}`, updatedData)
-            setUser({ ...user, ...updatedUser})
-            localStorage.setItem("persevere_user", JSON.stringify({ ...user, ...updatedUser}))
-            setLoading(false)
+            await axios.put(`${API_URL}/api/users/${user.id}`, updatedData);
+            const fullUser = await axios.get(`${API_URL}/api/users?filters[id]=${user.id}`); // Get all fields (avatar, role, adress, horses, etc.)
+            const fullUserData = fullUser.data[0];
+            // setUser({ ...user, ...fullUserData});
+            setUser({ ...fullUserData});
+            localStorage.setItem("persevere_user", JSON.stringify({ ...fullUserData}));
+            setLoading(false);
+            setSuccess({
+                action: 'update', 
+                message: "L'utilisateur a été mis à jour.",
+            })
+            console.log("MISE A JOUR | L'utilisateur a été mis à jour.")
         } catch(err) {
             setLoading(false)
-            console.log("MISE A JOUR | Une erreur est survenue lors de la tentative de mise à jour de l'utilisateur. | " + err)
             setError({ 
                 status: err.response.status,
                 action: 'update',
-                message: `Une erreur est survenue lors de la tentative de mise à jour de l'utilisateur (code ${err.response.status}).`,
+                message: `Une erreur est survenue (code ${err.response.status}).`,
             })
+            console.log("MISE A JOUR | Une erreur est survenue lors de la tentative de mise à jour de l'utilisateur. | " + err)
         }
     }
 

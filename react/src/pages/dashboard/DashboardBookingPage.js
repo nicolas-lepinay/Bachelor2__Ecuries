@@ -30,6 +30,7 @@ import Checks from '../../components/bootstrap/forms/Checks';
 import Select from '../../components/bootstrap/forms/Select';
 import USERS, { getUserDataWithUsername } from '../../common/data/userDummyData';
 import Avatar, { AvatarGroup } from '../../components/Avatar';
+import defaultAvatar from '../../assets/img/wanna/defaultAvatar.webp';
 import useMinimizeAside from '../../hooks/useMinimizeAside';
 import Popovers from '../../components/bootstrap/Popovers';
 import {
@@ -47,6 +48,9 @@ import CommonPercentageOfLoadChart from '../common/CommonPercentageOfLoadChart';
 import CommonDashboardBookingLists from '../common/BookingComponents/CommonDashboardBookingLists';
 import CommonRightPanel from '../common/BookingComponents/CommonRightPanel';
 import useDarkMode from '../../hooks/useDarkMode';
+
+// 🅰️ Axios :
+import axios from 'axios';
 
 const localizer = momentLocalizer(moment);
 const now = new Date();
@@ -134,9 +138,35 @@ const MyWeekEvent = (data) => {
 
 const DashboardBookingPage = () => {
 	const { darkModeStatus, themeStatus } = useDarkMode();
-	useMinimizeAside();
 
+    // ⚙️ Strapi's API URL :
+    const API_URL = process.env.REACT_APP_API_URL;
+
+    // ⚙️ PRO ID AND CLIENT ID :
+    const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
+
+	useMinimizeAside();
+    
 	const [toggleRightPanel, setToggleRightPanel] = useState(true);
+    
+    const [users, setUsers] = useState([]);
+
+    console.log("****************")
+    console.log(moment().startOf('month').add(4, 'day').startOf('day').add(9, 'hour')._d)
+
+
+    useEffect( () => {
+        const fetchUsers = async () => {
+            try {
+                const res = await axios.get(`${API_URL}/api/users?populate=*&filters[role][id]=${PRO_ID}`);
+                setUsers(res.data);
+                console.log(res.data);
+            } catch(err) {
+                console.log(err)
+            }
+        }
+        fetchUsers();
+    }, [PRO_ID, API_URL])
 
 	// BEGIN :: Calendar
 	// Active employee
@@ -148,6 +178,7 @@ const DashboardBookingPage = () => {
 	});
 	// Events
 	const [events, setEvents] = useState(eventList);
+    const [appointment, setAppointments] = useState([]);
 
 	// FOR DEV
 	useEffect(() => {
@@ -262,16 +293,6 @@ const DashboardBookingPage = () => {
     return (
 		<PageWrapper title={demoPages.appointment.subMenu.dashboard.text}>
 			<SubHeader>
-				{/* <SubHeaderLeft>
-					<Icon icon='Info' className='me-2' size='2x' />
-					<span className='text-muted'>
-						You have{' '}
-						<Icon icon='Check Circle ' color='success' className='mx-1' size='lg' /> 12
-						approved appointments and{' '}
-						<Icon icon='pending_actions ' color='danger' className='mx-1' size='lg' /> 3
-						pending appointments for today.
-					</span>
-				</SubHeaderLeft> */}
 				<SubHeaderLeft>
 					<Button
 						icon='Groups'
@@ -305,7 +326,7 @@ const DashboardBookingPage = () => {
 			<Page container='fluid'>
 				{toggleCalendar && (
 					<>
-						<div className='row mb-4 g-3 justify-content-center '>
+						{/* <div className='row mb-4 g-3 justify-content-center '>
 							{Object.keys(USERS).map((u) => (
 								<div key={USERS[u].username} className='col-auto'>
 									<Popovers
@@ -314,23 +335,12 @@ const DashboardBookingPage = () => {
 											<>
 												<div className='h6'>{`${USERS[u].name} ${USERS[u].surname}`}</div>
 												<div>
-													<b>Event: </b>
+													<b>RDV : </b>
 													{
 														events.filter(
 															(i) =>
 																i.user?.username ===
 																USERS[u].username,
-														).length
-													}
-												</div>
-												<div>
-													<b>Approved: </b>
-													{
-														events.filter(
-															(i) =>
-																i.user?.username ===
-																	USERS[u].username &&
-																i.color === 'info',
 														).length
 													}
 												</div>
@@ -369,6 +379,54 @@ const DashboardBookingPage = () => {
 													</span>
 												</span>
 											)}
+										</div>
+									</Popovers>
+								</div>
+							))}
+						</div> */}
+
+                        
+                        <div className='row mb-4 g-3 justify-content-center '>
+							{users.map( (user) => (
+								<div key={user.username} className='col-auto'>
+									<Popovers
+										trigger='hover'
+										desc={
+											<>
+												<div className='h6'>{`${user.name} ${user.surname}`}</div>
+												<div>
+													<b>RDV : </b>
+													{
+														events.filter(
+															(i) =>
+																i.user?.username ===
+																user.username,
+														).length
+													}
+												</div>
+											</>
+										}>
+										<div className='position-relative'>
+											<Avatar
+												srcSet={user?.srcSet || defaultAvatar}
+												src={user?.src || defaultAvatar}
+												color={user?.color}
+												size={64}
+												border={4}
+												className='cursor-pointer'
+												borderColor={
+													employeeList[user.username]
+														? 'info'
+														: themeStatus
+												}
+												onClick={() =>
+													setEmployeeList({
+														...employeeList,
+														[user.username]:
+															!employeeList[user.username],
+													})
+												}
+											/>
 										</div>
 									</Popovers>
 								</div>
