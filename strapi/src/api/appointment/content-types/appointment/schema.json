@@ -25,7 +25,7 @@
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::horse.horse",
-      "inversedBy": "appointments"
+      "mappedBy": "appointments"
     },
     "clients": {
       "type": "relation",
@@ -38,6 +38,9 @@
       "relation": "manyToMany",
       "target": "plugin::users-permissions.user",
       "inversedBy": "appointments_employees"
+    },
+    "icon": {
+      "type": "string"
     }
   }
 }

@@ -39,9 +39,9 @@ export const getLabel = (date, viewMode) => {
 };
 
 export const getTodayButtonLabel = (viewMode) => {
-	if (viewMode === Views.MONTH || viewMode === Views.AGENDA) return 'This month';
-	if (viewMode === Views.WEEK || viewMode === Views.WORK_WEEK) return 'This week';
-	return 'Today';
+	if (viewMode === Views.MONTH || viewMode === Views.AGENDA) return 'Ce mois-ci';
+	if (viewMode === Views.WEEK || viewMode === Views.WORK_WEEK) return 'Cette semaine';
+	return "Aujourd'hui";
 };
 
 export const getViews = () => {
@@ -93,10 +93,10 @@ export const CalendarViewModeButtons = ({ viewMode, setViewMode }) => {
 						(viewMode === Views.DAY && 'calendar_view_day') ||
 						'view_agenda'
 					}>
-					{(viewMode === Views.MONTH && 'Month') ||
-						(viewMode === Views.WEEK && 'Week') ||
-						(viewMode === Views.WORK_WEEK && 'Work Week') ||
-						(viewMode === Views.DAY && 'Day') ||
+					{(viewMode === Views.MONTH && 'Mois') ||
+						(viewMode === Views.WEEK && 'Semaine') ||
+						(viewMode === Views.WORK_WEEK && 'Semaine (5 jours)') ||
+						(viewMode === Views.DAY && 'Journée') ||
 						'Agenda'}
 				</Button>
 			</DropdownToggle>
@@ -107,7 +107,7 @@ export const CalendarViewModeButtons = ({ viewMode, setViewMode }) => {
 						icon='calendar_view_month'
 						isActive={viewMode === Views.MONTH}
 						onClick={() => setViewMode(Views.MONTH)}>
-						Month
+						Mois
 					</Button>
 				</DropdownItem>
 				<DropdownItem>
@@ -116,7 +116,7 @@ export const CalendarViewModeButtons = ({ viewMode, setViewMode }) => {
 						icon='calendar_view_week'
 						isActive={viewMode === Views.WEEK}
 						onClick={() => setViewMode(Views.WEEK)}>
-						Week
+						Semaine
 					</Button>
 				</DropdownItem>
 				<DropdownItem>
@@ -125,7 +125,7 @@ export const CalendarViewModeButtons = ({ viewMode, setViewMode }) => {
 						icon='view_week'
 						isActive={viewMode === Views.WORK_WEEK}
 						onClick={() => setViewMode(Views.WORK_WEEK)}>
-						Work Week
+						Semaine (5 jours)
 					</Button>
 				</DropdownItem>
 				<DropdownItem>
@@ -134,7 +134,7 @@ export const CalendarViewModeButtons = ({ viewMode, setViewMode }) => {
 						icon='calendar_view_day'
 						isActive={viewMode === Views.DAY}
 						onClick={() => setViewMode(Views.DAY)}>
-						Day
+						Journée
 					</Button>
 				</DropdownItem>
 				<DropdownItem>

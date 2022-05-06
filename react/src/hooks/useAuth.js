@@ -29,7 +29,7 @@ function useProvideAuth() {
                 user = { ...user, ...fullUserData};
                 setUser(user);
                 localStorage.setItem("persevere_user", JSON.stringify(user)); // Send user to local storage
-                console.log(`CONNEXION | Connexion réussie. Bienvenue, ${user.username}.`);
+                console.log(`CONNEXION | Connexion réussie. Bienvenue, ${user?.name} ${user?.surname}.`);
                 setLoading(false);
             } else {
                 console.log("CONNEXION | Ce compte n'a pas encore été confirmé par un administrateur.");

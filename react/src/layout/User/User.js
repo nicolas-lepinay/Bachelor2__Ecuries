@@ -47,7 +47,7 @@ const User = () => {
 				</div>
 				<div className='user-info'>
 					<div className='user-name d-flex align-items-center'>
-						{`${auth?.user?.name} ${auth?.user?.surname}`}
+						{`${auth?.user?.username}`}
 						<Icon icon='Verified' className='ms-1' color='info' />
 					</div>
 					<div className='user-sub-title'>{auth?.user?.position}</div>

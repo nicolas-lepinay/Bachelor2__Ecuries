@@ -108,6 +108,10 @@
       "relation": "manyToMany",
       "target": "api::appointment.appointment",
       "mappedBy": "employees"
+    },
+    "color": {
+      "type": "string",
+      "default": "info"
     }
   }
 }

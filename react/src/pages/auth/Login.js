@@ -54,7 +54,7 @@ function Login() {
     const handleSignup = async (e) => {
         e.preventDefault();   
         const signupInfo = {
-            username: `${signupName} ${signupSurname}`,
+            username: `${signupName} ${signupSurname.charAt(0)}.`,
             name: signupName,
             surname: signupSurname,
             email: signupEmail,
@@ -64,10 +64,6 @@ function Login() {
         }
         auth.register(signupInfo)
     }
-
-    // useEffect( () => {
-
-    // }, [])
 
     return (
         <PageWrapper title='Connexion' className='no-class' isLoginPage={true}>

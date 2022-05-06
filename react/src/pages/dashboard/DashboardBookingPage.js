@@ -30,11 +30,12 @@ import Checks from '../../components/bootstrap/forms/Checks';
 import Select from '../../components/bootstrap/forms/Select';
 import USERS, { getUserDataWithUsername } from '../../common/data/userDummyData';
 import Avatar, { AvatarGroup } from '../../components/Avatar';
+// Default Avatar :
 import defaultAvatar from '../../assets/img/wanna/defaultAvatar.webp';
-import useMinimizeAside from '../../hooks/useMinimizeAside';
+
 import Popovers from '../../components/bootstrap/Popovers';
 import {
-	CalendarTodayButton,
+    CalendarTodayButton,
 	CalendarViewModeButtons,
 	getLabel,
 	getUnitType,
@@ -47,10 +48,19 @@ import CommonApprovedAppointmentChart from '../common/CommonApprovedAppointmentC
 import CommonPercentageOfLoadChart from '../common/CommonPercentageOfLoadChart';
 import CommonDashboardBookingLists from '../common/BookingComponents/CommonDashboardBookingLists';
 import CommonRightPanel from '../common/BookingComponents/CommonRightPanel';
+
+// 🛠️ Hooks :
+import useMinimizeAside from '../../hooks/useMinimizeAside';
 import useDarkMode from '../../hooks/useDarkMode';
+import useFetch from '../../hooks/useFetch'
+import useFetchAppointments from '../../hooks/useFetchAppointments'
+import useFetchEmployees from '../../hooks/useFetchEmployees'
 
 // 🅰️ Axios :
 import axios from 'axios';
+
+// ⚙️ Strapi's API URL :
+const API_URL = process.env.REACT_APP_API_URL;
 
 const localizer = momentLocalizer(moment);
 const now = new Date();
@@ -59,41 +69,89 @@ const MyEvent = (data) => {
 	const { darkModeStatus } = useDarkMode();
 
 	const { event } = data;
+
 	return (
 		<div className='row g-2'>
 			<div className='col text-truncate'>
 				{event?.icon && <Icon icon={event?.icon} size='lg' className='me-2' />}
-				{event?.name}
+				{event?.name || event?.employees?.data[0]?.attributes?.occupation}
 			</div>
-			{event?.user?.src && (
-				<div className='col-auto'>
-					<div className='row g-1 align-items-baseline'>
-						<div className='col-auto'>
-							<Avatar src={event?.user?.src} srcSet={event?.user?.srcSet} size={18} />
-						</div>
-						<small
-							className={classNames('col-auto text-truncate', {
-								'text-dark': !darkModeStatus,
-								'text-white': darkModeStatus,
-							})}>
-							{event?.user?.name}
-						</small>
-					</div>
-				</div>
-			)}
-			{event?.users && (
-				<div className='col-auto'>
-					<AvatarGroup size={18}>
-						{event.users.map((user) => (
-							// eslint-disable-next-line react/jsx-props-no-spreading
-							<Avatar key={user.src} {...user} />
-						))}
-					</AvatarGroup>
-				</div>
-			)}
+
+            <div className='col-auto'>
+                <div className='row g-1 align-items-baseline'>
+                    <div className='col-auto'>
+                        <Avatar 
+                            src={event?.employees?.data && event?.employees?.data[0]?.attributes?.avatar ? `${API_URL}${event?.employees?.data[0]?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                            srcSet={event?.employees?.data && event?.employees?.data[0]?.attributes?.avatar ? `${API_URL}${event?.employees?.data[0]?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                            size={18} />
+                    </div>
+                    <small
+                        className={classNames('col-auto text-truncate', {
+                            'text-dark': !darkModeStatus,
+                            'text-white': darkModeStatus,
+                        })}>
+                        {event?.employees?.data[0]?.attributes?.name}
+                    </small>
+                </div>
+            </div>
+			
 		</div>
 	);
 };
+
+// const MyEvent = (data) => {
+// 	const { darkModeStatus } = useDarkMode();
+
+// 	const { event } = data;
+// 	return (
+// 		<div className='row g-2'>
+// 			<div className='col text-truncate'>
+//                 <Icon icon={event?.icon || 'HorseVariant'} size='lg' className='me-2' />
+//                 {event?.name || 'UNDEFINED'}
+// 			</div>
+// 		</div>
+// 	);
+// };
+
+// const MyWeekEvent = (data) => {
+// 	const { darkModeStatus } = useDarkMode();
+
+// 	const { event } = data;
+// 	return (
+// 		<div className='row g-2'>
+// 			<div className='col-12 text-truncate'>
+// 				{event?.icon && <Icon icon={event?.icon} size='lg' className='me-2' />}
+// 				{event?.name}
+// 			</div>
+// 			{event?.employees && (
+// 				<div className='col-12'>
+// 					<div className='row g-1 align-items-baseline'>
+// 						<div className='col-auto'>
+// 							<Avatar {...event?.employees[0]} size={18} />
+// 						</div>
+// 						<small
+// 							className={classNames('col-auto text-truncate', {
+// 								'text-dark': !darkModeStatus,
+// 								'text-white': darkModeStatus,
+// 							})}>
+// 							{event?.user?.name}
+// 						</small>
+// 					</div>
+// 				</div>
+// 			)}
+// 			{event?.users && (
+// 				<div className='col-12'>
+// 					<AvatarGroup size={18}>
+// 						{event.users.map((user) => (
+// 							// eslint-disable-next-line react/jsx-props-no-spreading
+// 							<Avatar key={user.src} {...user} />
+// 						))}
+// 					</AvatarGroup>
+// 				</div>
+// 			)}
+// 		</div>
+// 	);
+// };
 
 const MyWeekEvent = (data) => {
 	const { darkModeStatus } = useDarkMode();
@@ -102,45 +160,21 @@ const MyWeekEvent = (data) => {
 	return (
 		<div className='row g-2'>
 			<div className='col-12 text-truncate'>
-				{event?.icon && <Icon icon={event?.icon} size='lg' className='me-2' />}
-				{event?.name}
+				{event?.name || 'UNDEFINED'}
 			</div>
-			{event?.user && (
-				<div className='col-12'>
-					<div className='row g-1 align-items-baseline'>
-						<div className='col-auto'>
-							{/* eslint-disable-next-line react/jsx-props-no-spreading */}
-							<Avatar {...event?.user} size={18} />
-						</div>
-						<small
-							className={classNames('col-auto text-truncate', {
-								'text-dark': !darkModeStatus,
-								'text-white': darkModeStatus,
-							})}>
-							{event?.user?.name}
-						</small>
-					</div>
-				</div>
-			)}
-			{event?.users && (
-				<div className='col-12'>
-					<AvatarGroup size={18}>
-						{event.users.map((user) => (
-							// eslint-disable-next-line react/jsx-props-no-spreading
-							<Avatar key={user.src} {...user} />
-						))}
-					</AvatarGroup>
-				</div>
-			)}
 		</div>
 	);
 };
 
 const DashboardBookingPage = () => {
+
+    // 🛠️ useFetch hook :
+    const fetch = useFetch();
+
 	const { darkModeStatus, themeStatus } = useDarkMode();
 
     // ⚙️ Strapi's API URL :
-    const API_URL = process.env.REACT_APP_API_URL;
+    // const API_URL = process.env.REACT_APP_API_URL;
 
     // ⚙️ PRO ID AND CLIENT ID :
     const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
@@ -149,36 +183,55 @@ const DashboardBookingPage = () => {
     
 	const [toggleRightPanel, setToggleRightPanel] = useState(true);
     
-    const [users, setUsers] = useState([]);
+    // Events
+    const [events, setEvents] = useState(eventList);
 
-    console.log("****************")
-    console.log(moment().startOf('month').add(4, 'day').startOf('day').add(9, 'hour')._d)
+    // Fetch employees :
+    const { 
+        data: employees, 
+        setData: setEmployees, 
+        loading: employeesLoading, 
+        error: employeesError } = useFetchEmployees();
 
+        console.log("***********")
+        console.log(employees[0])
 
-    useEffect( () => {
-        const fetchUsers = async () => {
-            try {
-                const res = await axios.get(`${API_URL}/api/users?populate=*&filters[role][id]=${PRO_ID}`);
-                setUsers(res.data);
-                console.log(res.data);
-            } catch(err) {
-                console.log(err)
-            }
-        }
-        fetchUsers();
-    }, [PRO_ID, API_URL])
+    // Fetch appointments :
+    const { 
+        data: appointments, 
+        setData: setAppointments, 
+        loading: appointmentsLoading, 
+        error: appointmentsError } = useFetchAppointments();
+
+    console.log("Appointments : ")
+    console.log(appointments)
 
 	// BEGIN :: Calendar
 	// Active employee
-	const [employeeList, setEmployeeList] = useState({
-		[USERS.JOHN.username]: true,
-		[USERS.ELLA.username]: true,
-		[USERS.RYAN.username]: true,
-		[USERS.GRACE.username]: true,
-	});
-	// Events
-	const [events, setEvents] = useState(eventList);
-    const [appointment, setAppointments] = useState([]);
+	// const [employeeList, setEmployeeList] = useState({
+	// 	[USERS.JOHN.username]: true,
+	// 	[USERS.ELLA.username]: true,
+	// 	[USERS.RYAN.username]: true,
+	// 	[USERS.GRACE.username]: true,
+	// });
+
+    const [employeeList, setEmployeeList] = useState({});
+    const [selectedEmployee, setSelectedEmployee] = useState({})
+
+    useEffect(() => {
+        const list = {};
+        employees.map( employee => {
+            list[employee.id] = true;
+        })
+        setEmployeeList(list);
+        employees.length > 0 && setSelectedEmployee(employees[0])
+    }, [employees])
+
+    console.log("EMPLOYEES :")
+    console.log({})
+
+    console.log("EMPLOYEE LIST :")
+    console.log(employeeList)
 
 	// FOR DEV
 	useEffect(() => {
@@ -215,6 +268,14 @@ const DashboardBookingPage = () => {
 		setEventAdding(true);
 		setEventItem({ start, end });
 	};
+
+    const handleEmployeeListChange = (employee) => {
+        setEmployeeList( {...employeeList, [employee.id]: !employeeList[employee.id] })
+    }
+
+    const handleSelectedEmployee = (employee) => {
+        setSelectedEmployee(employee)
+    }
 
 	useEffect(() => {
 		if (eventAdding) {
@@ -387,45 +448,53 @@ const DashboardBookingPage = () => {
 
                         
                         <div className='row mb-4 g-3 justify-content-center '>
-							{users.map( (user) => (
-								<div key={user.username} className='col-auto'>
+							{employees && employees.map( (employee) => (
+								<div key={employee.username} className='col-auto'>
 									<Popovers
 										trigger='hover'
+                                        placement='bottom'
 										desc={
 											<>
-												<div className='h6'>{`${user.name} ${user.surname}`}</div>
+												<div className='h6'><b>{`${employee.name} ${employee.surname}`}</b></div>
 												<div>
-													<b>RDV : </b>
+													<span>Rendez-vous : </span>
+                                                    <b>
 													{
-														events.filter(
-															(i) =>
-																i.user?.username ===
-																user.username,
+														appointments.filter(
+															(appointment) =>
+																appointment?.employees?.data[0].id ===
+																employee.id,
 														).length
 													}
+                                                    </b>
 												</div>
 											</>
 										}>
 										<div className='position-relative'>
 											<Avatar
-												srcSet={user?.srcSet || defaultAvatar}
-												src={user?.src || defaultAvatar}
-												color={user?.color}
+												srcSet={employee?.avatar ? `${API_URL}${employee?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+												src={employee?.avatar ? `${API_URL}${employee?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+												color={employee?.color}
 												size={64}
 												border={4}
 												className='cursor-pointer'
 												borderColor={
-													employeeList[user.username]
+													employeeList[employee.id]
 														? 'info'
 														: themeStatus
 												}
-												onClick={() =>
-													setEmployeeList({
-														...employeeList,
-														[user.username]:
-															!employeeList[user.username],
-													})
-												}
+												// onClick={() =>
+												// 	setEmployeeList({
+												// 		...employeeList,
+												// 		[employee.id]:
+												// 			!employeeList[employee.id],
+												// 	})
+												// }
+
+                                                onClick={ () => {
+                                                    handleEmployeeListChange(employee);
+                                                    handleSelectedEmployee(employee);
+                                                } }
 											/>
 										</div>
 									</Popovers>
@@ -461,8 +530,8 @@ const DashboardBookingPage = () => {
 											selectable
 											toolbar={false}
 											localizer={localizer}
-											events={events.filter(
-												(i) => employeeList[i.user?.username],
+                                            events={appointments.filter(
+												(appointment) => employeeList[appointment.employees.data[0].id],
 											)}
 											defaultView={Views.WEEK}
 											views={views}
@@ -675,7 +744,12 @@ const DashboardBookingPage = () => {
 					</OffCanvasBody>
 				</OffCanvas>
 
-				<CommonRightPanel setOpen={setToggleRightPanel} isOpen={toggleRightPanel} />
+				<CommonRightPanel
+                    employee={selectedEmployee}
+                    employees={employees}
+                    setOpen={setToggleRightPanel} 
+                    isOpen={toggleRightPanel} 
+                />
 			</Page>
 		</PageWrapper>
 	);

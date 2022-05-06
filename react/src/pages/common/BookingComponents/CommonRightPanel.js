@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import OffCanvas, { OffCanvasBody } from '../../../components/bootstrap/OffCanvas';
 import Avatar, { AvatarGroup } from '../../../components/Avatar';
+
+// Default Avatar :
+import defaultAvatar from '../../../assets/img/wanna/defaultAvatar.webp';
+
 import USERS from '../../../common/data/userDummyData';
 import Dropdown, {
 	DropdownItem,
@@ -22,7 +26,11 @@ import { sales } from '../../../common/data/chartDummyData';
 import SERVICES from '../../../common/data/serviceDummyData';
 import useDarkMode from '../../../hooks/useDarkMode';
 
-const CommonRightPanel = ({ setOpen, isOpen }) => {
+const CommonRightPanel = ({ setOpen, isOpen, employee, employees }) => {
+
+    // ⚙️ Strapi's API URL :
+    const API_URL = process.env.REACT_APP_API_URL;
+
 	const { themeStatus, darkModeStatus } = useDarkMode();
 
 	const USER_APPOINTMENT = {
@@ -109,18 +117,18 @@ const CommonRightPanel = ({ setOpen, isOpen }) => {
 					<div className='col'>
 						<div className='d-flex align-items-center'>
 							<AvatarGroup className='me-3'>
-								{Object.keys(USERS).map((u) => (
+								{employees.map( employee => (
 									<Avatar
-										key={USERS[u].username}
-										srcSet={USERS[u].srcSet}
-										src={USERS[u].src}
-										userName={`${USERS[u].name} ${USERS[u].surname}`}
-										color={USERS[u].color}
+										key={employee.id}
+										srcSet={employee?.avatar ? `${API_URL}${employee?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+										src={employee?.avatar ? `${API_URL}${employee?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+										userName={`${employee?.name} ${employee?.surname}`}
+										color={employee?.color}
 									/>
 								))}
 							</AvatarGroup>
 							<div className='h5 mb-0 text-muted'>
-								<strong>Gym</strong> Team
+								<strong>Écuries</strong> de Persévère
 							</div>
 						</div>
 					</div>
@@ -142,7 +150,7 @@ const CommonRightPanel = ({ setOpen, isOpen }) => {
 										onClick={() => {
 											setOpen(false);
 										}}>
-										Close
+										Fermer
 									</Button>
 								</DropdownItem>
 							</DropdownMenu>
@@ -151,15 +159,16 @@ const CommonRightPanel = ({ setOpen, isOpen }) => {
 				</div>
 				<div className='d-flex justify-content-center mb-3'>
 					<Avatar
-						srcSet={USERS.JOHN.srcSet}
-						src={USERS.JOHN.src}
-						color={USERS.JOHN.color}
+						srcSet={employee?.avatar ? `${API_URL}${employee?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                        src={employee?.avatar ? `${API_URL}${employee?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+						color={employee?.color}
 						shadow='default'
 					/>
 				</div>
 				<div className='d-flex flex-column align-items-center mb-5'>
-					<div className='h2 fw-bold'>{`${USERS.JOHN.name} ${USERS.JOHN.surname}`}</div>
-					<div className='h5 text-muted text-lowercase opacity-50'>{`@${USERS.JOHN.name}${USERS.JOHN.surname}`}</div>
+					{/* <div className='h2 fw-bold'>{`${USERS.JOHN.name} ${USERS.JOHN.surname}`}</div> */}
+                    <div className='h2 fw-bold'>{`${employee?.name} ${employee?.surname}`}</div>
+					<div className='h5 text-muted opacity-50'>{employee?.occupation || 'Professionel(le)'}</div>
 				</div>
 				<div
 					className={classNames('rounded-3', {

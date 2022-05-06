@@ -39,6 +39,7 @@ const LandingPage = () => {
 
     // 🦸 User:
     const auth = useAuth();
+    console.log(auth.user)
 
     const formikProfile = useFormik({
 		initialValues: {
@@ -156,8 +157,9 @@ const LandingPage = () => {
 										<div className='d-flex align-items-center'>
 											<div className='flex-shrink-0'>
 												<Avatar
-													srcSet={auth.user.avatar ? `${API_URL}${auth.user?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
-													src={auth.user.avatar ? `${API_URL}${auth.user?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+													srcSet={auth.user?.avatar ? `${API_URL}${auth.user?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+													src={auth.user?.avatar ? `${API_URL}${auth.user?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                                                    color={auth.user?.color}
 													className='rounded-circle'
 												/>
 											</div>

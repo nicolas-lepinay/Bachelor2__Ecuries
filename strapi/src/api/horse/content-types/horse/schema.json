@@ -26,6 +26,16 @@
       "relation": "manyToMany",
       "target": "api::appointment.appointment",
       "inversedBy": "horses"
+    },
+    "health_record": {
+      "type": "component",
+      "repeatable": true,
+      "component": "health-record.health-record"
+    },
+    "planning": {
+      "type": "component",
+      "repeatable": true,
+      "component": "planning.planning"
     }
   }
 }
