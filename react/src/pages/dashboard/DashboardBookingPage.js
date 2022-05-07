@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
+import 'moment/locale/fr';
 import { useFormik } from 'formik';
 import { Calendar as DatePicker } from 'react-date-range';
+
 import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../layout/SubHeader/SubHeader';
 
 import Page from '../../layout/Page/Page';
@@ -18,17 +20,21 @@ import Card, {
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import CommonUpcomingEvents from '../common/CommonUpcomingEvents';
-import eventList from '../../common/data/events';
 import OffCanvas, {
 	OffCanvasBody,
 	OffCanvasHeader,
 	OffCanvasTitle,
 } from '../../components/bootstrap/OffCanvas';
+
+
+import Accordion, { AccordionItem } from '../../components/bootstrap/Accordion';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Input from '../../components/bootstrap/forms/Input';
-import Checks from '../../components/bootstrap/forms/Checks';
+import Checks, { ChecksGroup } from '../../components/bootstrap/forms/Checks';
 import Select from '../../components/bootstrap/forms/Select';
-import USERS, { getUserDataWithUsername } from '../../common/data/userDummyData';
+import Textarea from '../../components/bootstrap/forms/Textarea';
+import InputGroup, { InputGroupText } from '../../components/bootstrap/forms/InputGroup';
+
 import Avatar, { AvatarGroup } from '../../components/Avatar';
 // Default Avatar :
 import defaultAvatar from '../../assets/img/wanna/defaultAvatar.webp';
@@ -42,12 +48,12 @@ import {
 	getViews,
 } from '../../components/extras/calendarHelper';
 import { demoPages } from '../../menu';
-import SERVICES, { getServiceDataWithServiceName } from '../../common/data/serviceDummyData';
 import Option from '../../components/bootstrap/Option';
 import CommonApprovedAppointmentChart from '../common/CommonApprovedAppointmentChart';
 import CommonPercentageOfLoadChart from '../common/CommonPercentageOfLoadChart';
 import CommonDashboardBookingLists from '../common/BookingComponents/CommonDashboardBookingLists';
 import CommonRightPanel from '../common/BookingComponents/CommonRightPanel';
+import showNotification from '../../components/extras/showNotification';
 
 // 🛠️ Hooks :
 import useMinimizeAside from '../../hooks/useMinimizeAside';
@@ -55,6 +61,12 @@ import useDarkMode from '../../hooks/useDarkMode';
 import useFetch from '../../hooks/useFetch'
 import useFetchAppointments from '../../hooks/useFetchAppointments'
 import useFetchEmployees from '../../hooks/useFetchEmployees'
+import usePost from '../../hooks/usePost';
+import useAuth from '../../hooks/useAuth';
+
+// 🖥️ Modal :
+import CustomModal from '../../components/CustomModal'
+import { confirmation } from '../../modals'
 
 // 🅰️ Axios :
 import axios from 'axios';
@@ -63,17 +75,43 @@ import axios from 'axios';
 const API_URL = process.env.REACT_APP_API_URL;
 
 const localizer = momentLocalizer(moment);
+
 const now = new Date();
+
+const Circle = () => {
+
+    return(
+        <Icon
+            icon='Circle'
+            className={classNames(
+                'mr-2',
+                'animate__animated animate__heartBeat animate__infinite animate__slower',
+            )}
+        />
+    )
+}
 
 const MyEvent = (data) => {
 	const { darkModeStatus } = useDarkMode();
 
 	const { event } = data;
 
+    // RDV confirmé :
+    const isConfirmedEvent = event?.confirmed;
+
+    // RDV actif (confirmé + en cours) :
+    const isActiveEvent = isConfirmedEvent && event.start <= now && event.end >= now;
+
+    // RDV passé :
+    const isPastEvent = event.end < now;
+
 	return (
 		<div className='row g-2'>
 			<div className='col text-truncate'>
-				{event?.icon && <Icon icon={event?.icon} size='lg' className='me-2' />}
+                {isActiveEvent && <Circle/>}
+                {!isConfirmedEvent && !isPastEvent && <Circle/>}
+				{(isConfirmedEvent || isPastEvent) && !isActiveEvent && event?.icon && <Icon icon={event?.icon} size='lg' className='me-2' />}
+
 				{event?.name || event?.employees?.data[0]?.attributes?.occupation}
 			</div>
 
@@ -83,7 +121,8 @@ const MyEvent = (data) => {
                         <Avatar 
                             src={event?.employees?.data && event?.employees?.data[0]?.attributes?.avatar ? `${API_URL}${event?.employees?.data[0]?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
                             srcSet={event?.employees?.data && event?.employees?.data[0]?.attributes?.avatar ? `${API_URL}${event?.employees?.data[0]?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
-                            size={18} />
+                            size={18} 
+                        />
                     </div>
                     <small
                         className={classNames('col-auto text-truncate', {
@@ -94,127 +133,157 @@ const MyEvent = (data) => {
                     </small>
                 </div>
             </div>
+
+
 			
 		</div>
 	);
 };
 
-// const MyEvent = (data) => {
-// 	const { darkModeStatus } = useDarkMode();
-
-// 	const { event } = data;
-// 	return (
-// 		<div className='row g-2'>
-// 			<div className='col text-truncate'>
-//                 <Icon icon={event?.icon || 'HorseVariant'} size='lg' className='me-2' />
-//                 {event?.name || 'UNDEFINED'}
-// 			</div>
-// 		</div>
-// 	);
-// };
-
-// const MyWeekEvent = (data) => {
-// 	const { darkModeStatus } = useDarkMode();
-
-// 	const { event } = data;
-// 	return (
-// 		<div className='row g-2'>
-// 			<div className='col-12 text-truncate'>
-// 				{event?.icon && <Icon icon={event?.icon} size='lg' className='me-2' />}
-// 				{event?.name}
-// 			</div>
-// 			{event?.employees && (
-// 				<div className='col-12'>
-// 					<div className='row g-1 align-items-baseline'>
-// 						<div className='col-auto'>
-// 							<Avatar {...event?.employees[0]} size={18} />
-// 						</div>
-// 						<small
-// 							className={classNames('col-auto text-truncate', {
-// 								'text-dark': !darkModeStatus,
-// 								'text-white': darkModeStatus,
-// 							})}>
-// 							{event?.user?.name}
-// 						</small>
-// 					</div>
-// 				</div>
-// 			)}
-// 			{event?.users && (
-// 				<div className='col-12'>
-// 					<AvatarGroup size={18}>
-// 						{event.users.map((user) => (
-// 							// eslint-disable-next-line react/jsx-props-no-spreading
-// 							<Avatar key={user.src} {...user} />
-// 						))}
-// 					</AvatarGroup>
-// 				</div>
-// 			)}
-// 		</div>
-// 	);
-// };
 
 const MyWeekEvent = (data) => {
 	const { darkModeStatus } = useDarkMode();
 
 	const { event } = data;
+
+    // RDV confirmé :
+    const isConfirmedEvent = event?.confirmed;
+
+    // RDV actif (confirmé + en cours) :
+    const isActiveEvent = isConfirmedEvent && event.start <= now && event.end >= now;
+
+    // RDV passé :
+    const isPastEvent = event.end < now;
+
 	return (
 		<div className='row g-2'>
 			<div className='col-12 text-truncate'>
-				{event?.name || 'UNDEFINED'}
+                {isActiveEvent && <Circle color='success' />}
+                {!isConfirmedEvent && !isPastEvent && <Circle color='danger' />}
+				{(isConfirmedEvent || isPastEvent) && !isActiveEvent && event?.icon && <Icon icon={event?.icon} size='lg' className='me-2' />}
+
+				{event?.name || event?.employees?.data[0]?.attributes?.occupation}
 			</div>
+			{event?.employees && (
+				<div className='col-12'>
+					<div className='row g-1 align-items-baseline'>
+						<div className='col-auto'>
+                            <Avatar 
+                                src={event?.employees?.data && event?.employees?.data[0]?.attributes?.avatar ? `${API_URL}${event?.employees?.data[0]?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                                srcSet={event?.employees?.data && event?.employees?.data[0]?.attributes?.avatar ? `${API_URL}${event?.employees?.data[0]?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                                size={18} 
+                            />
+						</div>
+						<small
+							className={classNames('col-auto text-truncate', {
+								'text-dark': !darkModeStatus,
+								'text-white': darkModeStatus,
+							})}>
+							{event?.employees?.data[0]?.attributes?.name}
+						</small>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };
 
 const DashboardBookingPage = () => {
 
-    // 🛠️ useFetch hook :
+    
+    // 🛠️ Hooks :
     const fetch = useFetch();
-
+    const post = usePost();
+    const auth = useAuth(); // 🦸
 	const { darkModeStatus, themeStatus } = useDarkMode();
-
-    // ⚙️ Strapi's API URL :
-    // const API_URL = process.env.REACT_APP_API_URL;
-
-    // ⚙️ PRO ID AND CLIENT ID :
-    const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
-
 	useMinimizeAside();
-    
-	const [toggleRightPanel, setToggleRightPanel] = useState(true);
-    
-    // Events
-    const [events, setEvents] = useState(eventList);
 
-    // Fetch employees :
+	const [toggleRightPanel, setToggleRightPanel] = useState(true);
+
+    // Id du rôle 'Admin' :
+    const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; 
+
+    // Boolean isAdmin :
+    const isAdmin = Number(auth.user.role.id) === Number(ADMIN_ID);
+
+    // 👩‍🚀 Fetch all employees :
     const { 
         data: employees, 
         setData: setEmployees, 
         loading: employeesLoading, 
         error: employeesError } = useFetchEmployees();
 
-        console.log("***********")
-        console.log(employees[0])
-
-    // Fetch appointments :
+    // 📅 Fetch all appointments :
     const { 
         data: appointments, 
         setData: setAppointments, 
         loading: appointmentsLoading, 
         error: appointmentsError } = useFetchAppointments();
 
-    console.log("Appointments : ")
-    console.log(appointments)
+    const icons = [
+        {
+            icon: 'Block',
+            description: 'Aucune icône.'
+        },
+        {
+            icon: 'HorseVariant',
+            description: 'Cheval (tête)',
+        },
+        {
+            icon: 'Horse',
+            description: 'Cheval (corps)',
+        },
+        {
+            icon: 'HorseHuman',
+            description: 'Cavalière',
+        },
+        {
+            icon: 'Horseshoe',
+            description: 'Fer à cheval',
+        }, 
+        {
+            icon: 'Tooth',
+            description: 'Dentisterie',
+        }, 
+        {
+            icon: 'Bone',
+            description: 'Osthéopathie',
+        }, 
+        {
+            icon: 'FootPrint',
+            description: 'Podologie',
+        }, 
+        {
+            icon: 'Leaf',
+            description: 'Phytothérapie',
+        }, 
+        {
+            icon: 'CleaningServices',
+            description: 'Brossage',
+        }, 
+        {
+            icon: 'HealthAndSafety',
+            description: 'Soins',
+        }, 
+        {
+            icon: 'Park',
+            description: 'Promenade',
+        },
+        {
+            icon: 'FitnessCenter',
+            description: 'Exercice',
+        },
+        {
+            icon: 'CameraAlt',
+            description: 'Photographie',
+        },
+        {
+            icon: 'HandWave',
+            description: 'Main',
+        }, 
+    ]
 
 	// BEGIN :: Calendar
-	// Active employee
-	// const [employeeList, setEmployeeList] = useState({
-	// 	[USERS.JOHN.username]: true,
-	// 	[USERS.ELLA.username]: true,
-	// 	[USERS.RYAN.username]: true,
-	// 	[USERS.GRACE.username]: true,
-	// });
-
     const [employeeList, setEmployeeList] = useState({});
     const [selectedEmployee, setSelectedEmployee] = useState({})
 
@@ -226,18 +295,6 @@ const DashboardBookingPage = () => {
         setEmployeeList(list);
         employees.length > 0 && setSelectedEmployee(employees[0])
     }, [employees])
-
-    console.log("EMPLOYEES :")
-    console.log({})
-
-    console.log("EMPLOYEE LIST :")
-    console.log(employeeList)
-
-	// FOR DEV
-	useEffect(() => {
-		setEvents(eventList);
-		return () => {};
-	}, []);
 
 	// Selected Event
 	const [eventItem, setEventItem] = useState(null);
@@ -294,14 +351,23 @@ const DashboardBookingPage = () => {
 	 */
 	// eslint-disable-next-line no-unused-vars
 	const eventStyleGetter = (event, start, end, isSelected) => {
-		const isActiveEvent = start <= now && end >= now;
+
+        // RDV confirmé :
+        const isConfirmedEvent = event?.confirmed;
+
+        // RDV actif (confirmé + en cours) :
+		const isActiveEvent = isConfirmedEvent && start <= now && end >= now;
+
+        // RDV passé :
 		const isPastEvent = end < now;
-		const color = isActiveEvent ? 'success' : event.color;
+
+		const color = isActiveEvent ? 'success' : !isConfirmedEvent ? 'danger' : event?.employees?.data[0]?.attributes?.color;
 
 		return {
 			className: classNames({
 				[`bg-l${darkModeStatus ? 'o25' : '10'}-${color} text-${color}`]: color,
 				'border border-success': isActiveEvent,
+                'border border-danger': !isConfirmedEvent,
 				'opacity-50': isPastEvent,
 			}),
 		};
@@ -309,24 +375,55 @@ const DashboardBookingPage = () => {
 
 	const formik = useFormik({
 		initialValues: {
-			eventName: '',
-			eventStart: '',
-			eventEnd: '',
-			eventEmployee: '',
+            id: '',
+			name: '',
+			start: '',
+			end: '',
+            confirmed: '',
+            description: '',
+            icon: '',
+            employees: {
+                id: '',
+            },
+            random: '',
 		},
 		onSubmit: (values) => {
+            // Validation :
+            if(values.name === '' 
+                || !values?.name 
+                || values?.start === '' 
+                || !values?.start 
+                || values?.end === '' 
+                || !values?.end === '' 
+                || values?.employees?.id === '' 
+                || !values?.employees?.id)
+                    return
+
+            // Je supprime tous les champs vide ou null/undefined (mais pas false!) :
+            for (const key in values) {
+                if (values[key] === '' || values[key] === null || values[key] === undefined) {
+                    delete values[key];
+                }
+            }
+            // Supprime le champ 'eventAllDay' :
+            delete values["eventAllDay"];
+
+            // Si le bouton 'Aucune icône' est cochée, je set l'icône à null pour la supprimer de la base de données :
+            if(values.icon === 'Block')
+                values.icon = null;
+
+            // Cast de l'employeeId en int :
+            values.employees.id = Number(values.employees.id);
+
+            // ✨ AJOUT D'UN NOUVEL EVENEMENT ✨
 			if (eventAdding) {
-				setEvents((prevEvents) => [
-					...prevEvents,
-					{
-						id: values.eventStart,
-						...getServiceDataWithServiceName(values.eventName),
-						end: values.eventEnd,
-						start: values.eventStart,
-						user: { ...getUserDataWithUsername(values.eventEmployee) },
-					},
-				]);
-			}
+                !values.icon && delete values["icon"];
+                isAdmin ? values.confirmed = true : values.confirmed = false;
+                handlePost(values)
+            // ✨ MODIFICATION D'UN EVENEMENT EXISTANT ✨
+			} else {
+                handleUpdate(values);
+            }
 			setToggleInfoEventCanvas(false);
 			setEventAdding(false);
 			setEventItem(null);
@@ -334,22 +431,106 @@ const DashboardBookingPage = () => {
 		},
 	});
 
+    const handlePost = async (newData) => {
+        // ⚙️ Strapi's URL :
+        const API_URL = process.env.REACT_APP_API_URL;
+        const APPOINTMENTS_ROUTE = process.env.REACT_APP_APPOINTMENTS_ROUTE;
+
+        try {
+            const res = await axios.post(`${API_URL}${APPOINTMENTS_ROUTE}?populate=employees.avatar&populate=employees.role&populate=horses.owner`, { data: newData });
+            const resData = res.data.data;
+
+            let formattedData = {}
+            formattedData = { id: resData.id, ...resData.attributes }
+
+            if(formattedData?.start)
+                formattedData.start = new Date(formattedData.start)
+            if(formattedData?.end)
+                formattedData.end = new Date(formattedData.end)
+        
+            setAppointments( prev => [...prev, formattedData] );
+            showNotification(
+                'Calendrier.', // title
+				"Le rendez-vous a été ajouté au calendrier.", // message
+                'success' // type
+			);
+        } catch(err) {
+            console.log("USE POST | Appointment | Le rendez-vous n'a pas pu être ajouté à la base de données. | " + err);
+            showNotification(
+                'Calendrier.', // title
+				"Oops ! Une erreur s'est produite. Le rendez-vous n'a pas pu être ajouté.", // message
+                'danger' // type
+			);
+        }
+    }
+
+    const handleUpdate = async (newData) => {
+        // ⚙️ Strapi's URL :
+        const API_URL = process.env.REACT_APP_API_URL;
+        const APPOINTMENTS_ROUTE = process.env.REACT_APP_APPOINTMENTS_ROUTE;
+
+        try {
+            const res = await axios.put(`${API_URL}${APPOINTMENTS_ROUTE}/${newData.id}?populate=employees.avatar&populate=employees.role&populate=horses.owner`, { data: newData });
+            const resData = res.data.data;
+
+            let formattedData = {}
+            formattedData = { id: resData.id, ...resData.attributes }
+
+            if(formattedData?.start)
+                formattedData.start = new Date(formattedData.start)
+            if(formattedData?.end)
+                formattedData.end = new Date(formattedData.end)
+
+            // Loop over the appointments list and find the id of the updated one:
+            const updatedAppointments = appointments.map(item => {
+                if (item.id == formattedData.id)
+                    return formattedData; // Returns updated appointment
+                
+                return item; // else returns unmodified appointment 
+            });
+        
+            setAppointments(updatedAppointments);
+            showNotification(
+                'Mise à jour.', // title
+				"Le rendez-vous a été modifié.", // message
+                'success' // type
+			);
+        } catch(err) {
+            console.log("USE POST | Appointment | Le rendez-vous n'a pas pu être ajouté à la base de données. | " + err);
+            showNotification(
+                'Mise à jour.', // title
+				"Oops ! Une erreur s'est produite. Le rendez-vous n'a pas pu être modifié.", // message
+                'danger' // type
+			);
+        }
+    }
+
+    const modalAction = () => {
+        console.log("MODAL CLICKED !")
+    }
+
 	useEffect(() => {
-		if (eventItem)
+		if (eventItem) {
 			formik.setValues({
 				...formik.values,
-				eventId: eventItem.id || null,
-				eventName: eventItem.name,
-				eventStart: moment(eventItem.start).format(),
-				eventEnd: moment(eventItem.end).format(),
-				eventEmployee: eventItem?.user?.username,
+				id: eventItem.id,
+				name: eventItem?.name,
+				start: moment(eventItem.start).format(),
+				end: moment(eventItem.end).format(),
+                employees: {
+                    id: eventItem?.employees?.data[0]?.id,
+                },
+                confirmed: eventItem.confirmed,
+                description: eventItem?.description,
+                icon: eventItem?.icon ? eventItem.icon : 'Block',
 			});
+        }
 		return () => {};
-		//	eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [eventItem]);
 	// END:: Calendar
 
 	const [toggleCalendar, setToggleCalendar] = useState(true);
+    const [triggerModal, setTriggerModal] = useState(false);
 
     return (
 		<PageWrapper title={demoPages.appointment.subMenu.dashboard.text}>
@@ -386,67 +567,7 @@ const DashboardBookingPage = () => {
 			</SubHeader>
 			<Page container='fluid'>
 				{toggleCalendar && (
-					<>
-						{/* <div className='row mb-4 g-3 justify-content-center '>
-							{Object.keys(USERS).map((u) => (
-								<div key={USERS[u].username} className='col-auto'>
-									<Popovers
-										trigger='hover'
-										desc={
-											<>
-												<div className='h6'>{`${USERS[u].name} ${USERS[u].surname}`}</div>
-												<div>
-													<b>RDV : </b>
-													{
-														events.filter(
-															(i) =>
-																i.user?.username ===
-																USERS[u].username,
-														).length
-													}
-												</div>
-											</>
-										}>
-										<div className='position-relative'>
-											<Avatar
-												srcSet={USERS[u].srcSet}
-												src={USERS[u].src}
-												color={USERS[u].color}
-												size={64}
-												border={4}
-												className='cursor-pointer'
-												borderColor={
-													employeeList[USERS[u].username]
-														? 'info'
-														: themeStatus
-												}
-												onClick={() =>
-													setEmployeeList({
-														...employeeList,
-														[USERS[u].username]:
-															!employeeList[USERS[u].username],
-													})
-												}
-											/>
-											{!!events.filter(
-												(i) =>
-													i.user?.username === USERS[u].username &&
-													i.start < now &&
-													i.end > now,
-											).length && (
-												<span className='position-absolute top-85 start-85 translate-middle badge border border-2 border-light rounded-circle bg-success p-2'>
-													<span className='visually-hidden'>
-														Online user
-													</span>
-												</span>
-											)}
-										</div>
-									</Popovers>
-								</div>
-							))}
-						</div> */}
-
-                        
+					<>            
                         <div className='row mb-4 g-3 justify-content-center '>
 							{employees && employees.map( (employee) => (
 								<div key={employee.username} className='col-auto'>
@@ -483,16 +604,12 @@ const DashboardBookingPage = () => {
 														? 'info'
 														: themeStatus
 												}
-												// onClick={() =>
-												// 	setEmployeeList({
-												// 		...employeeList,
-												// 		[employee.id]:
-												// 			!employeeList[employee.id],
-												// 	})
-												// }
 
                                                 onClick={ () => {
                                                     handleEmployeeListChange(employee);
+                                                    handleSelectedEmployee(employee);
+                                                } }
+                                                onMouseEnter={ () => {
                                                     handleSelectedEmployee(employee);
                                                 } }
 											/>
@@ -612,59 +729,141 @@ const DashboardBookingPage = () => {
 							setEventAdding(status);
 						}}
 						className='p-4'>
-						<OffCanvasTitle id='canvas-title'>
-							{eventAdding ? 'Add Event' : 'Edit Event'}
+						<OffCanvasTitle id='canvas-title' tag='h3'>
+							{eventAdding ? 'Ajouter un évènement' : "Modifier l'évènement"}
 						</OffCanvasTitle>
 					</OffCanvasHeader>
 					<OffCanvasBody tag='form' onSubmit={formik.handleSubmit} className='p-4'>
 						<div className='row g-4'>
+
+
+                        {/* ICONES */}
+							{/* <div className='col-12'>
+                                <div>
+                                    {icons.map( item => (
+                                        <Popovers
+                                            trigger='hover'
+                                            placement='top'
+                                            desc={
+                                                <>
+                                                    <small className='text-muted'>{item.description}</small>
+                                                </>
+                                            }>
+                                            <Button
+                                                className='mx-3 my-2'
+                                                color='info'
+                                                forceFamily='material'
+                                                icon={item.icon}
+                                                name='icon'
+                                                isLink isActive
+                                                key={item.icon}
+                                                size='lg'
+                                                value={item.icon}
+                                                onClick={() => formik.setFieldValue("icon", `${item.icon}`)}
+                                            />
+                                        </Popovers>
+                                    ))}
+                                </div>
+                            </div> */}
+
+
+
 							{/* Name */}
 							<div className='col-12'>
-								<FormGroup id='eventName' label='Name'>
-									<Select
-										ariaLabel='Service select'
-										placeholder='Please select...'
-										size='lg'
-										value={formik.values.eventName}
-										onChange={formik.handleChange}>
-										{Object.keys(SERVICES).map((s) => (
-											<Option key={SERVICES[s].name} value={SERVICES[s].name}>
-												{SERVICES[s].name}
-											</Option>
-										))}
-									</Select>
-								</FormGroup>
+                                <InputGroup className='mb-2'>
+                                    <InputGroupText>Nom</InputGroupText>
+                                    <Input
+                                        id='name'
+                                        placeholder="Nom de l'évènement"
+                                        aria-label='name'
+                                        size='lg'
+                                        onChange={formik.handleChange}
+                                        value={formik.values.name}
+                                    />
+                                </InputGroup>
 							</div>
+
+                            {/* Description & Icône */}
+                            <div className='col-12'>
+                                <Accordion id='desc-and-ico' color='primary' className='mb-2' isFlush={false} >
+                                    <AccordionItem
+                                        id='desc'
+                                        title='Description'
+                                        icon='DocumentScanner'>
+                                        <Textarea
+                                            id='description'
+                                            placeholder='Écrire une description...'
+                                            onChange={formik.handleChange}
+                                            value={formik.values.description}
+                                        />
+                                    </AccordionItem>
+                                    <AccordionItem
+                                        id='ico'
+                                        title='Icône'
+                                        icon='HorseVariant'>
+                                        {!formik.values.noIcon &&
+                                            <>
+                                            {icons.map( item => (
+                                                <Popovers
+                                                    trigger='hover'
+                                                    placement='top'
+                                                    desc={
+                                                        <>
+                                                            <small className='text-muted'>{item.description}</small>
+                                                        </>
+                                                    }>
+                                                    <Button
+                                                        className='mx-2-5 my-2'
+                                                        color={formik.values.icon === item.icon ? `success` : 'info'}
+                                                        forceFamily='material'
+                                                        icon={item.icon}
+                                                        name='icon'
+                                                        isLink isActive
+                                                        key={item.icon}
+                                                        size='lg'
+                                                        value={item.icon}
+                                                        onClick={() => formik.setFieldValue("icon", `${item.icon}`)}
+                                                    />
+                                                </Popovers>
+                                            ))}
+                                        </>
+                                        }
+                                    </AccordionItem>
+                                </Accordion>
+                            </div>
+
 							{/* Date */}
 							<div className='col-12'>
-								<Card className='mb-0 bg-l10-info' shadow='sm'>
+								<Card className='mb-2 bg-l10-info' shadow='sm'>
 									<CardHeader className='bg-l25-info'>
 										<CardLabel icon='DateRange' iconColor='info'>
 											<CardTitle className='text-info'>
-												Date Options
+												Date et horaires
 											</CardTitle>
 										</CardLabel>
 									</CardHeader>
 									<CardBody>
 										<div className='row g-3'>
-											<div className='col-12'>
+											{eventAdding &&
+                                                <div className='col-12'>
 												<FormGroup id='eventAllDay'>
 													<Checks
 														type='switch'
 														value='true'
-														label='All day event'
+														label='Journée complète'
 														checked={formik.values.eventAllDay}
 														onChange={formik.handleChange}
 													/>
 												</FormGroup>
 											</div>
+                                            }
 											<div className='col-12'>
 												<FormGroup
-													id='eventStart'
+													id='start'
 													label={
 														formik.values.eventAllDay
 															? 'Date'
-															: 'Start Date'
+															: 'Date de début'
 													}>
 													<Input
 														type={
@@ -675,10 +874,10 @@ const DashboardBookingPage = () => {
 														value={
 															formik.values.eventAllDay
 																? moment(
-																		formik.values.eventStart,
+																		formik.values.start,
 																  ).format(moment.HTML5_FMT.DATE)
 																: moment(
-																		formik.values.eventStart,
+																		formik.values.start,
 																  ).format(
 																		moment.HTML5_FMT
 																			.DATETIME_LOCAL,
@@ -691,11 +890,11 @@ const DashboardBookingPage = () => {
 
 											{!formik.values.eventAllDay && (
 												<div className='col-12'>
-													<FormGroup id='eventEnd' label='End Date'>
+													<FormGroup id='end' label='Date de fin'>
 														<Input
 															type='datetime-local'
 															value={moment(
-																formik.values.eventEnd,
+																formik.values.end,
 															).format(
 																moment.HTML5_FMT.DATETIME_LOCAL,
 															)}
@@ -708,26 +907,27 @@ const DashboardBookingPage = () => {
 									</CardBody>
 								</Card>
 							</div>
+
 							{/* Employee */}
 							<div className='col-12'>
-								<Card className='mb-0 bg-l10-dark' shadow='sm'>
-									<CardHeader className='bg-l25-dark'>
-										<CardLabel icon='Person Add' iconColor='dark'>
-											<CardTitle>Employee Options</CardTitle>
+								<Card className='mb-2 bg-l10-primary' shadow='sm'>
+									<CardHeader className='bg-l25-primary'>
+										<CardLabel icon='Person Add' iconColor='primary'>
+											<CardTitle className='text-primary'>Professionnel(le)</CardTitle>
 										</CardLabel>
 									</CardHeader>
 									<CardBody>
-										<FormGroup id='eventEmployee' label='Employee'>
+										<FormGroup id='employees.id'>
 											<Select
-												placeholder='Please select...'
-												value={formik.values.eventEmployee}
+												placeholder='Veuillez choisir...'
+												value={formik.values?.employees?.id}
 												onChange={formik.handleChange}
 												ariaLabel='Employee select'>
-												{Object.keys(USERS).map((u) => (
+												{employees.map( employee => (
 													<Option
-														key={USERS[u].id}
-														value={USERS[u].username}>
-														{`${USERS[u].name} ${USERS[u].surname}`}
+														key={employee.username}
+														value={employee.id}>
+														{`${employee.name} ${employee.surname}`}
 													</Option>
 												))}
 											</Select>
@@ -735,21 +935,86 @@ const DashboardBookingPage = () => {
 									</CardBody>
 								</Card>
 							</div>
-							<div className='col'>
-								<Button color='info' type='submit'>
-									Save
-								</Button>
+
+                            {/* Confirm event */}
+                            {/* (Uniquement Admin + Uniquement pour la modification d'un évènement existant) */}
+                            {isAdmin && !eventAdding &&
+                            <div className='col-12'>
+								<Card className={`mt-2 mb-2 bg-l10-${formik.values.confirmed ? 'success' : 'danger'}`} shadow='sm'>
+									<CardBody>
+										<FormGroup id='confirmed'>
+                                            <ChecksGroup isInline>
+                                                <Checks
+                                                    type='switch'
+                                                    value='true'
+                                                    name='confirmed'
+                                                    checked={formik.values.confirmed}
+                                                    onChange={formik.handleChange}
+                                                    label={formik.values.confirmed ? 'Le rendez-vous est confirmé.' : "Le rendez-vous n'est pas confirmé."}
+                                                />
+                                                <Icon
+                                                    icon='Circle'
+                                                    className={classNames(
+                                                        formik.values.confirmed ? 'text-success' : 'text-danger',
+                                                        'animate__animated animate__heartBeat animate__infinite animate__slower',
+                                                    )}
+                                                />
+                                            </ChecksGroup>
+										</FormGroup>
+									</CardBody>
+								</Card>
 							</div>
+                            }
+
+                            <div className='d-flex justify-content-between py-3'>
+                                <div className=''>
+                                    <Button 
+                                        color='info' 
+                                        icon='Save'
+                                        type='submit'
+                                        disabled={formik?.values?.name === '' 
+                                            || formik.values?.employees?.id === '' 
+                                            || formik.values?.start === '' 
+                                            || !formik.values?.name 
+                                            || !formik.values?.employees?.id 
+                                            || !formik.values?.start }
+                                        >
+                                        Publier
+                                    </Button>
+                                </div>
+
+                                { !eventAdding &&
+                                    <div className=''>
+                                    <Button 
+                                        color='danger' 
+                                        icon='Delete'
+                                        isOutline
+                                        onClick={ () => setTriggerModal(true)}
+                                        >
+                                        Supprimer
+                                    </Button>
+                                </div>
+                                }
+                            </div>
 						</div>
 					</OffCanvasBody>
 				</OffCanvas>
 
 				<CommonRightPanel
-                    employee={selectedEmployee}
-                    employees={employees}
                     setOpen={setToggleRightPanel} 
                     isOpen={toggleRightPanel} 
+                    employee={selectedEmployee}
+                    employees={employees}
+                    appointments={appointments}
                 />
+
+                <CustomModal 
+                    state={triggerModal} 
+                    setState={setTriggerModal} 
+                    src={confirmation.appointment.delete}
+                    action={modalAction}
+                />
+
 			</Page>
 		</PageWrapper>
 	);

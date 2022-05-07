@@ -86,12 +86,6 @@
     "phone": {
       "type": "string"
     },
-    "horses": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::horse.horse",
-      "mappedBy": "user"
-    },
     "address": {
       "type": "component",
       "repeatable": false,
@@ -112,6 +106,12 @@
     "color": {
       "type": "string",
       "default": "info"
+    },
+    "horses": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::horse.horse",
+      "mappedBy": "owner"
     }
   }
 }

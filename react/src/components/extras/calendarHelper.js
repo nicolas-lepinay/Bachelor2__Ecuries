@@ -25,16 +25,16 @@ export const getUnitType = (viewMode) => {
 export const getLabel = (date, viewMode) => {
 	if (viewMode === Views.MONTH) return moment(date).format('MMMM YYYY');
 	if (viewMode === Views.WEEK)
-		return `${moment(date).startOf('week').format('MMM D')} - ${moment(date)
+		return `${moment(date).startOf('week').format('LL')} - ${moment(date)
 			.endOf('week')
 			.format('MMM D')}`;
 	if (viewMode === Views.WORK_WEEK)
-		return `${moment(date).startOf('week').add(1, 'day').format('MMM D')} - ${moment(date)
+		return `${moment(date).startOf('week').add(1, 'day').format('LL')} - ${moment(date)
 			.endOf('week')
 			.add(-1, 'day')
-			.format('MMM D')}`;
+			.format('LL')}`;
 	if (viewMode === Views.AGENDA)
-		return `${moment(date).format('L')} - ${moment(date).add(1, 'month').format('L')}`;
+		return `${moment(date).format('LL')} - ${moment(date).add(1, 'month').format('LL')}`;
 	return moment(date).format('dddd, MMM D');
 };
 

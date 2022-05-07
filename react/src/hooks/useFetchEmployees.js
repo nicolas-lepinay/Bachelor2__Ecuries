@@ -8,10 +8,11 @@ const useFetchEmployees = () => {
     // ⚙️ Strapi's URL :
     const API_URL = process.env.REACT_APP_API_URL;
     
-    // ⚙️ PRO ID :
+    // ⚙️ PRO ID and ADMIN ID :
     const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
+    const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; // Id du rôle 'Admin'
 
-    const query = `/api/users?populate=*&filters[role][id]=${PRO_ID}`;
+    const query = `/api/users?populate=*&filters[role][id]=${PRO_ID}&filters[role][id]=${ADMIN_ID}`;
 
     const [data, setData] = useState([]);
     const [error, setError] = useState(null);

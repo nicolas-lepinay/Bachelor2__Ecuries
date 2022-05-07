@@ -25,91 +25,38 @@ import Chart from '../../../components/extras/Chart';
 import { sales } from '../../../common/data/chartDummyData';
 import SERVICES from '../../../common/data/serviceDummyData';
 import useDarkMode from '../../../hooks/useDarkMode';
+import { irBlack } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
-const CommonRightPanel = ({ setOpen, isOpen, employee, employees }) => {
+const convert = require('convert-seconds');
+
+const CommonRightPanel = ({ setOpen, isOpen, employee, employees, appointments }) => {
 
     // ⚙️ Strapi's API URL :
     const API_URL = process.env.REACT_APP_API_URL;
 
+    const now = new Date();
+
 	const { themeStatus, darkModeStatus } = useDarkMode();
 
-	const USER_APPOINTMENT = {
-		APPROVED: 'Approved',
-		PENDING: 'Pending',
-		CANCELED: 'Canceled',
+	const APPOINTMENT_STATUS = {
+		CONFIRMED: 'Confirmés',
+		PENDING: 'En attente',
+		PAST: 'Passés',
 	};
 	const [activeUserAppointmentTab, setActiveUserAppointmentTab] = useState(
-		USER_APPOINTMENT.APPROVED,
+		APPOINTMENT_STATUS.CONFIRMED,
 	);
 	const handleActiveUserAppointmentTab = (tabName) => {
 		setActiveUserAppointmentTab(tabName);
 	};
 
-	const dataJohnAppointments = [
-		{
-			id: 1,
-			time: '1h 30m',
-			person: 2,
-			...SERVICES.KAYAKING,
-			status: USER_APPOINTMENT.APPROVED,
-		},
-		{
-			id: 2,
-			time: '1h 30m',
-			person: 2,
-			...SERVICES.TENNIS,
-			status: USER_APPOINTMENT.APPROVED,
-		},
-		{
-			id: 3,
-			time: '45m',
-			person: 1,
-			...SERVICES.SURFING,
-			status: USER_APPOINTMENT.APPROVED,
-		},
-		{
-			id: 4,
-			time: '1h',
-			person: 1,
-			...SERVICES.HANDBALL,
-			status: USER_APPOINTMENT.PENDING,
-		},
-		{
-			id: 5,
-			time: '1h',
-			person: 4,
-			...SERVICES.FOOTBALL,
-			status: USER_APPOINTMENT.PENDING,
-		},
-		{
-			id: 6,
-			time: '2h',
-			person: 1,
-			...SERVICES.KITE_SURFING,
-			status: USER_APPOINTMENT.PENDING,
-		},
-		{
-			id: 7,
-			time: '30m',
-			person: 1,
-			...SERVICES.YOGA,
-			status: USER_APPOINTMENT.PENDING,
-		},
-		{
-			id: 8,
-			time: '1h',
-			person: 1,
-			...SERVICES.ICE_SKATING,
-			status: USER_APPOINTMENT.PENDING,
-		},
-		{
-			id: 9,
-			time: '1h',
-			person: 1,
-			...SERVICES.SURFING,
-			status: USER_APPOINTMENT.CANCELED,
-		},
-	];
+    // Filter only this employee's appointments :
+    appointments = appointments.filter(
+        (appointment) =>
+            appointment?.employees?.data[0].id ===
+            employee.id,
+    )
+
 	return (
 		<OffCanvas setOpen={setOpen} isOpen={isOpen} isRightPanel>
 			<OffCanvasBody className='p-4'>
@@ -133,7 +80,7 @@ const CommonRightPanel = ({ setOpen, isOpen, employee, employees }) => {
 						</div>
 					</div>
 					<div className='col-auto'>
-						<Dropdown>
+						{/* <Dropdown>
 							<DropdownToggle hasIcon={false}>
 								<Button
 									icon='MoreHoriz'
@@ -154,7 +101,13 @@ const CommonRightPanel = ({ setOpen, isOpen, employee, employees }) => {
 									</Button>
 								</DropdownItem>
 							</DropdownMenu>
-						</Dropdown>
+						</Dropdown> */}
+                        <Button
+                            color='light'
+                            icon='Close'
+                            size='lg'
+                            onClick={() => { setOpen(false) }}>
+                        </Button>
 					</div>
 				</div>
 				<div className='d-flex justify-content-center mb-3'>
@@ -178,34 +131,43 @@ const CommonRightPanel = ({ setOpen, isOpen, employee, employees }) => {
 						'bg-lo50-info': darkModeStatus,
 					})}>
 					<div className='row row-cols-3 g-3 pb-3 px-3 mt-0'>
-						{Object.keys(USER_APPOINTMENT).map((key) => (
+						{Object.keys(APPOINTMENT_STATUS).map((key) => (
 							<div
-								key={USER_APPOINTMENT[key]}
+								key={APPOINTMENT_STATUS[key]}
 								className='col d-flex flex-column align-items-center'>
 								<Button
 									color={
 										(darkModeStatus &&
-											activeUserAppointmentTab === USER_APPOINTMENT[key]) ||
+											activeUserAppointmentTab === APPOINTMENT_STATUS[key]) ||
 										!darkModeStatus
 											? 'dark'
 											: null
 									}
-									className='w-100 text-capitalize'
+									className='w-100 text-uppercase'
 									rounded={1}
 									onClick={() =>
-										handleActiveUserAppointmentTab(USER_APPOINTMENT[key])
+										handleActiveUserAppointmentTab(APPOINTMENT_STATUS[key])
 									}
-									isLight={activeUserAppointmentTab !== USER_APPOINTMENT[key]}>
+									isLight={activeUserAppointmentTab !== APPOINTMENT_STATUS[key]}>
 									<div className='h6 mb-3 text-muted opacity-80'>
-										{USER_APPOINTMENT[key]}
+										{APPOINTMENT_STATUS[key]}
 									</div>
 									<div
 										className={classNames('h2', {
 											'text-light': darkModeStatus,
 										})}>
 										{
-											dataJohnAppointments.filter(
-												(f) => f.status === USER_APPOINTMENT[key],
+											appointments.filter(
+												(appointment) => {
+                                                    if(APPOINTMENT_STATUS[key] === APPOINTMENT_STATUS.CONFIRMED)
+                                                        return appointment?.confirmed === true && appointment?.end > now;
+
+                                                    else if(APPOINTMENT_STATUS[key] === APPOINTMENT_STATUS.PENDING)
+                                                        return !appointment?.confirmed;
+
+                                                    else if(APPOINTMENT_STATUS[key] === APPOINTMENT_STATUS.PAST)
+                                                        return appointment?.end < now;
+                                                }
 											).length
 										}
 									</div>
@@ -214,10 +176,17 @@ const CommonRightPanel = ({ setOpen, isOpen, employee, employees }) => {
 						))}
 					</div>
 				</div>
-				{dataJohnAppointments
-					.filter((f) => f.status === activeUserAppointmentTab)
-					.map((item) => (
-						<Card key={item.id}>
+				{appointments
+					.filter( appointment => {
+                        if(activeUserAppointmentTab === APPOINTMENT_STATUS.CONFIRMED)
+                            return appointment?.confirmed === true && appointment?.end > now;
+                        else if(activeUserAppointmentTab === APPOINTMENT_STATUS.PENDING)
+                            return !appointment?.confirmed;
+                        else if(activeUserAppointmentTab === APPOINTMENT_STATUS.PAST)
+                            return appointment?.end < now;
+                    })
+					.map( appointment => (
+						<Card key={appointment.id}>
 							<CardBody>
 								<div className='row g-3 align-items-center'>
 									<div className='col d-flex align-items-center'>
@@ -232,19 +201,25 @@ const CommonRightPanel = ({ setOpen, isOpen, employee, employees }) => {
 														},
 													)}>
 													<span className='text-info fs-1 fw-bold'>
-														<Icon icon={item.icon} />
+														<Icon icon={appointment?.icon ? appointment.icon : 'HelpBasic'} />
 													</span>
 												</div>
 											</div>
 										</div>
 										<div className='flex-grow-1 ms-3 d-flex justify-content-between align-items-center'>
 											<div>
-												<div className='fw-bold fs-6 mb-0'>{item.name}</div>
+												<div className='fw-bold fs-6 mb-0'>{appointment.name}</div>
 												<div className='text-muted'>
 													<small>
-														Time:{' '}
-														<span className='text-info fw-bold'>
-															{item.time}
+														Date :{' '}
+														{/* <span className='text-info fw-bold'>
+															{convert((appointment.end - appointment.start)/1000).hours}
+                                                            h
+                                                            {convert((appointment.end - appointment.start)/1000).minutes}
+														</span> */}
+
+                                                        <span className='text-info fw-bold'>
+															{appointment?.start.toLocaleDateString('fr', {year:'2-digit', month:'2-digit', day:'2-digit'})}
 														</span>
 													</small>
 												</div>
@@ -260,8 +235,8 @@ const CommonRightPanel = ({ setOpen, isOpen, employee, employees }) => {
 													'bg-lo25-info': darkModeStatus,
 												},
 											)}>
-											{`${item.person} ${
-												item.person > 1 ? 'People' : 'Person'
+											{`${appointment?.horses?.data?.length || '0'} ${
+												appointment?.horses?.data?.length > 1 ? 'chevaux' : 'cheval'
 											}`}
 										</div>
 									</div>

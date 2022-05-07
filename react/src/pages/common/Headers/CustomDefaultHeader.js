@@ -1,13 +1,14 @@
 import React from 'react';
-import Header from '../../../layout/Header/Header';
-import CustomCommonHeaderRight from './CustomCommonHeaderRight';
+// import Header from '../../../layout/Header/Header';
+import CustomHeader from '../../../layout/Header/CustomHeader';
+// import CustomCommonHeaderRight from './CustomCommonHeaderRight';
 
 const CustomDefaultHeader = () => {
 
     return (
-		<Header>
-            <CustomCommonHeaderRight />
-		</Header>
+		<CustomHeader>
+            {/* <CustomCommonHeaderRight /> */}
+		</CustomHeader>
 	);
 };
 

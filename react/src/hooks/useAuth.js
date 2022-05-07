@@ -10,6 +10,7 @@ import axios from 'axios';
 function useProvideAuth() {
     // ⚙️ Strapi's URL :
     const API_URL = process.env.REACT_APP_API_URL;
+    const USERS_ROUTE = process.env.REACT_APP_USERS_ROUTE;
 
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("persevere_user")) || null);
     const [error, setError] = useState(null);
@@ -24,30 +25,30 @@ function useProvideAuth() {
             const data = await res.data;
             if(data.user.confirmed === true) {
                 let user = { ...data.user, jwt: data.jwt };
-                const fullUser = await axios.get(`${API_URL}/api/users?filters[id]=${user.id}`); // Get all fields (avatar, role, adress, horses, etc.)
+                const fullUser = await axios.get(`${API_URL}${USERS_ROUTE}?filters[id]=${user.id}`); // Get all fields (avatar, role, adress, horses, etc.)
                 const fullUserData = fullUser.data[0];
                 user = { ...user, ...fullUserData};
                 setUser(user);
                 localStorage.setItem("persevere_user", JSON.stringify(user)); // Send user to local storage
                 console.log(`CONNEXION | Connexion réussie. Bienvenue, ${user?.name} ${user?.surname}.`);
-                setLoading(false);
             } else {
                 console.log("CONNEXION | Ce compte n'a pas encore été confirmé par un administrateur.");
-                setLoading(false);
                 setError({ 
                     status: 403,
                     action: 'login',
                     message: "Ce compte n'a pas encore été validé par un administrateur.",
                 })
             }
+            setLoading(false);
         } catch(err) {
             console.log("CONNEXION | Une erreur est survenue lors de la tentative de connexion. | " + err);
-            setLoading(false);
             setError({ 
                 status: err.response.status,
                 action: 'login',
                 message: err.response.status === 400 ? "Aucun compte correspondant n'a été trouvé." : `Oops ! Une erreur s'est produite pendant la connexion 😰\n(code d'erreur ${err.response.status}).`,
             })
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -59,7 +60,7 @@ function useProvideAuth() {
             const res = await axios.post(`${API_URL}/api/auth/local/register`, rest)
             const data = await res.data
             // Set user to 'Unconfirmed' and update their role :
-            await axios.put(`${API_URL}/api/users/${data.user.id}`, { confirmed: false, role })
+            await axios.put(`${API_URL}${USERS_ROUTE}/${data.user.id}`, { confirmed: false, role })
             console.log(`INSCRIPTION | Le compte de ${data.user.username} a bien été créé. Un administrateur doit confirmer son inscription.`)
             setLoading(false)
             setSuccess({
@@ -87,10 +88,9 @@ function useProvideAuth() {
     const updateUser = async (updatedData) => {
         setLoading(true)
         try {
-            await axios.put(`${API_URL}/api/users/${user.id}`, updatedData);
-            const fullUser = await axios.get(`${API_URL}/api/users?filters[id]=${user.id}`); // Get all fields (avatar, role, adress, horses, etc.)
+            await axios.put(`${API_URL}${USERS_ROUTE}/${user.id}`, updatedData);
+            const fullUser = await axios.get(`${API_URL}${USERS_ROUTE}?filters[id]=${user.id}`); // Get all fields (avatar, role, adress, horses, etc.)
             const fullUserData = fullUser.data[0];
-            // setUser({ ...user, ...fullUserData});
             setUser({ ...fullUserData});
             localStorage.setItem("persevere_user", JSON.stringify({ ...fullUserData}));
             setLoading(false);

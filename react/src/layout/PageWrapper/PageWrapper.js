@@ -17,9 +17,10 @@ const PageWrapper = forwardRef(({ title, description, className, isLoginPage, ch
     const auth = useAuth(); // 🦸 Auth :
 
 	useLayoutEffect(() => {
-		document.getElementsByTagName('TITLE')[0].text = `${title ? `${title} | ` : ''}${
-			process.env.REACT_APP_SITE_NAME
-		}`;
+		// document.getElementsByTagName('TITLE')[0].text = `${title ? `${title} | ` : ''}${
+		// 	process.env.REACT_APP_SITE_NAME
+		// }`;
+        document.getElementsByTagName('TITLE')[0].text = `${title ? `${title}` : ''}`;
 		document
 			.querySelector('meta[name="description"]')
 			.setAttribute('content', description || process.env.REACT_APP_META_DESC);

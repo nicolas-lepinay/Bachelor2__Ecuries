@@ -9,8 +9,8 @@ const Brand = ({ asideStatus, setAsideStatus }) => {
 		<div className='brand'>
 			<div className='brand-logo'>
 				<h1 className='brand-title '>
-					<Link to='/' aria-label='Logo' alt='Facit'>
-						{/* <Logo height={32} /> */}
+					<Link to='/' aria-label='Logo' alt='Equus'>
+						<Logo height={34} />
 					</Link>
 				</h1>
 			</div>

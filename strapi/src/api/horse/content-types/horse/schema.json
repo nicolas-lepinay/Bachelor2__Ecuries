@@ -12,7 +12,7 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "user": {
+    "owner": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",

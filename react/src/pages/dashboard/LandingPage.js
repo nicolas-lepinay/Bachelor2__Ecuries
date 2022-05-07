@@ -39,7 +39,6 @@ const LandingPage = () => {
 
     // 🦸 User:
     const auth = useAuth();
-    console.log(auth.user)
 
     const formikProfile = useFormik({
 		initialValues: {
@@ -59,12 +58,10 @@ const LandingPage = () => {
             // Update user :
             auth.updateUser(values);
 
-            // Success or error message :
-			showNotification(
-				<span className='d-flex align-items-center'>
-					<Icon icon='Info' size='lg' className='me-1' />
-					<span>{auth.error ? auth.error.message : 'Vos informations ont été mises à jour.' }</span>
-				</span>
+            showNotification(
+                'Mise à jour.', // title
+				auth.error ? auth.error.message : 'Vos informations ont été mises à jour.', // message
+                auth.error ? 'danger' : 'success' // type
 			);
 		},
 	});
@@ -88,11 +85,10 @@ const LandingPage = () => {
             auth.updateUser({ address: { ...values} });
 
             // Success or error message :
-			showNotification(
-				<span className='d-flex align-items-center'>
-					<Icon icon='Info' size='lg' className='me-1' />
-					<span>{auth.error ? auth.error.message : 'Votre adresse a été mise à jour.' }</span>
-				</span>
+            showNotification(
+                'Mise à jour.', // title
+				auth.error ? auth.error.message : 'Votre adresse a été mise à jour.', // message
+                auth.error ? 'danger' : 'success' // type
 			);
 		},
 	});
@@ -117,26 +113,23 @@ const LandingPage = () => {
             })
             if(auth.error) {
                 showNotification(
-                    <span className='d-flex align-items-center'>
-                        <Icon icon='Info' size='lg' className='me-1' />
-                        <span>Le mot de passe actuel est incorrect.</span>
-                    </span>
+                    'Mise à jour.', // title
+                    'Le mot de passe actuel est incorrect.', // message
+                    'danger' // type
                 );
             } else {
                 if(values.newPassword !== values.confirmNewPassword) {
                     showNotification(
-                        <span className='d-flex align-items-center'>
-                            <Icon icon='Info' size='lg' className='me-1' />
-                            <span>Les mots de passe ne correspondent pas.</span>
-                        </span>
+                        'Mise à jour.', // title
+                        'Les mots de passe ne correspondent pas.', // message
+                        'danger' // type
                     );
                 } else {
                     auth.update({ password: values.newPassword })
                     showNotification(
-                        <span className='d-flex align-items-center'>
-                            <Icon icon='Info' size='lg' className='me-1' />
-                            <span>Votre mot de passe a été mis à jour.</span>
-                        </span>
+                        'Mise à jour.', // title
+                        'Votre mot de passe a été mis à jour.', // message
+                        'success' // type
                     );
                 }
             }

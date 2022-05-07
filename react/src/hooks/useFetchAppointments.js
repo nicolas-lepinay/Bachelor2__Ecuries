@@ -7,7 +7,8 @@ const useFetchAppointments = () => {
 
     // ⚙️ Strapi's URL :
     const API_URL = process.env.REACT_APP_API_URL;
-    const query = '/api/appointments?populate=clients.avatar&populate=employees.avatar&populate=employees.role';
+    const APPOINTMENTS_ROUTE = process.env.REACT_APP_APPOINTMENTS_ROUTE;
+    const query = `${APPOINTMENTS_ROUTE}?populate=employees.avatar&populate=employees.role&populate=horses.owner`;
 
     const [data, setData] = useState([]);
     const [error, setError] = useState(null);
@@ -23,7 +24,10 @@ const useFetchAppointments = () => {
         
                 // Reformat object to simply its structure:
                 resData.map( item => {
-                    formattedData.push(item.attributes);
+                    formattedData.push({ 
+                        id: item.id, 
+                        ...item.attributes
+                    });
                 });
                 
                 // Convert date fields (start, end) to Date objects :

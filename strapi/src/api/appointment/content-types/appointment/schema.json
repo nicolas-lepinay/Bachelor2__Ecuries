@@ -41,6 +41,13 @@
     },
     "icon": {
       "type": "string"
+    },
+    "confirmed": {
+      "type": "boolean",
+      "default": false
+    },
+    "description": {
+      "type": "text"
     }
   }
 }

@@ -148,7 +148,7 @@ const Aside = () => {
 			{asideStatus && hasTouchButton && isModernDesign && (
 				<>
 					<motion.div className='aside-drag-area' ref={constraintsRef} />
-					<Tooltips title='Toggle Aside' flip={['top', 'right']}>
+					<Tooltips title='Tirer / Pousser' flip={['top', 'right']}>
 						<motion.div
 							className='aside-touch'
 							drag='x'

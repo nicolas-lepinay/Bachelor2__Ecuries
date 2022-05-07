@@ -485,7 +485,8 @@ $offcanvas-modal-backdrop-filter: 0.25rem !default;
 $offcanvas-modal-box-shadow: $box-shadow-lg !default;
 
 $dark-offcanvas-bg-color: $dark-modal-content-bg !default;
-$dark-offcanvas-right-panel-bg-color: shade-color($dark-body-bg, 70) !default;
+
+$dark-offcanvas-right-panel-bg-color: shade-color($dark-body-bg, 10) !default; // 70 WAS THE DEFAULT BY FACIT
 
 // Code
 
