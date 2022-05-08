@@ -987,6 +987,108 @@ export const productsMenu = {
 // 2. loginPage
 // 3. logoutPage
 
+// Page d'accueil
+export const landingPage = {
+    landing: {
+        id: 'home',
+        text: 'Accueil',
+        path: '/',
+        icon: 'HolidayVillage',
+        subMenu: null,
+    }
+}
+
+// Plannings
+const dashboards = {
+    title: {
+        id: 'planning',
+        text: 'Planning',
+        icon: 'Extension',
+    },
+    dashboards: {
+        id: 'dashboards',
+        text: 'Planning',
+        path: 'planning',
+        icon: 'CalendarViewMonth',
+        subMenu: {
+            // Planning des pensionnaires (chevaux) :
+            dashboardActivity: {
+                id: 'dashboard-activity',
+                text: 'Pensionnaires',
+                path: 'planning/pensionnaires',
+                icon: 'Horse',
+            },
+            // Planning des professionels :
+            dashboardBooking: {
+                id: 'dashboard-booking',
+                text: 'Professionnels',
+                path: 'planning/professionnels',
+                icon: 'Horseshoe',
+            },
+        },
+    },
+}
+
+const professional_accounts = {
+    id: 'account-professional',
+    text: 'Professionnels',
+    path: 'comptes/professionnels',
+    icon: 'AccountHardHat',
+}
+
+const horse_accounts = {
+    id: 'account-horse',
+    text: 'Pensionnaires',
+    path: 'comptes/pensionnaires',
+    icon: 'HorseVariant',
+}
+
+const client_accounts = {
+    id: 'account-horse',
+    text: 'Propriétaires',
+    path: 'comptes/propriétaires',
+    icon: 'PersonHeart',
+}
+
+
+// Gestion des comptes 
+const accounts = {
+    title: {
+        id: 'accounts',
+        text: 'Gestion des comptes',
+        icon: 'Extension',
+    },
+    accounts: {
+        id: 'account',
+        text: 'Comptes',
+        path: 'comptes',
+        icon: 'Person',
+        subMenu: {
+            // Comptes pensionnaires (chevaux) :
+            horses: horse_accounts,
+            // Comptes professionels :
+            professionals: professional_accounts,
+            // Comptes clients :
+            clients: client_accounts,
+        },
+    }
+}
+
+
+export const adminMenu = {
+    dashboards,
+    accounts,
+}
+
+export const professionalMenu = {
+    dashboards,
+    accounts,
+}
+
+export const clientMenu = {
+    dashboards,
+}
+
 export const loginPage = {
     login: {
 		id: 'login',

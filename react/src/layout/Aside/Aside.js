@@ -11,7 +11,7 @@ import useAsideTouch from '../../hooks/useAsideTouch';
 import Brand from '../Brand/Brand';
 import Navigation, { NavigationLine } from '../Navigation/Navigation';
 import User from '../User/User';
-import { dashboardMenu } from '../../menu';
+import { landingPage, adminMenu, dashboardMenu } from '../../menu';
 import ThemeContext from '../../contexts/themeContext';
 import Card, { CardBody } from '../../components/bootstrap/Card';
 
@@ -58,7 +58,12 @@ const Aside = () => {
 					<Brand asideStatus={asideStatus} setAsideStatus={setAsideStatus} />
 				</div>
 				<div className='aside-body'>
-					<Navigation menu={dashboardMenu} id='aside-dashboard' />
+                    <Navigation menu={landingPage} id='aside-landing' />
+                    <NavigationLine />
+                    <Navigation menu={adminMenu.dashboards} id='aside-admin-dashboards' />
+                    <NavigationLine />
+                    <Navigation menu={adminMenu.accounts} id='aside-admin-accounts' />
+					{/* <Navigation menu={dashboardMenu} id='aside-dashboard' /> */}
                     {/* <NavigationLine />
                     <Navigation menu={logoutPage} id='aside-demo-pages' /> */}
 

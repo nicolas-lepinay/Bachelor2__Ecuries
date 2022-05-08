@@ -32,10 +32,27 @@
       "repeatable": true,
       "component": "health-record.health-record"
     },
-    "planning": {
-      "type": "component",
-      "repeatable": true,
-      "component": "planning.planning"
+    "activities": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::activity.activity",
+      "inversedBy": "horses"
+    },
+    "color": {
+      "type": "string"
+    },
+    "breed": {
+      "type": "string"
+    },
+    "avatar": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
     }
   }
 }

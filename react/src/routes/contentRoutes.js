@@ -1,8 +1,21 @@
 import React, { lazy } from 'react';
-import { componentsMenu, dashboardMenu, demoPages, layoutMenu, loginPage, logoutPage } from '../menu';
+import { 
+    componentsMenu, 
+    dashboardMenu, 
+    demoPages, 
+    layoutMenu, 
+    landingPage,
+    adminMenu, 
+    professionalMenu,
+    clientMenu,
+    loginPage, 
+    logoutPage 
+} from '../menu';
 // import Login from '../pages/presentation/auth/Login';
 import Login from '../pages/auth/Login';
 import Logout from '../pages/auth/Logout';
+
+const LANDING_PAGE = lazy(() => import('../pages/dashboard/LandingPage'));
 
 const LANDING = {
 	// DASHBOARD: lazy(() => import('../pages/dashboard/DashboardPage')),
@@ -176,6 +189,14 @@ const EXTRA = {
 	NOTIFICATION: lazy(() => import('../pages/documentation/extras/NotificationPage')),
 	HOOKS: lazy(() => import('../pages/documentation/extras/HooksPage')),
 };
+
+// --------- MY CUSTOM VERSION ---------
+
+const DASHBOARDS = {
+	DASHBOARD_BOOKING: lazy(() => import('../pages/dashboard/DashboardBookingPage')),
+    DASHBOARD_ACTIVITY: lazy(() => import('../pages/dashboard/DashboardActivityPage')),
+}
+
 
 const presentation = [
 	/**
@@ -895,15 +916,69 @@ const documentation = [
 
 // ------------- MY CUSTOM VERSION -------------
 
-const dashboard = [
+// const dashboard = [
+//     {
+//         path: dashboardMenu.dashboard.path,
+// 		element: <LANDING.DASHBOARD />,
+// 		exact: true,
+//     },
+// 	{
+// 		path: dashboardMenu.dashboardBooking.path,
+// 		element: <LANDING.DASHBOARD_BOOKING />,
+// 		exact: true,
+// 	},
+// ];
+
+const admin = [
     {
-        path: dashboardMenu.dashboard.path,
-		element: <LANDING.DASHBOARD />,
+        path: landingPage.landing.path,
+		element: <LANDING_PAGE />,
 		exact: true,
     },
 	{
-		path: dashboardMenu.dashboardBooking.path,
-		element: <LANDING.DASHBOARD_BOOKING />,
+		path: adminMenu.dashboards.dashboards.subMenu.dashboardActivity.path,
+		element: <DASHBOARDS.DASHBOARD_ACTIVITY />,
+		exact: true,
+	},
+    {
+		path: adminMenu.dashboards.dashboards.subMenu.dashboardBooking.path,
+		element: <DASHBOARDS.DASHBOARD_BOOKING />,
+		exact: true,
+	},
+];
+
+const professional = [
+    {
+        path: landingPage.landing.path,
+		element: <LANDING_PAGE />,
+		exact: true,
+    },
+	{
+		path: adminMenu.dashboards.dashboards.subMenu.dashboardActivity.path,
+		element: <DASHBOARDS.DASHBOARD_ACTIVITY />,
+		exact: true,
+	},
+    {
+		path: adminMenu.dashboards.dashboards.subMenu.dashboardBooking.path,
+		element: <DASHBOARDS.DASHBOARD_BOOKING />,
+		exact: true,
+	},
+];
+
+const client = [
+    {
+        path: landingPage.landing.path,
+		element: <LANDING_PAGE />,
+		exact: true,
+    },
+	{
+		path: adminMenu.dashboards.dashboards.subMenu.dashboardActivity.path,
+		element: <DASHBOARDS.DASHBOARD_ACTIVITY />,
+		exact: true,
+	},
+    {
+		path: adminMenu.dashboards.dashboards.subMenu.dashboardBooking.path,
+		element: <DASHBOARDS.DASHBOARD_BOOKING />,
 		exact: true,
 	},
 ];
@@ -921,6 +996,7 @@ const auth = [
     }
 ];
 
-const contents = [...dashboard, ...auth];
+const contents = { admin, professional, client, auth };
 
-export default contents;
+export default contents ;
+

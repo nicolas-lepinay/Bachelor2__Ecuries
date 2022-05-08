@@ -25,12 +25,6 @@ import OffCanvas, {
 	OffCanvasHeader,
 	OffCanvasTitle } from '../../components/bootstrap/OffCanvas';
 
-import Dropdown, {
-    DropdownItem,
-    DropdownMenu,
-    DropdownToggle,
-} from '../../components/bootstrap/Dropdown';
-
 
 import Button from '../../components/bootstrap/Button';
 import Accordion, { AccordionItem } from '../../components/bootstrap/Accordion';
@@ -198,7 +192,7 @@ const MyWeekEvent = (data) => {
 	);
 };
 
-const DashboardBookingPage = () => {
+const DashboardActivityPage = () => {
 
     
     // 🛠️ Hooks :
@@ -960,72 +954,35 @@ const DashboardBookingPage = () => {
                             {/* Confirm event */}
                             {/* (Uniquement Admin + Uniquement pour la modification d'un évènement existant) */}
                             {isAdmin && !eventAdding &&
-                            <>
-                                <div className='col-12'>
-                                    <Card className={`mt-2 mb-2 bg-l10-${formik.values.confirmed ? 'success' : 'danger'}`} shadow='sm'>
-                                        <CardBody>
-                                            <FormGroup id='confirmed'>
-                                                <ChecksGroup isInline>
-                                                    <Checks
-                                                        type='switch'
-                                                        value='true'
-                                                        name='confirmed'
-                                                        checked={formik.values.confirmed}
-                                                        onChange={formik.handleChange}
-                                                        label={formik.values.confirmed ? 'Le rendez-vous est confirmé.' : "Le rendez-vous n'est pas confirmé."}
-                                                    />
-                                                    <Icon
-                                                        icon='Circle'
-                                                        className={classNames(
-                                                            formik.values.confirmed ? 'text-success' : 'text-danger',
-                                                            'animate__animated animate__heartBeat animate__infinite animate__slower',
-                                                        )}
-                                                    />
-                                                </ChecksGroup>
-                                            </FormGroup>
-                                        </CardBody>
-                                    </Card>
-                                </div>
-
-                                <div className='col-12'>
-                                    <Dropdown>
-                                        <DropdownToggle hasIcon={false}>
-                                            <Button
-                                                isLink
-                                                color={formik.values.confirmed ? 'success' : 'danger'}
-                                                icon='Circle'
-                                                className='text-nowrap'>
-                                                {formik.values.confirmed ? 'Confirmé' : 'En attente de confirmation'}
-                                            </Button>
-                                        </DropdownToggle>
-                                        <DropdownMenu>
-                                            <DropdownItem>
-                                                <div>
-                                                    <Icon
-                                                        icon='Circle'
-                                                        color='success'
-                                                    />
-                                                    Confirmé
-                                                </div>
-                                            </DropdownItem>
-
-                                            <DropdownItem >
-                                                <div>
-                                                    <Icon
-                                                        icon='Circle'
-                                                        color='danger'
-                                                    />
-                                                    En attente de confirmation
-                                                </div>
-                                            </DropdownItem>
-                                        </DropdownMenu>
-                                    </Dropdown>
-                                </div>
-                            </>
+                            <div className='col-12'>
+								<Card className={`mt-2 mb-2 bg-l10-${formik.values.confirmed ? 'success' : 'danger'}`} shadow='sm'>
+									<CardBody>
+										<FormGroup id='confirmed'>
+                                            <ChecksGroup isInline>
+                                                <Checks
+                                                    type='switch'
+                                                    value='true'
+                                                    name='confirmed'
+                                                    checked={formik.values.confirmed}
+                                                    onChange={formik.handleChange}
+                                                    label={formik.values.confirmed ? 'Le rendez-vous est confirmé.' : "Le rendez-vous n'est pas confirmé."}
+                                                />
+                                                <Icon
+                                                    icon='Circle'
+                                                    className={classNames(
+                                                        formik.values.confirmed ? 'text-success' : 'text-danger',
+                                                        'animate__animated animate__heartBeat animate__infinite animate__slower',
+                                                    )}
+                                                />
+                                            </ChecksGroup>
+										</FormGroup>
+									</CardBody>
+								</Card>
+							</div>
                             }
 
-                            <div className='d-flex justify-content-between py-3 mb-4'>
-                                <div>
+                            <div className='d-flex justify-content-between py-3'>
+                                <div className=''>
                                     <Button 
                                         color='info' 
                                         icon='Save'
@@ -1100,4 +1057,4 @@ const DashboardBookingPage = () => {
 	);
 };
 
-export default DashboardBookingPage;
+export default DashboardActivityPage;

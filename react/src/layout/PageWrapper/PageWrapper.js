@@ -14,7 +14,7 @@ import classNames from 'classnames';
 
 const PageWrapper = forwardRef(({ title, description, className, isLoginPage, children }, ref) => {
     
-    const auth = useAuth(); // 🦸 Auth :
+    const auth = useAuth(); // 🦸 Auth
 
 	useLayoutEffect(() => {
 		// document.getElementsByTagName('TITLE')[0].text = `${title ? `${title} | ` : ''}${
@@ -38,6 +38,7 @@ const PageWrapper = forwardRef(({ title, description, className, isLoginPage, ch
 		</div>
 	);
 });
+
 PageWrapper.propTypes = {
 	title: PropTypes.string,
 	description: PropTypes.string,

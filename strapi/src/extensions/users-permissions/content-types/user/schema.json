@@ -112,6 +112,12 @@
       "relation": "oneToMany",
       "target": "api::horse.horse",
       "mappedBy": "owner"
+    },
+    "activities": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::activity.activity",
+      "inversedBy": "users"
     }
   }
 }
