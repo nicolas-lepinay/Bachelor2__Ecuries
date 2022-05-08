@@ -1,3 +1,4 @@
+// 📚 Librairies :
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
@@ -7,26 +8,25 @@ import { useFormik } from 'formik';
 import { Calendar as DatePicker } from 'react-date-range';
 
 import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../layout/SubHeader/SubHeader';
-
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Icon from '../../components/icon/Icon';
-import Button from '../../components/bootstrap/Button';
+
+// 🅱️ Bootstrap components :
 import Card, {
 	CardActions,
 	CardBody,
 	CardHeader,
 	CardLabel,
-	CardTitle,
-} from '../../components/bootstrap/Card';
-import CommonUpcomingEvents from '../common/CommonUpcomingEvents';
+	CardTitle } from '../../components/bootstrap/Card';
+
 import OffCanvas, {
-	OffCanvasBody,
+    OffCanvasBody,
 	OffCanvasHeader,
-	OffCanvasTitle,
-} from '../../components/bootstrap/OffCanvas';
+	OffCanvasTitle } from '../../components/bootstrap/OffCanvas';
 
 
+import Button from '../../components/bootstrap/Button';
 import Accordion, { AccordionItem } from '../../components/bootstrap/Accordion';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Input from '../../components/bootstrap/forms/Input';
@@ -34,12 +34,20 @@ import Checks, { ChecksGroup } from '../../components/bootstrap/forms/Checks';
 import Select from '../../components/bootstrap/forms/Select';
 import Textarea from '../../components/bootstrap/forms/Textarea';
 import InputGroup, { InputGroupText } from '../../components/bootstrap/forms/InputGroup';
+import Popovers from '../../components/bootstrap/Popovers';
+import Option from '../../components/bootstrap/Option';
 
+import Modal, {
+    ModalBody,
+    ModalFooter,
+    ModalHeader,
+    ModalTitle } from '../../components/bootstrap/Modal'
+
+
+import CommonUpcomingEvents from '../common/CommonUpcomingEvents';
 import Avatar, { AvatarGroup } from '../../components/Avatar';
-// Default Avatar :
 import defaultAvatar from '../../assets/img/wanna/defaultAvatar.webp';
 
-import Popovers from '../../components/bootstrap/Popovers';
 import {
     CalendarTodayButton,
 	CalendarViewModeButtons,
@@ -48,7 +56,6 @@ import {
 	getViews,
 } from '../../components/extras/calendarHelper';
 import { demoPages } from '../../menu';
-import Option from '../../components/bootstrap/Option';
 import CommonApprovedAppointmentChart from '../common/CommonApprovedAppointmentChart';
 import CommonPercentageOfLoadChart from '../common/CommonPercentageOfLoadChart';
 import CommonDashboardBookingLists from '../common/BookingComponents/CommonDashboardBookingLists';
@@ -64,18 +71,14 @@ import useFetchEmployees from '../../hooks/useFetchEmployees'
 import usePost from '../../hooks/usePost';
 import useAuth from '../../hooks/useAuth';
 
-// 🖥️ Modal :
-import CustomModal from '../../components/CustomModal'
-import { confirmation } from '../../modals'
-
 // 🅰️ Axios :
 import axios from 'axios';
 
 // ⚙️ Strapi's API URL :
 const API_URL = process.env.REACT_APP_API_URL;
+const APPOINTMENTS_ROUTE = process.env.REACT_APP_APPOINTMENTS_ROUTE;
 
 const localizer = momentLocalizer(moment);
-
 const now = new Date();
 
 const Circle = () => {
@@ -432,9 +435,6 @@ const DashboardBookingPage = () => {
 	});
 
     const handlePost = async (newData) => {
-        // ⚙️ Strapi's URL :
-        const API_URL = process.env.REACT_APP_API_URL;
-        const APPOINTMENTS_ROUTE = process.env.REACT_APP_APPOINTMENTS_ROUTE;
 
         try {
             const res = await axios.post(`${API_URL}${APPOINTMENTS_ROUTE}?populate=employees.avatar&populate=employees.role&populate=horses.owner`, { data: newData });
@@ -455,7 +455,7 @@ const DashboardBookingPage = () => {
                 'success' // type
 			);
         } catch(err) {
-            console.log("USE POST | Appointment | Le rendez-vous n'a pas pu être ajouté à la base de données. | " + err);
+            console.log("POST | Appointment | Le rendez-vous n'a pas pu être ajouté à la base de données. | " + err);
             showNotification(
                 'Calendrier.', // title
 				"Oops ! Une erreur s'est produite. Le rendez-vous n'a pas pu être ajouté.", // message
@@ -465,9 +465,6 @@ const DashboardBookingPage = () => {
     }
 
     const handleUpdate = async (newData) => {
-        // ⚙️ Strapi's URL :
-        const API_URL = process.env.REACT_APP_API_URL;
-        const APPOINTMENTS_ROUTE = process.env.REACT_APP_APPOINTMENTS_ROUTE;
 
         try {
             const res = await axios.put(`${API_URL}${APPOINTMENTS_ROUTE}/${newData.id}?populate=employees.avatar&populate=employees.role&populate=horses.owner`, { data: newData });
@@ -496,7 +493,7 @@ const DashboardBookingPage = () => {
                 'success' // type
 			);
         } catch(err) {
-            console.log("USE POST | Appointment | Le rendez-vous n'a pas pu être ajouté à la base de données. | " + err);
+            console.log("UPDATE | Appointment | Le rendez-vous n'a pas pu être ajouté à la base de données. | " + err);
             showNotification(
                 'Mise à jour.', // title
 				"Oops ! Une erreur s'est produite. Le rendez-vous n'a pas pu être modifié.", // message
@@ -505,8 +502,25 @@ const DashboardBookingPage = () => {
         }
     }
 
-    const modalAction = () => {
-        console.log("MODAL CLICKED !")
+    const handleDelete = async () => {
+        if(eventItem?.id) {
+            try {
+                await axios.delete(`${API_URL}${APPOINTMENTS_ROUTE}/${eventItem.id}`);
+                setAppointments( appointments => appointments.filter( item => item.id !== eventItem.id))
+                showNotification(
+                    'Mise à jour.', // title
+                    "Le rendez-vous a été supprimé.", // message
+                    'success' // type
+                );
+            } catch (err) {
+                console.log("DELETE | Appointment | Le rendez-vous n'a pas pu être supprimé de la base de données. | " + err);
+                showNotification(
+                    'Calendrier.', // title
+                    "Oops ! Une erreur s'est produite. Le rendez-vous n'a pas pu être supprimé.", // message
+                    'danger' // type
+                );
+            }
+        }
     }
 
 	useEffect(() => {
@@ -1008,12 +1022,34 @@ const DashboardBookingPage = () => {
                     appointments={appointments}
                 />
 
-                <CustomModal 
-                    state={triggerModal} 
-                    setState={setTriggerModal} 
-                    src={confirmation.appointment.delete}
-                    action={modalAction}
-                />
+                <Modal
+                    isOpen={triggerModal}
+                    setIsOpen={setTriggerModal}
+                    titleId='confirmationModal'
+                    isCentered isAnimation >
+                        <ModalHeader setIsOpen={triggerModal}>
+                            <ModalTitle id='confirmationModal'>Voulez-vous supprimer ce rendez-vous ?</ModalTitle>
+                        </ModalHeader>
+                        <ModalBody className='text-center new-line'>Ce rendez-vous sera définitivement supprimé du calendrier.</ModalBody>
+                        <ModalFooter>
+                            <Button
+                                color='light'
+                                className='border-0'
+                                isOutline
+                                onClick={() => setTriggerModal(false)} >
+                                Annuler
+                            </Button>
+                            <Button 
+                                color='danger' 
+                                icon='Delete'
+                                onClick={ () => {
+                                    handleDelete();
+                                    setTriggerModal(false);
+                                } }>
+                                Confirmer
+                            </Button>
+                        </ModalFooter>
+                </Modal>
 
 			</Page>
 		</PageWrapper>

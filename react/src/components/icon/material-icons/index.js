@@ -1125,6 +1125,7 @@ export { default as PersonAdd } from './PersonAdd';
 export { default as PersonAddAlt } from './PersonAddAlt';
 export { default as PersonAddAlt1 } from './PersonAddAlt1';
 export { default as PersonAddDisabled } from './PersonAddDisabled';
+export { default as PersonHeart } from './PersonHeart';
 export { default as PersonOff } from './PersonOff';
 export { default as PersonOutline } from './PersonOutline';
 export { default as PersonPin } from './PersonPin';
