@@ -109,9 +109,6 @@ const MyEvent = (data) => {
     // Activité active (en cours) :
     const isActiveEvent = event.start <= now && event.end >= now;
 
-    // Activité passée :
-    const isPastEvent = event.end < now;
-
 	return (
 		<div className='row g-2'>
 			<div className='col text-truncate'>
@@ -124,18 +121,24 @@ const MyEvent = (data) => {
             <div className='col-auto'>
                 <div className='row g-1 align-items-baseline'>
                     <div className='col-auto'>
-                        <Avatar 
-                            src={event?.horses?.data[0]?.attributes?.avatar ? `${API_URL}${event?.horses?.data[0]?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
-                            srcSet={event?.horses?.data[0]?.attributes?.avatar ? `${API_URL}${event?.horses?.data[0]?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
-                            size={18} 
-                        />
+                        <AvatarGroup className='me-3' size={18}>
+                            {event?.horses?.data.map( horse => (
+                                <Avatar
+                                    key={horse.id}
+                                    srcSet={horse?.attributes?.avatar ? `${API_URL}${horse?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                                    src={horse?.attributes?.avatar ? `${API_URL}${horse?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                                    userName={horse?.attributes?.name}
+                                    color={horse?.attributes?.color}
+                                />
+                            ))}
+						</AvatarGroup>
                     </div>
                     <small
                         className={classNames('col-auto text-truncate', {
                             'text-dark': !darkModeStatus,
                             'text-white': darkModeStatus,
                         })}>
-                        {event?.horses?.data[0]?.attributes?.name}
+                        {event?.employee?.data?.attributes?.name}
                     </small>
                 </div>
             </div>
@@ -173,13 +176,19 @@ const MyWeekEvent = (data) => {
 			{event?.employee?.data && (
 				<div className='col-12'>
 					<div className='row g-1 align-items-baseline'>
-						<div className='col-auto'>
-                            <Avatar 
-                                src={event?.employee?.data?.attributes?.avatar ? `${API_URL}${event?.employee?.data?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
-                                srcSet={event?.employee?.data?.attributes?.avatar ? `${API_URL}${event?.employee?.data?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
-                                size={18} 
-                            />
-						</div>
+                        <div className='col-auto'>
+                            <AvatarGroup className='me-3' size={18}>
+                                {event?.horses?.data.map( horse => (
+                                    <Avatar
+                                        key={horse.id}
+                                        srcSet={horse?.attributes?.avatar ? `${API_URL}${horse?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                                        src={horse?.attributes?.avatar ? `${API_URL}${horse?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                                        userName={horse?.attributes?.name}
+                                        color={horse?.attributes?.color}
+                                    />
+                                ))}
+                            </AvatarGroup>
+                        </div>
 						<small
 							className={classNames('col-auto text-truncate', {
 								'text-dark': !darkModeStatus,
@@ -234,18 +243,13 @@ const DashboardActivityPage = () => {
     // Activities + Appointments merged :
     const [events, setEvents] = useState([]);
 
-    // console.log(activities)
-    // console.log(appointments)
-    // console.log(horses)
-    // console.log([...activities, ...appointments])
-
     useEffect( () => {
         // Je merge les activités des chevaux et les rendez-vous (uniquements ceux qui ont des chevaux d'inscrits) dans la variable events: 
         setEvents([ ...activities, ...appointments.filter( appointment => appointment.horses?.data.length > 0) ]);
         // console.log(events)
     }, [activities, appointments])
 
-    const icons = [
+    const icons_appointments = [
         {
             icon: 'Block',
             description: 'Aucune icône.'
@@ -308,6 +312,90 @@ const DashboardActivityPage = () => {
         }, 
     ]
 
+    const icons_activities = [
+        {
+            icon: 'Block',
+            description: 'Aucune icône.'
+        },
+        {
+            icon: 'HorseVariant',
+            description: 'Cheval (tête)',
+        },
+        {
+            icon: 'Horse',
+            description: 'Cheval (corps)',
+        },
+        {
+            icon: 'HorseHuman',
+            description: 'Cavalière',
+        },
+        {
+            icon: 'Horseshoe',
+            description: 'Fer à cheval',
+        }, 
+        {
+            icon: 'Psychology',
+            description: 'Psychologie',
+        }, 
+        {
+            icon: 'FrontHand',
+            description: 'Dressage',
+        },
+        {
+            icon: 'VolunteerActivism',
+            description: 'Relation cheval/cavalier',
+        }, 
+        {
+            icon: 'Healing',
+            description: 'Rééducation',
+        }, 
+        {
+            icon: 'FitnessCenter',
+            description: 'Exercice',
+        },
+        {
+            icon: 'BoomGateUp',
+            description: "Saut d'obstacles",
+        }, 
+        {
+            icon: 'GolfCourse',
+            description: 'Parcours',
+        },
+        {
+            icon: 'Gymnastics',
+            description: 'Voltige',
+        },
+        {
+            icon: 'Gesture',
+            description: 'Gestuel',
+        },
+        {
+            icon: 'SportsSoccer',
+            description: 'Ballon',
+        }, 
+        {
+            icon: 'Hiking',
+            description: 'Randonnée',
+        }, 
+        {
+            icon: 'Park',
+            description: 'Promenade',
+        },
+
+        {
+            icon: 'CleaningServices',
+            description: 'Brossage',
+        }, 
+        {
+            icon: 'Games',
+            description: 'Jeux',
+        },
+        {
+            icon: 'CameraAlt',
+            description: 'Photographie',
+        },    
+    ]
+
 	// BEGIN :: Calendar
     const [horseList, setHorseList] = useState({});
     const [selectedHorse, setSelectedHorse] = useState({})
@@ -337,7 +425,7 @@ const DashboardActivityPage = () => {
 	const setInfoAppointment = () => setToggleInfoAppointmentCanvas(!toggleInfoAppointmentCanvas);
 
 	const [eventAdding, setEventAdding] = useState(false);
-
+console.log(horseList)
 	// Calendar Unit Type
 	const unitType = getUnitType(viewMode);
 	// Calendar Date Label
@@ -389,8 +477,11 @@ const DashboardActivityPage = () => {
         // Activité passée :
 		const isPastEvent = end < now;
 
-		const color = event?.horses?.data[0]?.attributes?.color;
+		// const color = event?.horses?.data[0]?.attributes?.color;
 
+        const selectedHorses = event?.horses?.data.filter( horse => horseList[horse.id] === true); // Uniquement les chevaux dont on affiche le planning
+        const color = selectedHorses[0]?.attributes?.color; // La couleur du premier cheval parmi ceux dont on affiche le planning
+        
 		return {
 			className: classNames({
 				[`bg-l${darkModeStatus ? 'o25' : '10'}-${color} text-${color}`]: color,
@@ -412,6 +503,9 @@ const DashboardActivityPage = () => {
             horses: {
                 id: '',
             },
+            employee: {
+                id: auth.user.id,
+            }
 		},
 		onSubmit: (values) => {
             // Validation :
@@ -420,9 +514,11 @@ const DashboardActivityPage = () => {
                 || values?.start === '' 
                 || !values?.start 
                 || values?.end === '' 
-                || !values?.end === '' 
+                || !values?.end 
                 || values?.horses?.id === '' 
-                || !values?.horses?.id)
+                || !values?.horses?.id
+                || values?.employee?.id === '' 
+                || !values?.employee?.id)
                     return
 
             // Je supprime tous les champs vide ou null/undefined (mais pas false!) :
@@ -478,7 +574,7 @@ const DashboardActivityPage = () => {
             || values?.start === '' 
             || !values?.start 
             || values?.end === '' 
-            || !values?.end === '' 
+            || !values?.end 
             || values?.employee?.id === '' 
             || !values?.employee?.id)
                 return
@@ -511,6 +607,9 @@ const DashboardActivityPage = () => {
 	});
 
 	useEffect(() => {
+        formikAppointment.setValues({});
+        formikActivity.setValues({});
+
 		if (eventItem) {
             eventItem.hasOwnProperty('confirmed') // L'event est un rendez-vous...
             ?
@@ -527,6 +626,7 @@ const DashboardActivityPage = () => {
                 description: eventItem?.description,
                 icon: eventItem?.icon ? eventItem.icon : 'Block',
 			})
+            // ...sinon, l'event est une activité...
             :
 			formikActivity.setValues({
 				...formikActivity.values,
@@ -536,6 +636,9 @@ const DashboardActivityPage = () => {
 				end: moment(eventItem.end).format(),
                 horses: {
                     id: eventItem?.horses?.data[0]?.id,
+                },
+                employee: {
+                    id: eventItem?.employee?.data?.id || auth.user.id,
                 },
                 description: eventItem?.description,
                 icon: eventItem?.icon ? eventItem.icon : 'Block',
@@ -751,10 +854,10 @@ const DashboardActivityPage = () => {
                                     <AccordionItem
                                         id='ico'
                                         title='Icône'
-                                        icon='HorseVariant'>
+                                        icon='EmojiEvents'>
                                         {!formikActivity.values.noIcon &&
                                             <>
-                                            {icons.map( item => (
+                                            {icons_activities.map( item => (
                                                 <Popovers
                                                     trigger='hover'
                                                     placement='top'
@@ -863,7 +966,7 @@ const DashboardActivityPage = () => {
 							<div className='col-12'>
 								<Card className='mb-2 bg-l10-primary' shadow='sm'>
 									<CardHeader className='bg-l25-primary'>
-										<CardLabel icon='Person Add' iconColor='primary'>
+										<CardLabel icon='Horse' iconColor='primary'>
 											<CardTitle className='text-primary'>Pensionnaire</CardTitle>
 										</CardLabel>
 									</CardHeader>
@@ -887,6 +990,34 @@ const DashboardActivityPage = () => {
 								</Card>
 							</div>
 
+                            {/* Employee */}
+							<div className='col-12'>
+								<Card className='mb-2 bg-l10-info' shadow='sm'>
+									<CardHeader className='bg-l25-info'>
+										<CardLabel icon='Person Add' iconColor='info'>
+											<CardTitle className='text-info'>Professionnel(le)</CardTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody>
+										<FormGroup id='employee.id'>
+											<Select
+												placeholder='Veuillez choisir...'
+												value={formikActivity.values?.employee?.id}
+												onChange={formikActivity.handleChange}
+												ariaLabel='Employee select'>
+												{employees.map( employee => (
+													<Option
+														key={employee.id}
+														value={employee.id}>
+														{employee.name} {employee.surname}
+													</Option>
+												))}
+											</Select>
+										</FormGroup>
+									</CardBody>
+								</Card>
+							</div>
+
                             <div className='d-flex justify-content-between py-3 mb-4'>
                                 <div>
                                     <Button 
@@ -894,11 +1025,14 @@ const DashboardActivityPage = () => {
                                         icon='Save'
                                         type='submit'
                                         disabled={formikActivity?.values?.name === '' 
-                                            || formikActivity.values?.employee?.id === '' 
-                                            || formikActivity.values?.start === '' 
-                                            || !formikActivity.values?.name 
-                                            || !formikActivity.values?.employee?.id 
-                                            || !formikActivity.values?.start }
+                                        || !formikActivity.values?.name 
+                                        || formikActivity.values?.start === '' 
+                                        || !formikActivity.values?.start
+                                        || formikActivity.values?.horses?.id === '' 
+                                        || !formikActivity.values?.horses?.id 
+                                        || formikActivity.values?.employee?.id === '' 
+                                        || !formikActivity.values?.employee?.id 
+                                        }
                                         >
                                         Sauvegarder
                                     </Button>
@@ -1022,10 +1156,10 @@ const DashboardActivityPage = () => {
                                     <AccordionItem
                                         id='ico'
                                         title='Icône'
-                                        icon='HorseVariant'>
+                                        icon='EmojiEvents'>
                                         {!formikAppointment.values.noIcon &&
                                             <>
-                                            {icons.map( item => (
+                                            {icons_appointments.map( item => (
                                                 <Popovers
                                                     trigger='hover'
                                                     placement='top'
@@ -1191,9 +1325,6 @@ const DashboardActivityPage = () => {
 						</div>
 					</OffCanvasBody>
 				</OffCanvas>
-
-
-
 
 				{/* <CommonRightPanel
                     setOpen={setToggleRightPanel} 

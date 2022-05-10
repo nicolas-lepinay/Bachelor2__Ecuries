@@ -8,7 +8,7 @@ const useFetchAppointments = () => {
     // ⚙️ Strapi's URL :
     const API_URL = process.env.REACT_APP_API_URL;
     const APPOINTMENTS_ROUTE = process.env.REACT_APP_APPOINTMENTS_ROUTE;
-    const query = `${APPOINTMENTS_ROUTE}?populate=employee.avatar&populate=employee.role&populate=horses.owner`;
+    const query = `${APPOINTMENTS_ROUTE}?populate=employee.avatar&populate=employee.role&populate=horses.owner&populate=horses.avatar`;
 
     const [data, setData] = useState([]);
     const [error, setError] = useState(null);

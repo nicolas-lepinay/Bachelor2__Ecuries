@@ -291,9 +291,7 @@ const DashboardBookingPage = () => {
 
     useEffect(() => {
         const list = {};
-        employees.map( employee => {
-            list[employee.id] = true;
-        })
+        employees.map( employee => list[employee.id] = true)
         setEmployeeList(list);
         employees.length > 0 && setSelectedEmployee(employees[0])
     }, [employees])
@@ -860,7 +858,7 @@ const DashboardBookingPage = () => {
                                     <AccordionItem
                                         id='ico'
                                         title='Icône'
-                                        icon='HorseVariant'>
+                                        icon='EmojiEvents'>
                                         {!formik.values.noIcon &&
                                             <>
                                             {icons.map( item => (
