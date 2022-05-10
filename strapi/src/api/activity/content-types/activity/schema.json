@@ -4,7 +4,8 @@
   "info": {
     "singularName": "activity",
     "pluralName": "activities",
-    "displayName": "Activity"
+    "displayName": "Activity",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -29,11 +30,14 @@
       "target": "api::horse.horse",
       "mappedBy": "activities"
     },
-    "users": {
+    "employee": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "activities"
+    },
+    "description": {
+      "type": "text"
     }
   }
 }

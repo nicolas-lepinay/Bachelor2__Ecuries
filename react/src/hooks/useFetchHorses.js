@@ -3,17 +3,13 @@ import { useEffect, useState } from 'react';
 // 🅰️ Axios :
 import axios from 'axios';
 
-const useFetchEmployees = () => {
+const useFetchHorses = () => {
 
     // ⚙️ Strapi's URL :
     const API_URL = process.env.REACT_APP_API_URL;
-    const USERS_ROUTE = process.env.REACT_APP_USERS_ROUTE;
+    const HORSES_ROUTE = process.env.REACT_APP_HORSES_ROUTE;
 
-    // ⚙️ PRO ID and ADMIN ID :
-    const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
-    const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; // Id du rôle 'Admin'
-
-    const query = `${USERS_ROUTE}?populate=*&filters[role][id]=${PRO_ID}&filters[role][id]=${ADMIN_ID}`;
+    const query = `${HORSES_ROUTE}?populate=*`;
 
     const [data, setData] = useState([]);
     const [error, setError] = useState(null);
@@ -24,10 +20,20 @@ const useFetchEmployees = () => {
             setLoading(true);
             try {
                 const res = await axios.get(`${API_URL}${query}`);
-                setData(res.data);
+                const resData = res.data.data
+                const formattedData = [];
+        
+                // Reformat object to simply its structure:
+                resData.map( item => {
+                    formattedData.push({ 
+                        id: item.id, 
+                        ...item.attributes
+                    });
+                });
+                setData(formattedData);
             } catch(err) {
                 setError(err)
-                console.log('USE FETCH EMPLOYEES | ' + query + ' | ' + err)
+                console.log('USE FETCH HORSES | ' + query + ' | ' + err)
             } finally {
                 setLoading(false);
             }
@@ -43,4 +49,4 @@ const useFetchEmployees = () => {
     }
 }
 
-export default useFetchEmployees;
+export default useFetchHorses;

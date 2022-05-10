@@ -25,17 +25,17 @@ export const getUnitType = (viewMode) => {
 export const getLabel = (date, viewMode) => {
 	if (viewMode === Views.MONTH) return moment(date).format('MMMM YYYY');
 	if (viewMode === Views.WEEK)
-		return `${moment(date).startOf('week').format('LL')} - ${moment(date)
+		return `${moment(date).startOf('week').format('D MMMM YYYY')} - ${moment(date)
 			.endOf('week')
-			.format('MMM D')}`;
+			.format('D MMMM YYYY')}`;
 	if (viewMode === Views.WORK_WEEK)
-		return `${moment(date).startOf('week').add(1, 'day').format('LL')} - ${moment(date)
+		return `${moment(date).startOf('week').format('dddd D MMMM YYYY')} - ${moment(date)
 			.endOf('week')
-			.add(-1, 'day')
-			.format('LL')}`;
+			.add(-2, 'day')
+			.format('dddd D MMMM YYYY')}`;
 	if (viewMode === Views.AGENDA)
-		return `${moment(date).format('LL')} - ${moment(date).add(1, 'month').format('LL')}`;
-	return moment(date).format('dddd, MMM D');
+		return `${moment(date).format('D MMMM YYYY')} - ${moment(date).add(1, 'month').format('D MMMM YYYY')}`;
+	return moment(date).format('dddd D MMMM YYYY');
 };
 
 export const getTodayButtonLabel = (viewMode) => {

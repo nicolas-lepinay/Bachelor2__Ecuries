@@ -61,7 +61,7 @@ import {
 	getUnitType,
 	getViews,
 } from '../../components/extras/calendarHelper';
-import { demoPages } from '../../menu';
+import { clientMenu, demoPages } from '../../menu';
 import CommonApprovedAppointmentChart from '../common/CommonApprovedAppointmentChart';
 import CommonPercentageOfLoadChart from '../common/CommonPercentageOfLoadChart';
 import CommonDashboardBookingLists from '../common/BookingComponents/CommonDashboardBookingLists';
@@ -71,10 +71,8 @@ import showNotification from '../../components/extras/showNotification';
 // 🛠️ Hooks :
 import useMinimizeAside from '../../hooks/useMinimizeAside';
 import useDarkMode from '../../hooks/useDarkMode';
-import useFetch from '../../hooks/useFetch'
 import useFetchAppointments from '../../hooks/useFetchAppointments'
 import useFetchEmployees from '../../hooks/useFetchEmployees'
-import usePost from '../../hooks/usePost';
 import useAuth from '../../hooks/useAuth';
 
 // 🅰️ Axios :
@@ -122,15 +120,15 @@ const MyEvent = (data) => {
                 {!isConfirmedEvent && !isPastEvent && <Circle color='danger' />}
 				{(isConfirmedEvent || isPastEvent) && !isActiveEvent && event?.icon && <Icon icon={event?.icon} size='lg' className='me-2' />}
 
-				{event?.name || event?.employees?.data[0]?.attributes?.occupation}
+				{event?.name || event?.employee?.data?.attributes?.occupation}
 			</div>
 
             <div className='col-auto'>
                 <div className='row g-1 align-items-baseline'>
                     <div className='col-auto'>
                         <Avatar 
-                            src={event?.employees?.data && event?.employees?.data[0]?.attributes?.avatar ? `${API_URL}${event?.employees?.data[0]?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
-                            srcSet={event?.employees?.data && event?.employees?.data[0]?.attributes?.avatar ? `${API_URL}${event?.employees?.data[0]?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                            src={event?.employee?.data && event?.employee?.data?.attributes?.avatar ? `${API_URL}${event?.employee?.data?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                            srcSet={event?.employee?.data && event?.employee?.data?.attributes?.avatar ? `${API_URL}${event?.employee?.data?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
                             size={18} 
                         />
                     </div>
@@ -139,13 +137,10 @@ const MyEvent = (data) => {
                             'text-dark': !darkModeStatus,
                             'text-white': darkModeStatus,
                         })}>
-                        {event?.employees?.data[0]?.attributes?.name}
+                        {event?.employee?.data?.attributes?.name}
                     </small>
                 </div>
             </div>
-
-
-			
 		</div>
 	);
 };
@@ -172,15 +167,15 @@ const MyWeekEvent = (data) => {
                 {!isConfirmedEvent && !isPastEvent && <Circle color='danger' />}
 				{(isConfirmedEvent || isPastEvent) && !isActiveEvent && event?.icon && <Icon icon={event?.icon} size='lg' className='me-2' />}
 
-				{event?.name || event?.employees?.data[0]?.attributes?.occupation}
+				{event?.name || event?.employee?.data?.attributes?.occupation}
 			</div>
-			{event?.employees && (
+			{event?.employee?.data && (
 				<div className='col-12'>
 					<div className='row g-1 align-items-baseline'>
 						<div className='col-auto'>
                             <Avatar 
-                                src={event?.employees?.data && event?.employees?.data[0]?.attributes?.avatar ? `${API_URL}${event?.employees?.data[0]?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
-                                srcSet={event?.employees?.data && event?.employees?.data[0]?.attributes?.avatar ? `${API_URL}${event?.employees?.data[0]?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                                src={event?.employee?.data?.attributes?.avatar ? `${API_URL}${event?.employee?.data?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                                srcSet={event?.employee?.data?.attributes?.avatar ? `${API_URL}${event?.employee?.data?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
                                 size={18} 
                             />
 						</div>
@@ -189,7 +184,7 @@ const MyWeekEvent = (data) => {
 								'text-dark': !darkModeStatus,
 								'text-white': darkModeStatus,
 							})}>
-							{event?.employees?.data[0]?.attributes?.name}
+							{event?.employee?.data?.attributes?.name}
 						</small>
 					</div>
 				</div>
@@ -199,11 +194,8 @@ const MyWeekEvent = (data) => {
 };
 
 const DashboardBookingPage = () => {
-
     
     // 🛠️ Hooks :
-    const fetch = useFetch();
-    const post = usePost();
     const auth = useAuth(); // 🦸
 	const { darkModeStatus, themeStatus } = useDarkMode();
 	useMinimizeAside();
@@ -371,7 +363,7 @@ const DashboardBookingPage = () => {
         // RDV passé :
 		const isPastEvent = end < now;
 
-		const color = event?.employees?.data[0]?.attributes?.color;
+		const color = event?.employee?.data?.attributes?.color;
 
 		return {
 			className: classNames({
@@ -392,10 +384,9 @@ const DashboardBookingPage = () => {
             confirmed: '',
             description: '',
             icon: '',
-            employees: {
+            employee: {
                 id: '',
             },
-            random: '',
 		},
 		onSubmit: (values) => {
             // Validation :
@@ -405,8 +396,8 @@ const DashboardBookingPage = () => {
                 || !values?.start 
                 || values?.end === '' 
                 || !values?.end === '' 
-                || values?.employees?.id === '' 
-                || !values?.employees?.id)
+                || values?.employee?.id === '' 
+                || !values?.employee?.id)
                     return
 
             // Je supprime tous les champs vide ou null/undefined (mais pas false!) :
@@ -423,7 +414,7 @@ const DashboardBookingPage = () => {
                 values.icon = null;
 
             // Cast de l'employeeId en int :
-            values.employees.id = Number(values.employees.id);
+            values.employee.id = Number(values.employee.id);
 
             // ✨ AJOUT D'UN NOUVEL EVENEMENT ✨
 			if (eventAdding) {
@@ -444,7 +435,7 @@ const DashboardBookingPage = () => {
     const handlePost = async (newData) => {
 
         try {
-            const res = await axios.post(`${API_URL}${APPOINTMENTS_ROUTE}?populate=employees.avatar&populate=employees.role&populate=horses.owner`, { data: newData });
+            const res = await axios.post(`${API_URL}${APPOINTMENTS_ROUTE}?populate=employee.avatar&populate=employee.role&populate=horses.owner`, { data: newData });
             const resData = res.data.data;
 
             let formattedData = {}
@@ -474,7 +465,7 @@ const DashboardBookingPage = () => {
     const handleUpdate = async (newData) => {
 
         try {
-            const res = await axios.put(`${API_URL}${APPOINTMENTS_ROUTE}/${newData.id}?populate=employees.avatar&populate=employees.role&populate=horses.owner`, { data: newData });
+            const res = await axios.put(`${API_URL}${APPOINTMENTS_ROUTE}/${newData.id}?populate=employee.avatar&populate=employee.role&populate=horses.owner`, { data: newData });
             const resData = res.data.data;
 
             let formattedData = {}
@@ -538,8 +529,8 @@ const DashboardBookingPage = () => {
 				name: eventItem?.name,
 				start: moment(eventItem.start).format(),
 				end: moment(eventItem.end).format(),
-                employees: {
-                    id: eventItem?.employees?.data[0]?.id,
+                employee: {
+                    id: eventItem?.employee?.data?.id,
                 },
                 confirmed: eventItem.confirmed,
                 description: eventItem?.description,
@@ -554,7 +545,7 @@ const DashboardBookingPage = () => {
     const [triggerModal, setTriggerModal] = useState(false);
 
     return (
-		<PageWrapper title={demoPages.appointment.subMenu.dashboard.text}>
+		<PageWrapper title={`${clientMenu.dashboards.dashboards.text} ${clientMenu.dashboards.dashboards.subMenu.dashboardBooking.text}`}>
 			<SubHeader>
 				<SubHeaderLeft>
 					<Button
@@ -595,6 +586,7 @@ const DashboardBookingPage = () => {
 									<Popovers
 										trigger='hover'
                                         placement='bottom'
+                                        animation={true}
 										desc={
 											<>
 												<div className='h6'><b>{`${employee.name} ${employee.surname}`}</b></div>
@@ -604,7 +596,7 @@ const DashboardBookingPage = () => {
 													{
 														appointments.filter(
 															(appointment) =>
-																appointment?.employees?.data[0].id ===
+																appointment?.employee?.data.id ===
 																employee.id,
 														).length
 													}
@@ -669,7 +661,7 @@ const DashboardBookingPage = () => {
 											toolbar={false}
 											localizer={localizer}
                                             events={appointments.filter(
-												(appointment) => employeeList[appointment.employees.data[0].id],
+												(appointment) => employeeList[appointment.employee.data.id],
 											)}
 											defaultView={Views.WEEK}
 											views={views}
@@ -787,6 +779,53 @@ const DashboardBookingPage = () => {
                                 </div>
                             </div> */}
 
+                            {/* Confirm event */}
+                            {/* (Uniquement Admin + Uniquement pour la modification d'un évènement existant) */}
+                            {isAdmin && !eventAdding &&
+                                <div className='col-12'>
+                                    <Dropdown>
+                                        <DropdownToggle hasIcon={false}>
+                                            <Button
+                                                isLight
+                                                color={formik.values.confirmed ? 'success' : 'danger'}
+                                                icon='Circle'
+                                                className='text-nowrap'>
+                                                {formik.values.confirmed ? 'Confirmé' : 'En attente de confirmation'}
+                                            </Button>
+                                        </DropdownToggle>
+                                        
+                                        <DropdownMenu >
+                                            <DropdownItem 
+                                                name='confirmed'
+                                                value={true}
+                                                onClick={() => formik.setFieldValue("confirmed", true)}
+                                                >
+                                                <div>
+                                                    <Icon
+                                                        icon='Circle'
+                                                        color='success'
+                                                    />
+                                                    Confirmé
+                                                </div>
+                                            </DropdownItem>
+
+                                            <DropdownItem 
+                                                name='confirmed'
+                                                value={false}
+                                                onClick={() => formik.setFieldValue("confirmed", false)}
+                                                >
+                                                <div>
+                                                    <Icon
+                                                        icon='Circle'
+                                                        color='danger'
+                                                    />
+                                                    En attente de confirmation
+                                                </div>
+                                            </DropdownItem>
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                </div>
+                            }   
 
 
 							{/* Name */}
@@ -938,10 +977,10 @@ const DashboardBookingPage = () => {
 										</CardLabel>
 									</CardHeader>
 									<CardBody>
-										<FormGroup id='employees.id'>
+										<FormGroup id='employee.id'>
 											<Select
 												placeholder='Veuillez choisir...'
-												value={formik.values?.employees?.id}
+												value={formik.values?.employee?.id}
 												onChange={formik.handleChange}
 												ariaLabel='Employee select'>
 												{employees.map( employee => (
@@ -959,9 +998,7 @@ const DashboardBookingPage = () => {
 
                             {/* Confirm event */}
                             {/* (Uniquement Admin + Uniquement pour la modification d'un évènement existant) */}
-                            {isAdmin && !eventAdding &&
-                            <>
-                                <div className='col-12'>
+                                {/* <div className='col-12'>
                                     <Card className={`mt-2 mb-2 bg-l10-${formik.values.confirmed ? 'success' : 'danger'}`} shadow='sm'>
                                         <CardBody>
                                             <FormGroup id='confirmed'>
@@ -985,44 +1022,7 @@ const DashboardBookingPage = () => {
                                             </FormGroup>
                                         </CardBody>
                                     </Card>
-                                </div>
-
-                                <div className='col-12'>
-                                    <Dropdown>
-                                        <DropdownToggle hasIcon={false}>
-                                            <Button
-                                                isLink
-                                                color={formik.values.confirmed ? 'success' : 'danger'}
-                                                icon='Circle'
-                                                className='text-nowrap'>
-                                                {formik.values.confirmed ? 'Confirmé' : 'En attente de confirmation'}
-                                            </Button>
-                                        </DropdownToggle>
-                                        <DropdownMenu>
-                                            <DropdownItem>
-                                                <div>
-                                                    <Icon
-                                                        icon='Circle'
-                                                        color='success'
-                                                    />
-                                                    Confirmé
-                                                </div>
-                                            </DropdownItem>
-
-                                            <DropdownItem >
-                                                <div>
-                                                    <Icon
-                                                        icon='Circle'
-                                                        color='danger'
-                                                    />
-                                                    En attente de confirmation
-                                                </div>
-                                            </DropdownItem>
-                                        </DropdownMenu>
-                                    </Dropdown>
-                                </div>
-                            </>
-                            }
+                                </div> */}
 
                             <div className='d-flex justify-content-between py-3 mb-4'>
                                 <div>
@@ -1031,13 +1031,13 @@ const DashboardBookingPage = () => {
                                         icon='Save'
                                         type='submit'
                                         disabled={formik?.values?.name === '' 
-                                            || formik.values?.employees?.id === '' 
+                                            || formik.values?.employee?.id === '' 
                                             || formik.values?.start === '' 
                                             || !formik.values?.name 
-                                            || !formik.values?.employees?.id 
+                                            || !formik.values?.employee?.id 
                                             || !formik.values?.start }
                                         >
-                                        Publier
+                                        Sauvegarder
                                     </Button>
                                 </div>
 
@@ -1072,9 +1072,9 @@ const DashboardBookingPage = () => {
                     titleId='confirmationModal'
                     isCentered isAnimation >
                         <ModalHeader setIsOpen={setTriggerModal}>
-                            <ModalTitle id='confirmationModal'>Voulez-vous supprimer ce rendez-vous ?</ModalTitle>
+                            <ModalTitle id='confirmationModal'>Supprimer un rendez-vous</ModalTitle>
                         </ModalHeader>
-                        <ModalBody className='text-center new-line'>Ce rendez-vous sera définitivement supprimé du calendrier.</ModalBody>
+                        <ModalBody className='text-center new-line'>{`Voulez-vous supprimer ce rendez-vous ?\nCe rendez-vous sera définitivement supprimé du calendrier.`}</ModalBody>
                         <ModalFooter>
                             <Button
                                 color='light'

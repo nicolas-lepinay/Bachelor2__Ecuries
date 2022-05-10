@@ -1009,7 +1009,7 @@ const dashboards = {
         id: 'dashboards',
         text: 'Planning',
         path: 'planning',
-        icon: 'CalendarViewMonth',
+        icon: 'Today',
         subMenu: {
             // Planning des pensionnaires (chevaux) :
             dashboardActivity: {

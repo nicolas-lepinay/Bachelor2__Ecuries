@@ -13,7 +13,7 @@ function Meta({ title, keywords, description }) {
 }
 
 Meta.defaultProps = { 
-    title: 'Ecuries de Persévère', 
+    title: 'Écuries de Persévère', 
     keywords: 'équitation, chevaux, écurie, karine massot', 
     description: 'Les écuries de Persévère, gérées par Karine Massot'
 }

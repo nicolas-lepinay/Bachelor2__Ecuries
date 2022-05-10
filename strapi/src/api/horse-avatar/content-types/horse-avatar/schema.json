@@ -1,0 +1,25 @@
+{
+  "kind": "singleType",
+  "collectionName": "horse_avatars",
+  "info": {
+    "singularName": "horse-avatar",
+    "pluralName": "horse-avatars",
+    "displayName": "HorseAvatar"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "avatars": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": true
+    }
+  }
+}

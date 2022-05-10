@@ -91,17 +91,11 @@
       "repeatable": false,
       "component": "address.address"
     },
-    "appointments_clients": {
+    "appointments": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "oneToMany",
       "target": "api::appointment.appointment",
-      "mappedBy": "clients"
-    },
-    "appointments_employees": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::appointment.appointment",
-      "mappedBy": "employees"
+      "mappedBy": "employee"
     },
     "color": {
       "type": "string",
@@ -115,9 +109,9 @@
     },
     "activities": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "oneToMany",
       "target": "api::activity.activity",
-      "inversedBy": "users"
+      "mappedBy": "employee"
     }
   }
 }
