@@ -21,12 +21,16 @@ const ContentRoutes = () => {
     const [filteredContents, setFilteredContents] = useState([]); // Routes filtered depending on user's role
 
     useEffect(() => {
-        if(Number(user.role.id) === Number(ADMIN_ID))
-            setFilteredContents([ ...admin, ...auth ])
-        else if(Number(user.role.id) === Number(PRO_ID))
-            setFilteredContents([ ...professional, ...auth ])
-        else
-            setFilteredContents([ ...client, ...auth ])
+        if(user) {
+            if(Number(user.role.id) === Number(ADMIN_ID))
+                setFilteredContents([ ...admin, ...auth ])
+            else if(Number(user.role.id) === Number(PRO_ID))
+                setFilteredContents([ ...professional, ...auth ])
+            else
+                setFilteredContents([ ...client, ...auth ])
+        } else {
+            setFilteredContents([ ...auth])
+        }
     }, [user])
 
 	return (

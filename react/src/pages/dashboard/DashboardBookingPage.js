@@ -334,6 +334,21 @@ const DashboardBookingPage = () => {
         setSelectedEmployee(employee)
     }
 
+    const [toggleEmployeeList, setToggleEmployeeList] = useState(false);
+    
+    const fillEmployeeList = () => {
+        const list = {};
+        employees.map( employee => list[employee.id] = true)
+        setEmployeeList(list);
+    }
+
+    const emptyEmployeeList = () => {
+        const list = {};
+        employees.map( employee => list[employee.id] = false)
+        setEmployeeList(list);
+    }
+
+
 	useEffect(() => {
 		if (eventAdding) {
 			setInfoEvent();
@@ -386,7 +401,7 @@ const DashboardBookingPage = () => {
                 id: '',
             },
 		},
-		onSubmit: (values) => {
+		onSubmit: (values, { resetForm }) => {
             // Validation :
             if(values.name === '' 
                 || !values?.name 
@@ -426,7 +441,7 @@ const DashboardBookingPage = () => {
 			setToggleInfoEventCanvas(false);
 			setEventAdding(false);
 			setEventItem(null);
-			formik.setValues({});
+            resetForm({ values: ''});
 		},
 	});
 
@@ -489,7 +504,7 @@ const DashboardBookingPage = () => {
                 'success' // type
 			);
         } catch(err) {
-            console.log("UPDATE | Appointment | Le rendez-vous n'a pas pu être ajouté à la base de données. | " + err);
+            console.log("UPDATE | Appointment | Le rendez-vous n'a pas pu être modifié dans la base de données. | " + err);
             showNotification(
                 'Mise à jour.', // title
 				"Oops ! Une erreur s'est produite. Le rendez-vous n'a pas pu être modifié.", // message
@@ -548,15 +563,30 @@ const DashboardBookingPage = () => {
 				<SubHeaderLeft>
 					<Button
 						icon='Groups'
+						onClick={() => {
+                            setToggleEmployeeList(!toggleEmployeeList);
+                            toggleEmployeeList ? fillEmployeeList() : emptyEmployeeList();
+                        } }
+						color={toggleEmployeeList ? 'light' : 'primary'}
+						aria-label='Select or unselect all employees'
+                        size='lg'
+                        title="Sélectionner / Déselectionner tous les professionnels"
+					/>
+                    <Button
+						icon='FaceRetouchingNatural'
 						onClick={() => setToggleRightPanel(!toggleRightPanel)}
-						color={toggleRightPanel ? 'dark' : 'light'}
+						color={toggleRightPanel ? 'primary' : 'light'}
 						aria-label='Toggle right panel'
+                        size='lg'
+                        title="Afficher l'aperçu du professionel"
 					/>
 					<Button
-						icon='AreaChart'
+						icon='Today'
 						onClick={() => setToggleCalendar(!toggleCalendar)}
-						color={toggleCalendar ? 'dark' : 'light'}
-						aria-label='Toggle calendar & charts'
+						color={toggleCalendar ? 'primary' : 'light'}
+						aria-label='Toggle calendar'
+                        size='lg'
+                        title="Afficher / Masquer le calendrier"
 					/>
 					<Popovers
 						desc={

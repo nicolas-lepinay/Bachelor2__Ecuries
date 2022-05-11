@@ -43,11 +43,6 @@ const CommonRightPanel = ({ setOpen, isOpen, horse, horses, events }) => {
     const tomorrow = moment().startOf('day').add(1, 'day')._d;
     const after_tomorrow = moment().startOf('day').add(2, 'day')._d;
 
-    console.log("TODAY / TOMORROW")
-    console.log(today)
-    console.log(tomorrow)
-
-
 	const { themeStatus, darkModeStatus } = useDarkMode();
 
 	const EVENT_STATUS = {
@@ -108,8 +103,8 @@ const CommonRightPanel = ({ setOpen, isOpen, horse, horses, events }) => {
 					/>
 				</div>
 				<div className='d-flex flex-column align-items-center mb-5'>
-                    <div className='h2 fw-bold'>{horse?.attributes?.name}</div>
-					<div className='h5 text-muted opacity-50'>{horse?.attributes?.breed || 'Un noble cheval'}</div>
+                    <div className='h2 fw-bold'>{horse?.name}</div>
+					<div className='h5 text-muted opacity-50'>{horse?.breed || 'Un noble cheval'}</div>
 				</div>
 				<div
 					className={classNames('rounded-3', {
@@ -166,8 +161,6 @@ const CommonRightPanel = ({ setOpen, isOpen, horse, horses, events }) => {
 				</div>
 				{events
 					.filter( event => {
-                        console.log("EVENT START :")
-                        console.log(event.start)
                         if(activeHorseActivityTab === EVENT_STATUS.TOMORROW)
                             return event?.start > tomorrow && event?.start < after_tomorrow;
 

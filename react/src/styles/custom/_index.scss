@@ -39,6 +39,10 @@ input:-webkit-autofill:focus {
     margin-right: $spacer * 0.75;
 }
 
+.mr-3 {
+    margin-right: $spacer * 1;
+}
+
 .flex-gap-1 {
     gap: 1rem;
 }

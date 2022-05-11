@@ -84,6 +84,8 @@ import data from '../../common/data/dummyEventsData';
 
 // ⚙️ Strapi's API URL :
 const API_URL = process.env.REACT_APP_API_URL;
+const APPOINTMENTS_ROUTE = process.env.REACT_APP_APPOINTMENTS_ROUTE;
+const ACTIVITIES_ROUTE = process.env.REACT_APP_ACTIVITIES_ROUTE;
 
 const localizer = momentLocalizer(moment);
 const now = new Date();
@@ -237,9 +239,7 @@ const DashboardActivityPage = () => {
     // 👩‍🚀 Fetch all employees :
     const { 
         data: employees, 
-        setData: setEmployees, 
-        loading: employeesLoading, 
-        error: employeesError } = useFetchEmployees();
+        setData: setEmployees } = useFetchEmployees();
 
     // Activities + Appointments merged :
     const [events, setEvents] = useState([]);
@@ -398,8 +398,8 @@ const DashboardActivityPage = () => {
     ]
 
 	// BEGIN :: Calendar
-    const [horseList, setHorseList] = useState({});
-    const [selectedHorse, setSelectedHorse] = useState({})
+    const [horseList, setHorseList] = useState({}); // List of horses to display on the planning
+    const [selectedHorse, setSelectedHorse] = useState({}) // One horse to send to <CommonRightHorsePanel />
 
     useEffect(() => {
         const list = {};
@@ -426,7 +426,7 @@ const DashboardActivityPage = () => {
 	const setInfoAppointment = () => setToggleInfoAppointmentCanvas(!toggleInfoAppointmentCanvas);
 
 	const [eventAdding, setEventAdding] = useState(false);
-console.log(horseList)
+
 	// Calendar Unit Type
 	const unitType = getUnitType(viewMode);
 	// Calendar Date Label
@@ -453,6 +453,21 @@ console.log(horseList)
     const handleSelectedHorse = (horse) => {
         setSelectedHorse(horse)
     }
+
+    const [toggleHorseList, setToggleHorseList] = useState(false);
+    
+    const fillHorseList = () => {
+        const list = {};
+        horses.map( horse => list[horse.id] = true)
+        setHorseList(list);
+    }
+
+    const emptyHorseList = () => {
+        const list = {};
+        horses.map( horse => list[horse.id] = false)
+        setHorseList(list);
+    }
+
 
 	useEffect(() => {
 		if (eventAdding) {
@@ -492,23 +507,26 @@ console.log(horseList)
 		};
 	};
 
+    // Horses selected when creating/modifying an event :
+    const [selectedHorses, setSelectedHorses] = useState([]); // [ { id: '', name: '' }, { id: '', name: '' } ]
+
     // Formulaire pour ajout/modification d'activité :
 	const formikActivity = useFormik({
 		initialValues: {
             id: '',
 			name: '',
-			start: '',
-			end: '',
             description: '',
             icon: '',
-            horses: {
-                id: '',
-            },
+			start: '',
+			end: '',
+            horses: selectedHorses,
             employee: {
                 id: auth.user.id,
             }
 		},
-		onSubmit: (values) => {
+		onSubmit: (values, { resetForm  }) => {
+            console.log("selectedHorses : ")
+            console.log(selectedHorses)
             // Validation :
             if(values.name === '' 
                 || !values?.name 
@@ -516,8 +534,8 @@ console.log(horseList)
                 || !values?.start 
                 || values?.end === '' 
                 || !values?.end 
-                || values?.horses?.id === '' 
-                || !values?.horses?.id
+                || values?.horses.some( horse => horse?.id === '' || !horse?.id) 
+                || values?.horses?.length === 0
                 || values?.employee?.id === '' 
                 || !values?.employee?.id)
                     return
@@ -535,22 +553,20 @@ console.log(horseList)
             if(values.icon === 'Block')
                 values.icon = null;
 
-            // Cast du horseId en int :
-            values.horses.id = Number(values.horses.id);
-
             // ✨ AJOUT D'UN NOUVEL EVENEMENT ✨
 			if (eventAdding) {
                 !values.icon && delete values["icon"];
-                //handlePost(values)
+                handlePost(values)
             // ✨ MODIFICATION D'UN EVENEMENT EXISTANT ✨
 			} else {
-                //handleUpdate(values);
+                console.log("MODIFICATION D'UNE ACTIVITE : ")
+                console.log(values)
+                handleUpdate(values, ACTIVITIES_ROUTE);
             }
 			setToggleInfoActivityCanvas(false);
 			setEventAdding(false);
 			setEventItem(null);
-			formikActivity.setValues({});
-            formikAppointment.setValues({});
+            resetForm({ values: ''});
 		},
 	});
 
@@ -568,7 +584,7 @@ console.log(horseList)
                 id: '',
             },
 		},
-		onSubmit: (values) => {
+		onSubmit: (values, { resetForm  }) => {
             // Validation :
             if(values.name === '' 
             || !values?.name 
@@ -597,53 +613,143 @@ console.log(horseList)
             values.employee.id = Number(values.employee.id);
 
             // ✨ MODIFICATION DU RENDEZ-VOUS : ✨
-            //handleUpdate(values);
+            handleUpdate(values, APPOINTMENTS_ROUTE);
             
 			setToggleInfoAppointmentCanvas(false);
 			setEventAdding(false);
 			setEventItem(null);
-			formikAppointment.setValues({});
+            resetForm({ values });
             formikActivity.setValues({})
 		},
 	});
+
+    const handlePost = async (newData) => {
+        try {
+            const res = await axios.post(`${API_URL}${ACTIVITIES_ROUTE}?populate=employee.avatar&populate=employee.role&populate=horses.owner&populate=horses.avatar`, { data: newData });
+            const resData = res.data.data;
+
+            let formattedData = {}
+            formattedData = { id: resData.id, ...resData.attributes }
+
+            if(formattedData?.start)
+                formattedData.start = new Date(formattedData.start)
+            if(formattedData?.end)
+                formattedData.end = new Date(formattedData.end)
+        
+            setActivities( prev => [...prev, formattedData] );
+            showNotification(
+                'Calendrier.', // title
+				"L'activité a été ajoutée au calendrier.", // message
+                'success' // type
+			);
+        } catch(err) {
+            console.log("POST | Activities | L'activité n'a pas pu être ajoutée à la base de données. | " + err);
+            showNotification(
+                'Calendrier.', // title
+				"Oops ! Une erreur s'est produite. L'activité n'a pas pu être ajoutée.", // message
+                'danger' // type
+			);
+        }
+    }
+
+    const handleUpdate = async (newData, ROUTE) => {
+        try {
+            const res = await axios.put(`${API_URL}${ROUTE}/${newData.id}?populate=employee.avatar&populate=employee.role&populate=horses.owner&populate=horses.avatar`, { data: newData });
+            const resData = res.data.data;
+
+            let formattedData = {}
+            formattedData = { id: resData.id, ...resData.attributes }
+
+            if(formattedData?.start)
+                formattedData.start = new Date(formattedData.start)
+            if(formattedData?.end)
+                formattedData.end = new Date(formattedData.end)
+
+            // Loop over the appointments or activities list, find the id of the updated one and replace it :
+            if(ROUTE === APPOINTMENTS_ROUTE) {
+                const updatedAppointments = appointments.map(item => {
+                    if (item.id == formattedData.id)
+                        return formattedData; // Returns updated appointment
+                    
+                    return item; // else returns unmodified appointment 
+                });
+                setAppointments(updatedAppointments);
+
+            } else if(ROUTE === ACTIVITIES_ROUTE) {
+                const updatedActivities = activities.map(item => {
+                    if (item.id == formattedData.id)
+                        return formattedData; // Returns updated appointment
+                    
+                    return item; // else returns unmodified appointment 
+                });
+                setActivities(updatedActivities);
+            }
+        
+            showNotification(
+                'Mise à jour.', // title
+				ROUTE === APPOINTMENTS_ROUTE && "Le rendez-vous a été modifié.", // message
+                ROUTE === ACTIVITIES_ROUTE && "L'activité a été modifiée.", // message
+                'success' // type
+			);
+        } catch(err) {
+            ROUTE === APPOINTMENTS_ROUTE && console.log(`UPDATE | Appointment | Le rendez-vous n'a pas pu être modifié dans la base de données. | ` + err);
+            ROUTE === ACTIVITIES_ROUTE && console.log(`UPDATE | Activities | L'activité n'a pas pu être modifiée dans la base de données. | ` + err);
+            showNotification(
+                'Mise à jour.', // title
+				ROUTE === APPOINTMENTS_ROUTE && "Oops ! Une erreur s'est produite. Le rendez-vous n'a pas pu être modifié dans la base de données.", // message
+                ROUTE === ACTIVITIES_ROUTE && "Oops ! Une erreur s'est produite. L'activité n'a pas pu être modifiée dans la base de données.", // message
+                'danger' // type
+			);
+        }  
+    }
 
 	useEffect(() => {
         formikAppointment.setValues({});
         formikActivity.setValues({});
 
 		if (eventItem) {
-            eventItem.hasOwnProperty('confirmed') // L'event est un rendez-vous...
-            ?
-            formikAppointment.setValues({
-				...formikAppointment.values,
-				id: eventItem.id,
-				name: eventItem?.name,
-				start: moment(eventItem.start).format(),
-				end: moment(eventItem.end).format(),
-                employee: {
-                    id: eventItem?.employee?.data?.id,
-                },
-                confirmed: eventItem.confirmed,
-                description: eventItem?.description,
-                icon: eventItem?.icon ? eventItem.icon : 'Block',
-			})
+            // Si l'event est un rendez-vous...
+            if(eventItem.hasOwnProperty('confirmed')) {
+                formikAppointment.setValues({
+                    ...formikAppointment.values,
+                    id: eventItem.id,
+                    name: eventItem?.name,
+                    start: moment(eventItem.start).format(),
+                    end: moment(eventItem.end).format(),
+                    employee: {
+                        id: eventItem?.employee?.data?.id,
+                    },
+                    confirmed: eventItem.confirmed,
+                    description: eventItem?.description,
+                    icon: eventItem?.icon ? eventItem.icon : 'Block',
+                })
             // ...sinon, l'event est une activité...
-            :
-			formikActivity.setValues({
-				...formikActivity.values,
-				id: eventItem.id,
-				name: eventItem?.name,
-				start: moment(eventItem.start).format(),
-				end: moment(eventItem.end).format(),
-                horses: {
-                    id: eventItem?.horses?.data[0]?.id,
-                },
-                employee: {
-                    id: eventItem?.employee?.data?.id || auth.user.id,
-                },
-                description: eventItem?.description,
-                icon: eventItem?.icon ? eventItem.icon : 'Block',
-			});
+            } else {
+                const formattedData = [];
+                
+                eventItem?.horses && 
+                eventItem?.horses?.data &&
+                eventItem.horses.data.map( item => {
+                    formattedData.push({
+                        id: item.id, 
+                        name: item.attributes.name,
+                    })
+                })
+                setSelectedHorses(formattedData);
+                formikActivity.setValues({
+                    ...formikActivity.values,
+                    id: eventItem.id,
+                    name: eventItem?.name,
+                    start: moment(eventItem.start).format(),
+                    end: moment(eventItem.end).format(),
+                    horses: eventItem?.horses?.data || [],
+                    employee: {
+                        id: eventItem?.employee?.data?.id || auth.user.id,
+                    },
+                    description: eventItem?.description,
+                    icon: eventItem?.icon ? eventItem.icon : 'Block',
+                });
+            }
         }
 		return () => {};
 	}, [eventItem]);
@@ -656,17 +762,32 @@ console.log(horseList)
 		<PageWrapper title={`${clientMenu.dashboards.dashboards.text} ${clientMenu.dashboards.dashboards.subMenu.dashboardActivity.text}`}>
 			<SubHeader>
 				<SubHeaderLeft>
+                    <Button
+						icon='Workspaces'
+						onClick={() => {
+                            setToggleHorseList(!toggleHorseList);
+                            toggleHorseList ? fillHorseList() : emptyHorseList();
+                        } }
+						color={toggleHorseList ? 'light' : 'primary'}
+						aria-label='Select or unselect all horses'
+                        size='lg'
+                        title="Sélectionner / Déselectionner tous les chevaux"
+					/>
 					<Button
 						icon='HorseVariant'
 						onClick={() => setToggleRightPanel(!toggleRightPanel)}
-						color={toggleRightPanel ? 'dark' : 'light'}
+						color={toggleRightPanel ? 'primary' : 'light'}
 						aria-label='Toggle right panel'
+                        size='lg'
+                        title="Afficher / Masquer l'aperçu du cheval"
 					/>
 					<Button
-						icon='AreaChart'
+						icon='Today'
 						onClick={() => setToggleCalendar(!toggleCalendar)}
-						color={toggleCalendar ? 'dark' : 'light'}
-						aria-label='Toggle calendar & charts'
+						color={toggleCalendar ? 'primary' : 'light'}
+						aria-label='Toggle calendar & charts'ù                        
+                        size='lg'
+                        title="Afficher / Masquer le calendrier"
 					/>
 					<Popovers
 						desc={
@@ -780,7 +901,6 @@ console.log(horseList)
 											onSelectEvent={(event) => {
 												setEventItem(event);
 												event.hasOwnProperty('confirmed') ? setInfoAppointment() : setInfoActivity();
-                                                console.log(event);
 											}}
 											onSelectSlot={handleSelect}
 											onView={handleViewMode}
@@ -960,30 +1080,56 @@ console.log(horseList)
 								</Card>
 							</div>
 
-							{/* Horse */}
+							{/* Horses */}
 							<div className='col-12'>
 								<Card className='mb-2 bg-l10-primary' shadow='sm'>
 									<CardHeader className='bg-l25-primary'>
 										<CardLabel icon='Horse' iconColor='primary'>
-											<CardTitle className='text-primary'>Pensionnaire</CardTitle>
+											<CardTitle className='text-primary'>Pensionnaires</CardTitle>
 										</CardLabel>
 									</CardHeader>
-									<CardBody>
-										<FormGroup id='horses.id'>
-											<Select
+									<CardBody> 
+                                        <div className='col-12'>
+                                        {selectedHorses.map( horse => (
+                                            <Button
+                                                value={horse.id}
+                                                icon='Close'
+                                                color='info'
+                                                className='mr-3 mb-4'
+                                                onClick={() => setSelectedHorses(selectedHorses.filter(h=>h.id !== horse.id))}
+                                            >
+                                                {horse.name}
+                                            </Button>
+                                        ))}
+                                        </div>
+
+										{horses.filter( horse => !selectedHorses.some(h => h.id == horse.id)).length > 0 &&
+										<FormGroup id='horses' >
+                                            <Select
 												placeholder='Veuillez choisir...'
-												value={formikActivity.values?.horses?.id}
-												onChange={formikActivity.handleChange}
+												value={selectedHorses}
+                                                id='horses'
+                                                name='horses'
+                                                onChange={ (e) => {
+                                                    const newData = [...selectedHorses, { 
+                                                        id: e.target.value.split(';')[0], 
+                                                        name: e.target.value.split(';')[1], 
+                                                    }];
+                                                    setSelectedHorses(newData)
+                                                    formikActivity.setFieldValue("horses", newData)
+                                                }}
 												ariaLabel='Horse select'>
-												{horses.map( horse => (
-													<Option
-														key={horse.name}
-														value={horse.id}>
-														{horse.name}
-													</Option>
-												))}
+												{horses.filter( horse => !selectedHorses.some(h => h.id == horse.id)).map( horse => (
+                                                    <Option
+                                                        key={horse.name}
+                                                        value={`${horse.id};${horse.name}`}>
+                                                        {horse.name}
+                                                    </Option>
+												))
+                                                }
 											</Select>
 										</FormGroup>
+                                        }
 									</CardBody>
 								</Card>
 							</div>
@@ -1026,10 +1172,9 @@ console.log(horseList)
                                         || !formikActivity.values?.name 
                                         || formikActivity.values?.start === '' 
                                         || !formikActivity.values?.start
-                                        || formikActivity.values?.horses?.id === '' 
-                                        || !formikActivity.values?.horses?.id 
                                         || formikActivity.values?.employee?.id === '' 
                                         || !formikActivity.values?.employee?.id 
+                                        || selectedHorses.length === 0
                                         }
                                         >
                                         Sauvegarder
