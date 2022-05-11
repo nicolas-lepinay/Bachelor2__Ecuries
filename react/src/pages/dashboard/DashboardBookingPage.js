@@ -225,7 +225,7 @@ const DashboardBookingPage = () => {
     const icons = [
         {
             icon: 'Block',
-            description: 'Aucune icône.'
+            description: 'Aucune icône'
         },
         {
             icon: 'HorseVariant',
@@ -847,7 +847,7 @@ const DashboardBookingPage = () => {
                                     <AccordionItem
                                         id='desc'
                                         title='Description'
-                                        icon='DocumentScanner'>
+                                        icon='Description'>
                                         <Textarea
                                             id='description'
                                             placeholder='Écrire une description...'

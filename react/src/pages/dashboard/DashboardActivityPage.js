@@ -53,6 +53,7 @@ import Modal, {
 import CommonUpcomingEvents from '../common/CommonUpcomingEvents';
 import Avatar, { AvatarGroup } from '../../components/Avatar';
 import defaultAvatar from '../../assets/img/wanna/defaultAvatar.webp';
+import defaultHorseAvatar from '../../assets/img/horse-avatars/defaultHorseAvatar.webp';
 
 import {
     CalendarTodayButton,
@@ -65,7 +66,7 @@ import { adminMenu, clientMenu, demoPages } from '../../menu';
 import CommonApprovedAppointmentChart from '../common/CommonApprovedAppointmentChart';
 import CommonPercentageOfLoadChart from '../common/CommonPercentageOfLoadChart';
 import CommonDashboardBookingLists from '../common/BookingComponents/CommonDashboardBookingLists';
-import CommonRightPanel from '../common/BookingComponents/CommonRightPanel';
+import CommonRightHorsePanel from '../common/BookingComponents/CommonRightHorsePanel';
 import showNotification from '../../components/extras/showNotification';
 
 // 🛠️ Hooks :
@@ -125,8 +126,8 @@ const MyEvent = (data) => {
                             {event?.horses?.data.map( horse => (
                                 <Avatar
                                     key={horse.id}
-                                    srcSet={horse?.attributes?.avatar ? `${API_URL}${horse?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
-                                    src={horse?.attributes?.avatar ? `${API_URL}${horse?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                                    srcSet={horse?.attributes?.avatar ? `${API_URL}${horse?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultHorseAvatar}`}
+                                    src={horse?.attributes?.avatar ? `${API_URL}${horse?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultHorseAvatar}`}
                                     userName={horse?.attributes?.name}
                                     color={horse?.attributes?.color}
                                 />
@@ -181,8 +182,8 @@ const MyWeekEvent = (data) => {
                                 {event?.horses?.data.map( horse => (
                                     <Avatar
                                         key={horse.id}
-                                        srcSet={horse?.attributes?.avatar ? `${API_URL}${horse?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
-                                        src={horse?.attributes?.avatar ? `${API_URL}${horse?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+                                        srcSet={horse?.attributes?.avatar ? `${API_URL}${horse?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultHorseAvatar}`}
+                                        src={horse?.attributes?.avatar ? `${API_URL}${horse?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultHorseAvatar}`}
                                         userName={horse?.attributes?.name}
                                         color={horse?.attributes?.color}
                                     />
@@ -315,7 +316,7 @@ const DashboardActivityPage = () => {
     const icons_activities = [
         {
             icon: 'Block',
-            description: 'Aucune icône.'
+            description: 'Aucune icône'
         },
         {
             icon: 'HorseVariant',
@@ -712,8 +713,8 @@ console.log(horseList)
 										}>
 										<div className='position-relative'>
 											<Avatar
-												srcSet={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
-												src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+												srcSet={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultHorseAvatar}`}
+												src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultHorseAvatar}`}
 												color={horse?.color}
 												size={64}
 												border={4}
@@ -779,6 +780,7 @@ console.log(horseList)
 											onSelectEvent={(event) => {
 												setEventItem(event);
 												event.hasOwnProperty('confirmed') ? setInfoAppointment() : setInfoActivity();
+                                                console.log(event);
 											}}
 											onSelectSlot={handleSelect}
 											onView={handleViewMode}
@@ -843,7 +845,7 @@ console.log(horseList)
                                     <AccordionItem
                                         id='desc'
                                         title='Description'
-                                        icon='DocumentScanner'>
+                                        icon='Description'>
                                         <Textarea
                                             id='description'
                                             placeholder='Écrire une description...'
@@ -855,33 +857,29 @@ console.log(horseList)
                                         id='ico'
                                         title='Icône'
                                         icon='EmojiEvents'>
-                                        {!formikActivity.values.noIcon &&
-                                            <>
-                                            {icons_activities.map( item => (
-                                                <Popovers
-                                                    trigger='hover'
-                                                    placement='top'
-                                                    desc={
-                                                        <>
-                                                            <small className='text-muted'>{item.description}</small>
-                                                        </>
-                                                    }>
-                                                    <Button
-                                                        className='mx-2-5 my-2'
-                                                        color={formikActivity.values.icon === item.icon ? `success` : 'info'}
-                                                        forceFamily='material'
-                                                        icon={item.icon}
-                                                        name='icon'
-                                                        isLink isActive
-                                                        key={item.icon}
-                                                        size='lg'
-                                                        value={item.icon}
-                                                        onClick={() => formikActivity.setFieldValue("icon", `${item.icon}`)}
-                                                    />
-                                                </Popovers>
-                                            ))}
-                                        </>
-                                        }
+                                        {icons_activities.map( item => (
+                                            <Popovers
+                                                trigger='hover'
+                                                placement='top'
+                                                desc={
+                                                    <>
+                                                        <small className='text-muted'>{item.description}</small>
+                                                    </>
+                                                }>
+                                                <Button
+                                                    className='mx-2-5 my-2'
+                                                    color={formikActivity.values.icon === item.icon ? `success` : 'info'}
+                                                    forceFamily='material'
+                                                    icon={item.icon}
+                                                    name='icon'
+                                                    isLink isActive
+                                                    key={item.icon}
+                                                    size='lg'
+                                                    value={item.icon}
+                                                    onClick={() => formikActivity.setFieldValue("icon", `${item.icon}`)}
+                                                />
+                                            </Popovers>
+                                        ))}
                                     </AccordionItem>
                                 </Accordion>
                             </div>
@@ -1145,7 +1143,7 @@ console.log(horseList)
                                     <AccordionItem
                                         id='desc'
                                         title='Description'
-                                        icon='DocumentScanner'>
+                                        icon='Description'>
                                         <Textarea
                                             id='description'
                                             placeholder='Écrire une description...'
@@ -1157,33 +1155,29 @@ console.log(horseList)
                                         id='ico'
                                         title='Icône'
                                         icon='EmojiEvents'>
-                                        {!formikAppointment.values.noIcon &&
-                                            <>
-                                            {icons_appointments.map( item => (
-                                                <Popovers
-                                                    trigger='hover'
-                                                    placement='top'
-                                                    desc={
-                                                        <>
-                                                            <small className='text-muted'>{item.description}</small>
-                                                        </>
-                                                    }>
-                                                    <Button
-                                                        className='mx-2-5 my-2'
-                                                        color={formikAppointment.values.icon === item.icon ? `success` : 'info'}
-                                                        forceFamily='material'
-                                                        icon={item.icon}
-                                                        name='icon'
-                                                        isLink isActive
-                                                        key={item.icon}
-                                                        size='lg'
-                                                        value={item.icon}
-                                                        onClick={() => formikAppointment.setFieldValue("icon", `${item.icon}`)}
-                                                    />
-                                                </Popovers>
-                                            ))}
-                                        </>
-                                        }
+                                        {icons_appointments.map( item => (
+                                            <Popovers
+                                                trigger='hover'
+                                                placement='top'
+                                                desc={
+                                                    <>
+                                                        <small className='text-muted'>{item.description}</small>
+                                                    </>
+                                                }>
+                                                <Button
+                                                    className='mx-2-5 my-2'
+                                                    color={formikAppointment.values.icon === item.icon ? `success` : 'info'}
+                                                    forceFamily='material'
+                                                    icon={item.icon}
+                                                    name='icon'
+                                                    isLink isActive
+                                                    key={item.icon}
+                                                    size='lg'
+                                                    value={item.icon}
+                                                    onClick={() => formikAppointment.setFieldValue("icon", `${item.icon}`)}
+                                                />
+                                            </Popovers>
+                                        ))}
                                     </AccordionItem>
                                 </Accordion>
                             </div>
@@ -1326,13 +1320,13 @@ console.log(horseList)
 					</OffCanvasBody>
 				</OffCanvas>
 
-				{/* <CommonRightPanel
+				<CommonRightHorsePanel
                     setOpen={setToggleRightPanel} 
                     isOpen={toggleRightPanel} 
-                    employee={selectedHorse}
-                    employees={horses}
-                    appointments={activities}
-                /> */}
+                    horse={selectedHorse}
+                    horses={horses}
+                    events={events}
+                />
 
                 <Modal
                     isOpen={triggerModal}

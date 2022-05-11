@@ -22,6 +22,7 @@ import Card, {
 } from '../../components/bootstrap/Card';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Input from '../../components/bootstrap/forms/Input';
+import InputGroup, { InputGroupText } from '../../components/bootstrap/forms/InputGroup';
 import showNotification from '../../components/extras/showNotification';
 import Icon from '../../components/icon/Icon';
 import Alert from '../../components/bootstrap/Alert';
@@ -217,7 +218,7 @@ const LandingPage = () => {
 							</CardBody>
 						</Card> */}
 
-						<Card>
+						<Card className='px-5 py-4'>
 							<CardHeader>
 								<CardLabel>
 									<CardTitle>À propos</CardTitle>
@@ -435,7 +436,7 @@ const LandingPage = () => {
 									</CardHeader>
 									<CardBody>
 										<div className='row g-4'>
-											<FormGroup
+											{/* <FormGroup
 												className='col-10'
 												id='street'
 												label='Rue'>
@@ -445,9 +446,22 @@ const LandingPage = () => {
 													onChange={formikAddress.handleChange}
 													value={formikAddress.values.street}
 												/>
-											</FormGroup>
+											</FormGroup> */}
 
-											<FormGroup
+
+                                            <FormGroup className='col-10'>
+                                                <InputGroup>
+                                                    <InputGroupText id='street'>Rue</InputGroupText>
+                                                    <Input
+                                                        id='street'
+                                                        placeholder='Adresse de la rue'
+                                                        onChange={formikAddress.handleChange}
+                                                        value={formikAddress.values.street}
+                                                    />
+                                                </InputGroup>
+                                            </FormGroup>
+
+											{/* <FormGroup
 												className='col-md-4'
 												id='city'
 												label='Ville'>
@@ -457,8 +471,34 @@ const LandingPage = () => {
 													onChange={formikAddress.handleChange}
 													value={formikAddress.values.city}
 												/>
-											</FormGroup>
-											<FormGroup
+											</FormGroup> */}
+
+                                            <FormGroup className='col-md-3'>
+                                                <InputGroup>
+                                                    <InputGroupText id='zipcode'>Code postal</InputGroupText>
+                                                    <Input
+                                                        id='zipcode'
+                                                        placeholder='Code postal'
+                                                        pattern="[0-9]+"
+                                                        onChange={formikAddress.handleChange}
+                                                        value={formikAddress.values.zipcode}
+                                                    />
+                                                </InputGroup>
+                                            </FormGroup>
+
+                                            <FormGroup className='col-md-4'>
+                                                <InputGroup>
+                                                    <InputGroupText id='city'>Ville</InputGroupText>
+                                                    <Input
+                                                        id='city'
+                                                        placeholder='Ville'
+                                                        onChange={formikAddress.handleChange}
+                                                        value={formikAddress.values.city}
+                                                    />
+                                                </InputGroup>
+                                            </FormGroup>
+
+											{/* <FormGroup
 												className='col-md-4'
 												id='country'
 												label='Pays'>
@@ -468,9 +508,21 @@ const LandingPage = () => {
 													onChange={formikAddress.handleChange}
 													value={formikAddress.values.country}
 												/>
-											</FormGroup>
+											</FormGroup> */}
 
-											<FormGroup
+                                            <FormGroup className='col-md-3'>
+                                                <InputGroup>
+                                                    <InputGroupText id='country'>Pays</InputGroupText>
+                                                    <Input
+                                                        id='country'
+                                                        placeholder='Pays'
+                                                        onChange={formikAddress.handleChange}
+                                                        value={(formikAddress.values.country).toUpperCase()}
+                                                    />
+                                                </InputGroup>
+                                            </FormGroup>
+
+											{/* <FormGroup
 												className='col-md-2'
 												id='zipcode'
 												label='Code postal'>
@@ -481,7 +533,8 @@ const LandingPage = () => {
 													onChange={formikAddress.handleChange}
 													value={formikAddress.values.zipcode}
 												/>
-											</FormGroup>
+											</FormGroup> */}
+
 										</div>
 									</CardBody>
 									<CardFooter>
