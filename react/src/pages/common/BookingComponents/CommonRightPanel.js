@@ -112,8 +112,8 @@ const CommonRightPanel = ({ setOpen, isOpen, employee, employees, appointments }
 				</div>
 				<div className='d-flex justify-content-center mb-3'>
 					<Avatar
-						srcSet={employee?.avatar ? `${API_URL}${employee?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
-                        src={employee?.avatar ? `${API_URL}${employee?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+						srcSet={employee?.avatar ? `${API_URL}${employee?.avatar?.url}` : `${defaultAvatar}`}
+                        src={employee?.avatar ? `${API_URL}${employee?.avatar?.url}` : `${defaultAvatar}`}
 						color={employee?.color}
 						shadow='default'
 					/>
@@ -160,13 +160,13 @@ const CommonRightPanel = ({ setOpen, isOpen, employee, employees, appointments }
 											appointments.filter(
 												(appointment) => {
                                                     if(APPOINTMENT_STATUS[key] === APPOINTMENT_STATUS.CONFIRMED)
-                                                        return appointment?.confirmed === true && appointment?.end > now;
+                                                        return appointment?.confirmed === true && appointment?.end > now; // Confirmé + à venir
 
                                                     else if(APPOINTMENT_STATUS[key] === APPOINTMENT_STATUS.PENDING)
-                                                        return !appointment?.confirmed;
+                                                        return !appointment?.confirmed && appointment?.end > now; // En attente + à venir
 
                                                     else if(APPOINTMENT_STATUS[key] === APPOINTMENT_STATUS.PAST)
-                                                        return appointment?.end < now;
+                                                        return appointment?.confirmed && appointment?.end < now; // Confirmé + Passé
                                                 }
 											).length
 										}

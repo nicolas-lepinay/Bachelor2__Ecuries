@@ -42,6 +42,11 @@
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "appointments"
+    },
+    "horse_appointments": {
+      "type": "component",
+      "repeatable": true,
+      "component": "horse-appointment.horse-appointment"
     }
   }
 }

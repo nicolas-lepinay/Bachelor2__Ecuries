@@ -618,7 +618,7 @@ const DashboardBookingPage = () => {
 										desc={
 											<>
 												<div className='h6'><b>{`${employee.name} ${employee.surname}`}</b></div>
-												<div>
+												{/* <div>
 													<span>Rendez-vous : </span>
                                                     <b>
 													{
@@ -629,7 +629,7 @@ const DashboardBookingPage = () => {
 														).length
 													}
                                                     </b>
-												</div>
+												</div> */}
 											</>
 										}>
 										<div className='position-relative'>

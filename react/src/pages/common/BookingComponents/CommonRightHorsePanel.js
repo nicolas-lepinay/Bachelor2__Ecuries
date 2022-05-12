@@ -75,8 +75,8 @@ const CommonRightPanel = ({ setOpen, isOpen, horse, horses, events }) => {
 										key={horse.id}
                                         srcSet={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultHorseAvatar}`}
                                         src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultHorseAvatar}`}
-                                        userName={horse?.attributes?.name}
-                                        color={horse?.attributes?.color}
+                                        userName={horse?.name}
+                                        color={horse?.color}
                                     />
 								))}
 							</AvatarGroup>
@@ -96,15 +96,16 @@ const CommonRightPanel = ({ setOpen, isOpen, horse, horses, events }) => {
 				</div>
 				<div className='d-flex justify-content-center mb-3'>
 					<Avatar
-                        srcSet={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultHorseAvatar}`}
-                        src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultHorseAvatar}`}
+                        srcSet={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.url}` : `${defaultHorseAvatar}`}
+                        src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.url}` : `${defaultHorseAvatar}`}
                         color={horse?.attributes?.color}
 						shadow='default'
 					/>
 				</div>
 				<div className='d-flex flex-column align-items-center mb-5'>
                     <div className='h2 fw-bold'>{horse?.name}</div>
-					<div className='h5 text-muted opacity-50'>{horse?.breed || 'Un noble cheval'}</div>
+					{/* <div className='h5 text-muted opacity-50'>{horse?.breed || 'Un noble cheval'}</div> */}
+                    <div className='h5 text-muted opacity-50'>{horse?.owner?.data?.attributes?.name} {horse?.owner?.data?.attributes?.surname}</div>
 				</div>
 				<div
 					className={classNames('rounded-3', {

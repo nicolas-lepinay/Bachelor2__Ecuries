@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useContext, useLayoutEffect } from 'react';
 import { useFormik } from 'formik';
 import moment from 'moment';
 import classNames from 'classnames';
 import { useMeasure } from 'react-use';
+
+import ThemeContext from '../../contexts/themeContext';
 
 // 🛠️ useAuth hook :
 import useAuth from '../../hooks/useAuth';
@@ -139,6 +141,13 @@ const LandingPage = () => {
 
     const [ref, { height }] = useMeasure();
 
+    const { setRightPanel } = useContext(ThemeContext);
+
+    useLayoutEffect(() => {
+		setRightPanel(false);
+	});
+
+
 	return (
 		<PageWrapper title={dashboardMenu.dashboard.text}>
 			<Page container='fluid'>
@@ -151,10 +160,11 @@ const LandingPage = () => {
 										<div className='d-flex align-items-center'>
 											<div className='flex-shrink-0'>
 												<Avatar
-													srcSet={auth.user?.avatar ? `${API_URL}${auth.user?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
-													src={auth.user?.avatar ? `${API_URL}${auth.user?.avatar?.formats?.thumbnail?.url}` : `${defaultAvatar}`}
+													srcSet={auth.user?.avatar ? `${API_URL}${auth.user?.avatar?.url}` : `${defaultAvatar}`}
+													src={auth.user?.avatar ? `${API_URL}${auth.user?.avatar?.url}` : `${defaultAvatar}`}
                                                     color={auth.user?.color}
 													className='rounded-circle'
+                                                    size={200}
 												/>
 											</div>
 											<div className='flex-grow-1 ms-3'>

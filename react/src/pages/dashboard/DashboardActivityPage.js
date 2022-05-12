@@ -158,21 +158,21 @@ const MyWeekEvent = (data) => {
 
 	const { event } = data;
 
-    // RDV confirmé :
+    // RDV confirmé (undefined pour les activités) :
     const isConfirmedEvent = event?.confirmed;
 
-    // RDV actif (confirmé + en cours) :
-    const isActiveEvent = isConfirmedEvent && event.start <= now && event.end >= now;
+    // Event actif (en cours) :
+    const isActiveEvent = event.start <= now && event.end >= now;
 
-    // RDV passé :
+    // Event passé :
     const isPastEvent = event.end < now;
 
 	return (
 		<div className='row g-2'>
 			<div className='col-12 text-truncate'>
                 {isActiveEvent && <Circle color='success' />}
-                {!isConfirmedEvent && !isPastEvent && <Circle color='danger' />}
-				{(isConfirmedEvent || isPastEvent) && !isActiveEvent && event?.icon && <Icon icon={event?.icon} size='lg' className='me-2' />}
+                {isConfirmedEvent === false && !isPastEvent && <Circle color='danger' />}
+				{(isConfirmedEvent === true || isConfirmedEvent === undefined || isPastEvent) && !isActiveEvent && event?.icon && <Icon icon={event?.icon} size='lg' className='me-2' />}
 
 				{event?.name || event?.employee?.data?.attributes?.occupation}
 			</div>
@@ -687,8 +687,7 @@ const DashboardActivityPage = () => {
         
             showNotification(
                 'Mise à jour.', // title
-				ROUTE === APPOINTMENTS_ROUTE && "Le rendez-vous a été modifié.", // message
-                ROUTE === ACTIVITIES_ROUTE && "L'activité a été modifiée.", // message
+				"L'évènement a été modifié.", // message
                 'success' // type
 			);
         } catch(err) {
@@ -696,11 +695,35 @@ const DashboardActivityPage = () => {
             ROUTE === ACTIVITIES_ROUTE && console.log(`UPDATE | Activities | L'activité n'a pas pu être modifiée dans la base de données. | ` + err);
             showNotification(
                 'Mise à jour.', // title
-				ROUTE === APPOINTMENTS_ROUTE && "Oops ! Une erreur s'est produite. Le rendez-vous n'a pas pu être modifié dans la base de données.", // message
-                ROUTE === ACTIVITIES_ROUTE && "Oops ! Une erreur s'est produite. L'activité n'a pas pu être modifiée dans la base de données.", // message
+			    "Oops ! Une erreur s'est produite. L'évènement' n'a pas pu être modifié dans la base de données.", // message
                 'danger' // type
 			);
         }  
+    }
+
+    const handleDelete = async () => {
+        if(eventItem?.id) {
+            // Si l'event a une propriété 'confirmed', c'est un RDV. Sinon, une activité.
+            const ROUTE = eventItem.hasOwnProperty('confirmed') ? APPOINTMENTS_ROUTE : ACTIVITIES_ROUTE;
+            try {
+                await axios.delete(`${API_URL}${ROUTE}/${eventItem.id}`);
+
+                if(ROUTE === APPOINTMENTS_ROUTE) {
+                    setAppointments( appointments => appointments.filter( item => item.id !== eventItem.id))
+                    showNotification('Mise à jour.', "Le rendez-vous a été supprimé.", 'success');
+                } else if(ROUTE === ACTIVITIES_ROUTE) {
+                    setActivities( activity => activity.filter( item => item.id !== eventItem.id))
+                    showNotification('Mise à jour.', "L'activité a été supprimée.", 'success');
+                }
+            } catch (err) {
+                console.log("DELETE | Event | L'évènement n'a pas pu être supprimé de la base de données. | " + err);
+                showNotification(
+                    'Calendrier.', // title
+                    "Oops ! Une erreur s'est produite. L'évènement n'a pas pu être supprimé.", // message
+                    'danger' // type
+                );
+            }
+        }
     }
 
 	useEffect(() => {
@@ -1479,9 +1502,9 @@ const DashboardActivityPage = () => {
                     titleId='confirmationModal'
                     isCentered isAnimation >
                         <ModalHeader setIsOpen={setTriggerModal}>
-                            <ModalTitle id='confirmationModal'>Voulez-vous supprimer cette activité ?</ModalTitle>
+                            <ModalTitle id='confirmationModal'>Voulez-vous supprimer cet évènement ?</ModalTitle>
                         </ModalHeader>
-                        <ModalBody className='text-center new-line'>Cette activité sera définitivement supprimée du calendrier.</ModalBody>
+                        <ModalBody className='text-center new-line'>Cet évènement sera définitivement supprimé du calendrier.</ModalBody>
                         <ModalFooter>
                             <Button
                                 color='light'
@@ -1494,7 +1517,7 @@ const DashboardActivityPage = () => {
                                 color='danger' 
                                 icon='Delete'
                                 onClick={ () => {
-                                    // handleDelete();
+                                    handleDelete();
                                     setTriggerModal(false);
                                 } }>
                                 Confirmer
