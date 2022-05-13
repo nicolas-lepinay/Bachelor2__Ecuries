@@ -31,6 +31,7 @@ import Icon from '../../components/icon/Icon';
 import Alert from '../../components/bootstrap/Alert';
 import Avatar from '../../components/Avatar';
 import defaultAvatar from '../../assets/img/wanna/defaultAvatar.webp';
+import defaultHorseAvatar from '../../assets/img/horse-avatars/defaultHorseAvatar.webp';
 
 import { dashboardMenu } from '../../menu';
 import useDarkMode from '../../hooks/useDarkMode';
@@ -528,7 +529,7 @@ const LandingPage = () => {
                                                         id='country'
                                                         placeholder='Pays'
                                                         onChange={formikAddress.handleChange}
-                                                        value={(formikAddress.values.country).toUpperCase()}
+                                                        value={(formikAddress.values.country)}
                                                     />
                                                 </InputGroup>
                                             </FormGroup>
@@ -559,7 +560,7 @@ const LandingPage = () => {
 							</CardTabItem>
 
                             <CardTabItem id='horses' title='Chevaux' icon='Horse'>
-                                <Alert isLight className='border-0' shadow='md' icon='HorseVariant' color='info'>
+                                <Alert isLight className='border-0' shadow='md' icon='LocalPolice' color='info'>
 									Vous retrouverez ici la liste de vos chevaux.
 								</Alert>
 
@@ -585,8 +586,8 @@ const LandingPage = () => {
                                                                                 'shadow',
                                                                             )}>
                                                                             <img
-                                                                                src={horse?.avatar?.data?.attributes?.url}
-                                                                                alt={'Alt'}
+                                                                                src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.url}` : `${defaultHorseAvatar}`}
+                                                                                alt={'My horse'}
                                                                                 width={100}
                                                                             />
                                                                         </div>
@@ -602,7 +603,7 @@ const LandingPage = () => {
                                                                                 <div className='fw-bold fs-5 me-2'>
                                                                                     {horse.name}
                                                                                 </div>
-                                                                                <small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
+                                                                                <small className={`border border-${horse?.color} border-2 text-${horse?.color} fw-bold px-2 py-1 rounded-1`}>
                                                                                     {horse.breed || 'Race'}
                                                                                 </small>
                                                                             </div>
@@ -619,6 +620,7 @@ const LandingPage = () => {
                                                                                 hoverShadow='sm'
                                                                                 tag='a'
                                                                                 // to={`../${demoPages.appointment.subMenu.employeeID.path}/${user.id}`}
+                                                                                to={`/chevaux/${horse.id}`}
                                                                                 data-tour={auth.user.name}
                                                                             />
                                                                         </div>

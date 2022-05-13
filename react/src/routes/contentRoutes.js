@@ -9,7 +9,8 @@ import {
     professionalMenu,
     clientMenu,
     loginPage, 
-    logoutPage 
+    logoutPage,
+    queryPages,
 } from '../menu';
 // import Login from '../pages/presentation/auth/Login';
 import Login from '../pages/auth/Login';
@@ -931,56 +932,49 @@ const documentation = [
 
 const admin = [
     {
-        path: landingPage.landing.path,
-		element: <LANDING_PAGE />,
-		exact: true,
-    },
-	{
-		path: adminMenu.dashboards.dashboards.subMenu.dashboardActivity.path,
-		element: <DASHBOARDS.DASHBOARD_ACTIVITY />,
-		exact: true,
-	},
-    {
-		path: adminMenu.dashboards.dashboards.subMenu.dashboardBooking.path,
-		element: <DASHBOARDS.DASHBOARD_BOOKING />,
+		path: adminMenu.accounts.accounts.subMenu.horses.path,
+		element: <h1>COMPTES DES CHEVAUX</h1>,
 		exact: true,
 	},
 ];
 
 const professional = [
     {
-        path: landingPage.landing.path,
-		element: <LANDING_PAGE />,
+		path: professional.accounts.accounts.subMenu.horses.path,
+		element: <h1>COMPTES DES CHEVAUX</h1>,
 		exact: true,
     },
-	{
-		path: adminMenu.dashboards.dashboards.subMenu.dashboardActivity.path,
-		element: <DASHBOARDS.DASHBOARD_ACTIVITY />,
-		exact: true,
-	},
-    {
-		path: adminMenu.dashboards.dashboards.subMenu.dashboardBooking.path,
-		element: <DASHBOARDS.DASHBOARD_BOOKING />,
-		exact: true,
-	},
 ];
 
 const client = [
     {
+        path: clientMenu.accounts.accounts.subMenu.horses.path,
+		element: <h1>PROFILS DE MES CHEVAUX</h1>,
+		exact: true,
+    },
+];
+
+const common = [
+    {
         path: landingPage.landing.path,
 		element: <LANDING_PAGE />,
 		exact: true,
     },
 	{
-		path: adminMenu.dashboards.dashboards.subMenu.dashboardActivity.path,
+		path: clientMenu.dashboards.dashboards.subMenu.dashboardActivity.path,
 		element: <DASHBOARDS.DASHBOARD_ACTIVITY />,
 		exact: true,
 	},
     {
-		path: adminMenu.dashboards.dashboards.subMenu.dashboardBooking.path,
+		path: clientMenu.dashboards.dashboards.subMenu.dashboardBooking.path,
 		element: <DASHBOARDS.DASHBOARD_BOOKING />,
 		exact: true,
 	},
+    {
+        path: `${demoPages.appointment.subMenu.employeeID.path}/:id`,
+		element: <APP.APPOINTMENT.EMPLOYEE_VIEW />,
+		exact: true,
+    },
 ];
 
 const auth = [
@@ -996,7 +990,15 @@ const auth = [
     }
 ];
 
-const contents = { admin, professional, client, auth };
+const queries = [
+    {
+        path: queryPages.horses.path,
+        element: <DASHBOARDS.DASHBOARD_ACTIVITY />,
+        exact: true,
+    },
+]
+
+const contents = { admin, professional, client, common, auth, queries };
 
 export default contents ;
 

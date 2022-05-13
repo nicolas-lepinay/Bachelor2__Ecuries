@@ -1014,7 +1014,7 @@ const dashboards = {
             // Planning des pensionnaires (chevaux) :
             dashboardActivity: {
                 id: 'dashboard-activity',
-                text: 'Pensionnaires',
+                text: 'Chevaux',
                 path: 'planning/pensionnaires',
                 icon: 'Horse',
             },
@@ -1038,8 +1038,15 @@ const professional_accounts = {
 
 const horse_accounts = {
     id: 'account-horse',
-    text: 'Pensionnaires',
-    path: 'comptes/pensionnaires',
+    text: 'Chevaux',
+    path: 'comptes/chevaux',
+    icon: 'HorseVariant',
+}
+
+const horse_accounts_for_clients = {
+    id: 'account-horse-for-clients',
+    text: 'Mes chevaux',
+    path: '/mes-chevaux',
     icon: 'HorseVariant',
 }
 
@@ -1050,30 +1057,44 @@ const client_accounts = {
     icon: 'PersonHeart',
 }
 
-
-// Gestion des comptes 
+// Accès aux profils (pour l'admin et les pros) :
 const accounts = {
     title: {
         id: 'accounts',
-        text: 'Gestion des comptes',
+        text: 'Comptes',
         icon: 'Extension',
     },
     accounts: {
         id: 'account',
-        text: 'Comptes',
+        text: 'Utilisateurs',
         path: 'comptes',
         icon: 'Person',
         subMenu: {
-            // Comptes pensionnaires (chevaux) :
-            horses: horse_accounts,
-            // Comptes professionels :
-            professionals: professional_accounts,
-            // Comptes clients :
-            clients: client_accounts,
+            horses: horse_accounts,                 // Comptes chevaux
+            professionals: professional_accounts,   // Comptes professionels
+            clients: client_accounts,               // Comptes clients
         },
     }
 }
 
+// Accès aux profils des pros et de son cheval (pour les clients) :
+const accounts_for_clients = {
+    title: {
+        id: 'accounts',
+        text: 'Comptes',
+        icon: 'Extension',
+    },
+    accounts: {
+        id: 'account',
+        text: 'Utilisateurs',
+        path: 'comptes',
+        icon: 'Person',
+        subMenu: {
+            horses: horse_accounts_for_clients,      // Comptes chevaux
+            professionals: professional_accounts,   // Comptes professionels
+        },
+    }
+}
 
 export const adminMenu = {
     dashboards,
@@ -1087,6 +1108,7 @@ export const professionalMenu = {
 
 export const clientMenu = {
     dashboards,
+    accounts: accounts_for_clients,
 }
 
 export const loginPage = {
@@ -1105,4 +1127,12 @@ export const logoutPage = {
 		path: 'se-deconnecter',
 		icon: 'Logout',
 	}
+}
+
+export const queryPages = {
+    horses: {
+        id: 'horses_page',
+        text: 'Chevaux',
+        path: '/:id',
+    }
 }

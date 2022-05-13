@@ -11,7 +11,7 @@ import useAsideTouch from '../../hooks/useAsideTouch';
 import Brand from '../Brand/Brand';
 import Navigation, { NavigationLine } from '../Navigation/Navigation';
 import User from '../User/User';
-import { landingPage, adminMenu, dashboardMenu } from '../../menu';
+import { landingPage, adminMenu, professionalMenu, clientMenu } from '../../menu';
 import ThemeContext from '../../contexts/themeContext';
 import Card, { CardBody } from '../../components/bootstrap/Card';
 
@@ -31,14 +31,24 @@ const Aside = () => {
 	const constraintsRef = useRef(null);
 
 	const [doc, setDoc] = useState(false);
+    
+    // ⚙️ Role IDs
+    const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; // Id du rôle 'Admin'
+    const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
+    const CLIENT_ID = process.env.REACT_APP_CLIENT_ID; // Id du rôle 'Client'
+    
+    // 🦸 Logged-in user
+    const user = useAuth().user;
 
-    const auth = useAuth(); // 🦸 Auth :
+    const isAdmin = user && Number(user.role.id) === Number(ADMIN_ID);
+    const isPro = user && Number(user.role.id) === Number(PRO_ID);
+    const isClient = user && Number(user.role.id) === Number(CLIENT_ID);
 
 	const { darkModeStatus } = useDarkMode();
 
 	const { t } = useTranslation(['translation', 'menu']);
 
-    if(!auth.user)
+    if(!user)
         return null;
 
 	return (
@@ -54,15 +64,28 @@ const Aside = () => {
 						'aside-touch-bar-open': touchStatus && hasTouchButton && isModernDesign,
 					},
 				)}>
+
 				<div className='aside-head'>
 					<Brand asideStatus={asideStatus} setAsideStatus={setAsideStatus} />
 				</div>
+
 				<div className='aside-body'>
                     <Navigation menu={landingPage} id='aside-landing' />
+
                     <NavigationLine />
-                    <Navigation menu={adminMenu.dashboards} id='aside-admin-dashboards' />
+
+                    <Navigation 
+                        id='aside-admin-dashboards' 
+                        menu={isAdmin ? adminMenu.dashboards : isPro ? professionalMenu.dashboards : clientMenu.dashboards} 
+                    />
+
                     <NavigationLine />
-                    <Navigation menu={adminMenu.accounts} id='aside-admin-accounts' />
+
+                    <Navigation 
+                        id='aside-admin-accounts' 
+                        menu={isAdmin ? adminMenu.accounts : isPro ? professionalMenu.accounts : clientMenu.accounts} 
+                    />
+
 					{/* <Navigation menu={dashboardMenu} id='aside-dashboard' /> */}
                     {/* <NavigationLine />
                     <Navigation menu={logoutPage} id='aside-demo-pages' /> */}
