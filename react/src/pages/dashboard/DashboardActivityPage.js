@@ -152,7 +152,6 @@ const MyEvent = (data) => {
 	);
 };
 
-
 const MyWeekEvent = (data) => {
 	const { darkModeStatus } = useDarkMode();
 

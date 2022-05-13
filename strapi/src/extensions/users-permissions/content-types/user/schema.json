@@ -112,6 +112,9 @@
       "relation": "oneToMany",
       "target": "api::activity.activity",
       "mappedBy": "employee"
+    },
+    "biography": {
+      "type": "text"
     }
   }
 }

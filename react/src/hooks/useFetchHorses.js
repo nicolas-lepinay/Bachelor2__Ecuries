@@ -1,15 +1,21 @@
+// 🌌 React :
 import { useEffect, useState } from 'react';
 
 // 🅰️ Axios :
 import axios from 'axios';
 
-const useFetchHorses = () => {
+// 📚 Other libraries :
+import PropTypes from 'prop-types';
+
+const useFetchHorses = (filters) => {
+    
+    filters = filters ? filters : '';
 
     // ⚙️ Strapi's URL :
     const API_URL = process.env.REACT_APP_API_URL;
     const HORSES_ROUTE = process.env.REACT_APP_HORSES_ROUTE;
 
-    const query = `${HORSES_ROUTE}?populate=*`;
+    const query = `${HORSES_ROUTE}?populate=*${filters}`;
 
     const [data, setData] = useState([]);
     const [error, setError] = useState(null);
@@ -48,5 +54,6 @@ const useFetchHorses = () => {
         error,
     }
 }
+  
 
 export default useFetchHorses;

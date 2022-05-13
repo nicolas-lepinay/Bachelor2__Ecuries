@@ -98,7 +98,7 @@ const CommonRightPanel = ({ setOpen, isOpen, horse, horses, events }) => {
 					<Avatar
                         srcSet={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.url}` : `${defaultHorseAvatar}`}
                         src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.url}` : `${defaultHorseAvatar}`}
-                        color={horse?.attributes?.color}
+                        color={horse?.color}
 						shadow='default'
 					/>
 				</div>

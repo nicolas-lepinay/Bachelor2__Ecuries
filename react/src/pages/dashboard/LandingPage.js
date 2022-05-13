@@ -6,8 +6,9 @@ import { useMeasure } from 'react-use';
 
 import ThemeContext from '../../contexts/themeContext';
 
-// 🛠️ useAuth hook :
+// 🛠️ Hooks :
 import useAuth from '../../hooks/useAuth';
+import useFetchHorses from '../../hooks/useFetchHorses';
 
 import Button from '../../components/bootstrap/Button';
 import Page from '../../layout/Page/Page';
@@ -42,6 +43,13 @@ const LandingPage = () => {
 
     // 🦸 User:
     const auth = useAuth();
+
+    // 🐎 Fetch user's horse(s) :
+    const { 
+        data: horses, 
+        setData: setHorses } = useFetchHorses(`&filters[owner][id]=${auth.user.id}`);
+
+    console.log(horses)
 
     const formikProfile = useFormik({
 		initialValues: {
@@ -235,16 +243,8 @@ const LandingPage = () => {
 								</CardLabel>
 							</CardHeader>
 							<CardBody>
-								<p>
-                                    Auprès des chevaux depuis sa naissance, Karine a grandi dans les troupeaux 
-                                    de poneys et chevaux de l’élevage familial. En selle depuis ses 3 ans, Karine 
-                                    a reçu une formation complète auprès de nombreux cavaliers de haut niveau : 
-                                    Pascale Massot-Dandoy, Philippe Limousin, Alain Franckville, Serge Balbin, 
-                                    Patrick Le Rolland, Wilfried Pierrot. 
-								</p>
-                                <p>
-                                    Elle évoluera en compétition de dressage jusqu’à intégrer l’équipe de France 
-                                    de dressage espoir de l’âge de 14 à 18 ans.
+								<p className='new-line'>
+                                    {auth.user.biography || 'Dites-en nous plus à votre sujet.'}
                                 </p>
 							</CardBody>
 						</Card>
@@ -434,6 +434,7 @@ const LandingPage = () => {
 									everyone automatically.
 								</Alert> */}
 							</CardTabItem>
+
 							<CardTabItem id='address' title='Adresse' icon='HolidayVillage'>
 								<Card
 									className='rounded-2'
@@ -556,7 +557,110 @@ const LandingPage = () => {
 									</CardFooter>
 								</Card>
 							</CardTabItem>
-							<CardTabItem id='profile2' title='Mot de passe' icon='Lock'>
+
+                            <CardTabItem id='horses' title='Chevaux' icon='Horse'>
+                                <Alert isLight className='border-0' shadow='md' icon='HorseVariant' color='info'>
+									Vous retrouverez ici la liste de vos chevaux.
+								</Alert>
+
+
+                                <div className='row row-cols-xxl-2 row-cols-lg-1'>
+                                    {horses.map((horse) => (
+                                        <div key={horse.name} className='col'>
+                                            <Card>
+                                                <CardBody>
+                                                    <div className='row g-3'>
+                                                        <div className='col d-flex'>
+                                                            <div className='flex-shrink-0'>
+                                                                <div className='position-relative'>
+                                                                    <div
+                                                                        className='ratio ratio-1x1'
+                                                                        style={{ width: 100 }}>
+                                                                        <div
+                                                                            className={classNames(
+                                                                                `bg-l25-${horse.color}`,
+                                                                                'rounded-2',
+                                                                                'd-flex align-items-center justify-content-center',
+                                                                                'overflow-hidden',
+                                                                                'shadow',
+                                                                            )}>
+                                                                            <img
+                                                                                src={horse?.avatar?.data?.attributes?.url}
+                                                                                alt={'Alt'}
+                                                                                width={100}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                            <div className='flex-grow-1 ms-3 d-flex justify-content-between'>
+                                                                <div className='w-100'>
+                                                                    <div className='row'>
+                                                                        <div className='col'>
+                                                                            <div className='d-flex align-items-center'>
+                                                                                <div className='fw-bold fs-5 me-2'>
+                                                                                    {horse.name}
+                                                                                </div>
+                                                                                <small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
+                                                                                    {horse.breed || 'Race'}
+                                                                                </small>
+                                                                            </div>
+
+                                                                            <div className='text-muted'>
+                                                                                {horse.owner.data.attributes.name} {horse.owner.data.attributes.surname}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className='col-auto'>
+                                                                            <Button
+                                                                                icon='Info'
+                                                                                color='dark'
+                                                                                isLight
+                                                                                hoverShadow='sm'
+                                                                                tag='a'
+                                                                                // to={`../${demoPages.appointment.subMenu.employeeID.path}/${user.id}`}
+                                                                                data-tour={auth.user.name}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                    {/* {!!user?.services && (
+                                                                        <div className='row g-2 mt-3'>
+                                                                            {user?.services.map((service) => (
+                                                                                <div
+                                                                                    key={service.name}
+                                                                                    className='col-auto'>
+                                                                                    <Badge
+                                                                                        isLight
+                                                                                        color={service.color}
+                                                                                        className='px-3 py-2'>
+                                                                                        <Icon
+                                                                                            icon={service.icon}
+                                                                                            size='lg'
+                                                                                            className='me-1'
+                                                                                        />
+                                                                                        {service.name}
+                                                                                    </Badge>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    )} */}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </CardBody>
+                                            </Card>
+                                        </div>
+                                    ))}
+                                </div>
+
+
+
+
+
+							</CardTabItem>
+
+							<CardTabItem id='password' title='Mot de passe' icon='Lock'>
 								<Card
 									className='rounded-2'
 									tag='form'

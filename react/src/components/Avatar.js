@@ -90,7 +90,7 @@ const Avatar = forwardRef(
 				)}
 				srcSet={srcSet}
 				src={src}
-				alt='Avatar'
+				alt=''
 				width={size}
 				height={size}
 				// eslint-disable-next-line react/jsx-props-no-spreading
