@@ -11,6 +11,7 @@ import {
     loginPage, 
     logoutPage,
     queryPages,
+    clientQueryPages
 } from '../menu';
 // import Login from '../pages/presentation/auth/Login';
 import Login from '../pages/auth/Login';
@@ -197,6 +198,11 @@ const DASHBOARDS = {
 	DASHBOARD_BOOKING: lazy(() => import('../pages/dashboard/DashboardBookingPage')),
     DASHBOARD_ACTIVITY: lazy(() => import('../pages/dashboard/DashboardActivityPage')),
 }
+
+const ACCOUNTS = {
+	HORSE_PAGE: lazy(() => import('../pages/accounts/horses/HorsePage.jsx')),
+}
+
 
 
 const presentation = [
@@ -936,11 +942,16 @@ const admin = [
 		element: <h1>COMPTES DES CHEVAUX</h1>,
 		exact: true,
 	},
+    {
+        path: `${queryPages.horses.path}/:id`,
+        element: <ACCOUNTS.HORSE_PAGE />,
+        exact: true,
+    },
 ];
 
 const professional = [
     {
-		path: professional.accounts.accounts.subMenu.horses.path,
+		path: professionalMenu.accounts.accounts.subMenu.horses.path,
 		element: <h1>COMPTES DES CHEVAUX</h1>,
 		exact: true,
     },
@@ -951,6 +962,11 @@ const client = [
         path: clientMenu.accounts.accounts.subMenu.horses.path,
 		element: <h1>PROFILS DE MES CHEVAUX</h1>,
 		exact: true,
+    },
+    {
+        path: `${clientQueryPages.horses.path}/:id`,
+        element: <ACCOUNTS.HORSE_PAGE />,
+        exact: true,
     },
 ];
 
@@ -970,11 +986,11 @@ const common = [
 		element: <DASHBOARDS.DASHBOARD_BOOKING />,
 		exact: true,
 	},
-    {
-        path: `${demoPages.appointment.subMenu.employeeID.path}/:id`,
-		element: <APP.APPOINTMENT.EMPLOYEE_VIEW />,
-		exact: true,
-    },
+    // {
+    //     path: `${demoPages.appointment.subMenu.employeeID.path}/:id`,
+	// 	element: <APP.APPOINTMENT.EMPLOYEE_VIEW />,
+	// 	exact: true,
+    // },
 ];
 
 const auth = [
@@ -993,12 +1009,12 @@ const auth = [
 const queries = [
     {
         path: queryPages.horses.path,
-        element: <DASHBOARDS.DASHBOARD_ACTIVITY />,
+        element: <ACCOUNTS.HORSE_PAGE />,
         exact: true,
     },
 ]
 
 const contents = { admin, professional, client, common, auth, queries };
 
-export default contents ;
+export default contents;
 

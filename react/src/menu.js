@@ -1039,7 +1039,7 @@ const professional_accounts = {
 const horse_accounts = {
     id: 'account-horse',
     text: 'Chevaux',
-    path: 'comptes/chevaux',
+    path: '/comptes/chevaux',
     icon: 'HorseVariant',
 }
 
@@ -1131,8 +1131,16 @@ export const logoutPage = {
 
 export const queryPages = {
     horses: {
-        id: 'horses_page',
+        id: 'horses-page',
         text: 'Chevaux',
-        path: '/:id',
+        path: horse_accounts.path,
+    }
+}
+
+export const clientQueryPages = {
+    horses: {
+        id: 'horses-page-for-client',
+        text: 'Chevaux',
+        path: horse_accounts_for_clients.path,
     }
 }

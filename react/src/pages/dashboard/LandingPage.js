@@ -33,7 +33,7 @@ import Avatar from '../../components/Avatar';
 import defaultAvatar from '../../assets/img/wanna/defaultAvatar.webp';
 import defaultHorseAvatar from '../../assets/img/horse-avatars/defaultHorseAvatar.webp';
 
-import { dashboardMenu } from '../../menu';
+import { dashboardMenu, queryPages, clientQueryPages } from '../../menu';
 import useDarkMode from '../../hooks/useDarkMode';
 
 const LandingPage = () => {
@@ -42,15 +42,22 @@ const LandingPage = () => {
     // ⚙️ Strapi's API URL :
     const API_URL = process.env.REACT_APP_API_URL;
 
+    // ⚙️ Role IDs
+    const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; // Id du rôle 'Admin'
+    const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
+    const CLIENT_ID = process.env.REACT_APP_CLIENT_ID; // Id du rôle 'Client'
+
     // 🦸 User:
     const auth = useAuth();
+
+    const isAdmin = auth.user && Number(auth.user.role.id) === Number(ADMIN_ID);
+    const isPro = auth.user && Number(auth.user.role.id) === Number(PRO_ID);
+    const isClient = auth.user && Number(auth.user.role.id) === Number(CLIENT_ID);
 
     // 🐎 Fetch user's horse(s) :
     const { 
         data: horses, 
         setData: setHorses } = useFetchHorses(`&filters[owner][id]=${auth.user.id}`);
-
-    console.log(horses)
 
     const formikProfile = useFormik({
 		initialValues: {
@@ -615,12 +622,13 @@ const LandingPage = () => {
                                                                         <div className='col-auto'>
                                                                             <Button
                                                                                 icon='Info'
-                                                                                color='dark'
+                                                                                color='info'
                                                                                 isLight
                                                                                 hoverShadow='sm'
                                                                                 tag='a'
-                                                                                // to={`../${demoPages.appointment.subMenu.employeeID.path}/${user.id}`}
-                                                                                to={`/chevaux/${horse.id}`}
+                                                                                //to={`../${demoPages.appointment.subMenu.employeeID.path}/${user.id}`}
+                                                                                //to={`/chevaux/${horse.id}`}
+                                                                                to={isAdmin || isPro ? `${queryPages.horses.path}/${horse.id}` : `${clientQueryPages.horses.path}/${horse.id}`}
                                                                                 data-tour={auth.user.name}
                                                                             />
                                                                         </div>
