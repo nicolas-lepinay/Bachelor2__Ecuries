@@ -7,9 +7,12 @@ import axios from 'axios';
 // 📚 Other libraries :
 import PropTypes from 'prop-types';
 
-const useFetchHorses = (filters) => {
+const useFetchHorses = ({
+    filters = '',
+    isUnique = false,
+    } = {}) => {
     
-    filters = filters ? filters : '';
+    // filters = filters ? filters : '';
 
     // ⚙️ Strapi's URL :
     const API_URL = process.env.REACT_APP_API_URL;
@@ -36,7 +39,7 @@ const useFetchHorses = (filters) => {
                         ...item.attributes
                     });
                 });
-                setData(formattedData);
+                isUnique ? setData(formattedData[0]) : setData(formattedData);
             } catch(err) {
                 setError(err)
                 console.log('USE FETCH HORSES | ' + query + ' | ' + err)

@@ -6,6 +6,7 @@ import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
 import 'moment/locale/fr';
 import { useFormik } from 'formik';
 import { Calendar as DatePicker } from 'react-date-range';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../layout/SubHeader/SubHeader';
 import Page from '../../layout/Page/Page';
@@ -222,6 +223,7 @@ const DashboardActivityPage = () => {
 
     // 🐎 Fetch all horses :
     const { 
+        loading: horsesLoading,
         data: horses, 
         setData: setHorses } = useFetchHorses();
 
@@ -840,28 +842,16 @@ const DashboardActivityPage = () => {
 										desc={
 											<>
 												<div className='h6'><b>{horse.name}</b></div>
-												<div>
-													<span>Activités : </span>
-                                                    {/* <b>
-													{
-														activities.filter(
-															(activity) =>
-																activity?.horses?.data[0].id ===
-																horse.id,
-														).length
-													}
-                                                    </b> */}
-												</div>
 											</>
 										}>
-										<div className='position-relative'>
+										<div className='position-relative d-flex flex-column align-items-center mx-3'>
 											<Avatar
 												srcSet={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultHorseAvatar}`}
 												src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultHorseAvatar}`}
 												color={horse?.color}
 												size={64}
 												border={4}
-												className='cursor-pointer'
+												className='cursor-pointer mb-2'
 												borderColor={
 													horseList[horse.id]
 														? 'info'
@@ -876,10 +866,15 @@ const DashboardActivityPage = () => {
                                                     handleSelectedHorse(horse);
                                                 } }
 											/>
+                                            <div className='h6 text-center'>{horse.name}</div>
 										</div>
 									</Popovers>
 								</div>
 							))}
+
+                            {horsesLoading && (
+                                <CircularProgress color="info" size='46px' />
+                            )}
 						</div>
                         
 						<div className='row h-100'>

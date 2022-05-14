@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import CircularProgress from '@mui/material/CircularProgress';
+
 import OffCanvas, { OffCanvasBody } from '../../../components/bootstrap/OffCanvas';
 import Avatar, { AvatarGroup } from '../../../components/Avatar';
 
@@ -26,8 +28,6 @@ import { sales } from '../../../common/data/chartDummyData';
 import SERVICES from '../../../common/data/serviceDummyData';
 import useDarkMode from '../../../hooks/useDarkMode';
 import { irBlack } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
-
-const convert = require('convert-seconds');
 
 const CommonRightPanel = ({ setOpen, isOpen, employee, employees, appointments }) => {
 
@@ -56,6 +56,17 @@ const CommonRightPanel = ({ setOpen, isOpen, employee, employees, appointments }
             appointment?.employee?.data.id ===
             employee.id,
     )
+
+    if(!employee.id)
+        return (
+            <OffCanvas setOpen={setOpen} isOpen={isOpen} isRightPanel>
+                <OffCanvasBody className='p-4'>
+                    <div className='position-absolute top-50 start-50 translate-middle'>
+                        <CircularProgress color="info" />
+                    </div>
+                </OffCanvasBody>
+            </OffCanvas>
+    );
 
 	return (
 		<OffCanvas setOpen={setOpen} isOpen={isOpen} isRightPanel>

@@ -200,7 +200,7 @@ const DASHBOARDS = {
 }
 
 const ACCOUNTS = {
-	HORSE_PAGE: lazy(() => import('../pages/accounts/horses/HorsePage.jsx')),
+	HORSE_PAGE: lazy(() => import('../pages/accounts/horses/HorsePage')),
 }
 
 

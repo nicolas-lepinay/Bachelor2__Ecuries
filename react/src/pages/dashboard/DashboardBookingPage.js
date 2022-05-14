@@ -6,6 +6,7 @@ import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
 import 'moment/locale/fr';
 import { useFormik } from 'formik';
 import { Calendar as DatePicker } from 'react-date-range';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../layout/SubHeader/SubHeader';
 import Page from '../../layout/Page/Page';
@@ -658,6 +659,10 @@ const DashboardBookingPage = () => {
 									</Popovers>
 								</div>
 							))}
+
+                            {employeesLoading && (
+                                <CircularProgress color="info" size='46px' />
+                            )}
 						</div>
                         
 						<div className='row h-100'>

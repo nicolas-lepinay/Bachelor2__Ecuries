@@ -57,7 +57,7 @@ const LandingPage = () => {
     // 🐎 Fetch user's horse(s) :
     const { 
         data: horses, 
-        setData: setHorses } = useFetchHorses(`&filters[owner][id]=${auth.user.id}`);
+        setData: setHorses } = useFetchHorses({ filters: `&filters[owner][id]=${auth.user.id}` });
 
     const formikProfile = useFormik({
 		initialValues: {
@@ -196,23 +196,20 @@ const LandingPage = () => {
 									<div className='col-12'>
 										<div className='row g-3'>
 											<div className='col-12'>
-												<div className='d-flex align-items-center'>
+												<div className='d-flex align-items-end mb-2'>
 													<div className='flex-shrink-0'>
 														<Icon icon='Mail' size='3x' color='info' />
 													</div>
 													<div className='flex-grow-1 ms-3'>
+														<div className='text-muted'>Adresse e-mail</div>
 														<div className='fw-bold fs-5 mb-0'>
-															{auth.user.email ||
-																'Nope'}
-														</div>
-														<div className='text-muted'>
-															Adresse e-mail
+															{auth.user.email ||'Non-renseigné'}
 														</div>
 													</div>
 												</div>
 											</div>
 											<div className='col-12'>
-												<div className='d-flex align-items-center'>
+												<div className='d-flex align-items-end mb-2'>
 													<div className='flex-shrink-0'>
 														<Icon
 															icon='PhoneIphone'
@@ -221,10 +218,10 @@ const LandingPage = () => {
 														/>
 													</div>
 													<div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-5 mb-0'>
-															{auth.user.phone || '01 23 45 67 89'}
-														</div>
 														<div className='text-muted'>Téléphone</div>
+														<div className='fw-bold fs-5 mb-0'>
+															{auth.user.phone || 'Non-renseigné'}
+														</div>
 													</div>
 												</div>
 											</div>
@@ -611,7 +608,7 @@ const LandingPage = () => {
                                                                                     {horse.name}
                                                                                 </div>
                                                                                 <small className={`border border-${horse?.color} border-2 text-${horse?.color} fw-bold px-2 py-1 rounded-1`}>
-                                                                                    {horse.breed || 'Race'}
+                                                                                    {horse.breed || 'Un noble cheval'}
                                                                                 </small>
                                                                             </div>
 
