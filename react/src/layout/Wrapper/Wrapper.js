@@ -36,7 +36,7 @@ const Wrapper = () => {
 			<WrapperContainer>
 				<HeaderRoutes />
 				<Content />
-				{/* <FooterRoutes /> */}
+				<FooterRoutes />
 			</WrapperContainer>
 			<WrapperOverlay />
 		</>

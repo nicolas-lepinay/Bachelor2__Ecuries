@@ -12,11 +12,12 @@ import { demoPages, logoutPage } from '../../menu';
 import { DropdownItem, DropdownMenu } from '../../components/bootstrap/Dropdown';
 import Button from '../../components/bootstrap/Button';
 
-
 import Collapse from '../../components/bootstrap/Collapse';
 import { NavigationLine } from '../Navigation/Navigation';
 import Icon from '../../components/icon/Icon';
 import useNavigationItemHandle from '../../hooks/useNavigationItemHandle';
+
+import defaultAvatar from '../../assets/img/wanna/defaultAvatar.webp';
 
 const User = () => {
     // ⚙️ Strapi's API URL :
@@ -38,9 +39,9 @@ const User = () => {
 				onClick={() => setCollapseStatus(!collapseStatus)}>
 				<div className='user-avatar'>
 					<img
-						srcSet={`${API_URL}${auth?.user?.avatar?.formats?.thumbnail?.url}`}
-                        src={`${API_URL}${auth?.user?.avatar?.formats?.thumbnail?.url}`}
-						alt='Avatar'
+                        srcSet={auth.user?.avatar ? `${API_URL}${auth.user?.avatar?.url}` : `${defaultAvatar}`}
+                        src={auth.user?.avatar ? `${API_URL}${auth.user?.avatar?.url}` : `${defaultAvatar}`}
+						alt='.🦸‍♀️.'
 						width={128}
 						height={128}
 					/>

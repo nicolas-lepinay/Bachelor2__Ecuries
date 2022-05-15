@@ -16,16 +16,17 @@ const Footer = () => {
 			<div className='container-fluid'>
 				<div className='row'>
 					<div className='col'>
-						<span className='fw-light'>Copyright © 2022 - Version 2.2.3</span>
+						<span className='fw-light' style={{letterSpacing: '1px'}}>リコルヌ • <span className='fw-bold gradient-text'>licorne™</span> • 🦄</span>
 					</div>
 					<div className='col-auto'>
 						<a
-							href='/'
+							href='https://www.linkedin.com/in/nicolas-lepinay'
+                            target='_blank'
 							className={classNames('text-decoration-none', {
 								'link-dark': !darkModeStatus,
 								'link-light': darkModeStatus,
 							})}>
-							<small className='fw-bold'>Facit Theme</small>
+							<small className='fw-light'>Copyright © 2022 • Nicolas Lépinay</small>
 						</a>
 					</div>
 				</div>

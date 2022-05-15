@@ -11,7 +11,7 @@ import useAsideTouch from '../../hooks/useAsideTouch';
 import Brand from '../Brand/Brand';
 import Navigation, { NavigationLine } from '../Navigation/Navigation';
 import User from '../User/User';
-import { landingPage, adminMenu, professionalMenu, clientMenu } from '../../menu';
+import { landingPage, profilePage, adminMenu, professionalMenu, clientMenu } from '../../menu';
 import ThemeContext from '../../contexts/themeContext';
 import Card, { CardBody } from '../../components/bootstrap/Card';
 
@@ -71,6 +71,8 @@ const Aside = () => {
 
 				<div className='aside-body'>
                     <Navigation menu={landingPage} id='aside-landing' />
+
+                    <Navigation menu={profilePage} id='aside-landing' />
 
                     <NavigationLine />
 

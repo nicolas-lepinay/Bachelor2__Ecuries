@@ -998,6 +998,15 @@ export const landingPage = {
     }
 }
 
+export const profilePage = {
+    profile: {
+        id: 'mon-compte',
+        text: 'Mon compte',
+        path: '/mon-compte',
+        icon: 'Person',
+    }
+}
+
 // Plannings
 const dashboards = {
     title: {
@@ -1068,14 +1077,14 @@ const client_accounts = {
 const accounts = {
     title: {
         id: 'accounts',
-        text: 'Comptes',
+        text: 'Gestion',
         icon: 'Extension',
     },
     accounts: {
         id: 'account',
         text: 'Utilisateurs',
         path: 'comptes',
-        icon: 'Person',
+        icon: 'Group',
         subMenu: {
             horses: horse_accounts,                 // Comptes chevaux
             professionals: professional_accounts,   // Comptes professionels

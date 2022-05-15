@@ -5,6 +5,7 @@ import {
     demoPages, 
     layoutMenu, 
     landingPage,
+    profilePage,
     adminMenu, 
     professionalMenu,
     clientMenu,
@@ -17,11 +18,11 @@ import {
 import Login from '../pages/auth/Login';
 import Logout from '../pages/auth/Logout';
 
-const LANDING_PAGE = lazy(() => import('../pages/dashboard/LandingPage'));
+const PROFILE_PAGE = lazy(() => import('../pages/ProfilePage'));
 
 const LANDING = {
 	// DASHBOARD: lazy(() => import('../pages/dashboard/DashboardPage')),
-    DASHBOARD: lazy(() => import('../pages/dashboard/LandingPage')),
+    DASHBOARD: lazy(() => import('../pages/ProfilePage')),
 	DASHBOARD_BOOKING: lazy(() => import('../pages/dashboard/DashboardBookingPage')),
 	SUMMARY: lazy(() => import('../pages/SummaryPage')),
 };
@@ -194,6 +195,14 @@ const EXTRA = {
 
 // --------- MY CUSTOM VERSION ---------
 
+const HOME = {
+	HOME_PAGE: lazy(() => import('../pages/HomePage')),
+}
+
+const PROFILE = {
+	PROFILE_PAGE: lazy(() => import('../pages/ProfilePage')),
+}
+
 const DASHBOARDS = {
 	DASHBOARD_BOOKING: lazy(() => import('../pages/dashboard/DashboardBookingPage')),
     DASHBOARD_ACTIVITY: lazy(() => import('../pages/dashboard/DashboardActivityPage')),
@@ -262,7 +271,12 @@ const client = [
 const common = [
     {
         path: landingPage.landing.path,
-		element: <LANDING_PAGE />,
+		element: <HOME.HOME_PAGE />,
+		exact: true,
+    },
+    {
+        path: profilePage.profile.path,
+		element: <PROFILE.PROFILE_PAGE />,
 		exact: true,
     },
 	{

@@ -5,15 +5,15 @@ import moment from 'moment';
 import classNames from 'classnames';
 import { useMeasure } from 'react-use';
 
-import ThemeContext from '../../contexts/themeContext';
+import ThemeContext from '../contexts/themeContext';
 
 // 🛠️ Hooks :
-import useAuth from '../../hooks/useAuth';
-import useFetchHorses from '../../hooks/useFetchHorses';
+import useAuth from '../hooks/useAuth';
+import useFetchHorses from '../hooks/useFetchHorses';
 
-import Button from '../../components/bootstrap/Button';
-import Page from '../../layout/Page/Page';
-import PageWrapper from '../../layout/PageWrapper/PageWrapper';
+import Button from '../components/bootstrap/Button';
+import Page from '../layout/Page/Page';
+import PageWrapper from '../layout/PageWrapper/PageWrapper';
 import Card, {
 	CardActions,
 	CardBody,
@@ -23,27 +23,27 @@ import Card, {
 	CardLabel,
 	CardTabItem,
 	CardTitle,
-} from '../../components/bootstrap/Card';
+} from '../components/bootstrap/Card';
 import Dropdown, {
 	DropdownItem,
 	DropdownMenu,
 	DropdownToggle,
-} from '../../components/bootstrap/Dropdown';
-import Popovers from '../../components/bootstrap/Popovers';
-import FormGroup from '../../components/bootstrap/forms/FormGroup';
-import Input from '../../components/bootstrap/forms/Input';
-import InputGroup, { InputGroupText } from '../../components/bootstrap/forms/InputGroup';
-import showNotification from '../../components/extras/showNotification';
-import Icon from '../../components/icon/Icon';
-import Alert from '../../components/bootstrap/Alert';
-import Avatar from '../../components/Avatar';
-import defaultAvatar from '../../assets/img/wanna/defaultAvatar.webp';
-import defaultHorseAvatar from '../../assets/img/horse-avatars/defaultHorseAvatar.webp';
+} from '../components/bootstrap/Dropdown';
+import Popovers from '../components/bootstrap/Popovers';
+import FormGroup from '../components/bootstrap/forms/FormGroup';
+import Input from '../components/bootstrap/forms/Input';
+import InputGroup, { InputGroupText } from '../components/bootstrap/forms/InputGroup';
+import showNotification from '../components/extras/showNotification';
+import Icon from '../components/icon/Icon';
+import Alert from '../components/bootstrap/Alert';
+import Avatar from '../components/Avatar';
+import defaultAvatar from '../assets/img/wanna/defaultAvatar.webp';
+import defaultHorseAvatar from '../assets/img/horse-avatars/defaultHorseAvatar.webp';
 
-import { dashboardMenu, queryPages, clientQueryPages } from '../../menu';
-import useDarkMode from '../../hooks/useDarkMode';
+import { profilePage, queryPages, clientQueryPages } from '../menu';
+import useDarkMode from '../hooks/useDarkMode';
 
-const LandingPage = () => {
+const ProfilePage = () => {
 	const { darkModeStatus } = useDarkMode();
 
     // ⚙️ Strapi's API URL :
@@ -181,9 +181,8 @@ const LandingPage = () => {
 		setRightPanel(false);
 	});
 
-
 	return (
-		<PageWrapper title={dashboardMenu.dashboard.text}>
+		<PageWrapper title={profilePage.profile.text}>
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-xxl-4 col-xl-6'>
@@ -635,7 +634,7 @@ const LandingPage = () => {
                                                                                 )}>
                                                                                 <img
                                                                                     src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.url}` : `${defaultHorseAvatar}`}
-                                                                                    alt={'My horse'}
+                                                                                    alt={'.🐴.'}
                                                                                     width={100}
                                                                                 />
                                                                             </div>
@@ -896,4 +895,4 @@ const LandingPage = () => {
 	);
 };
 
-export default LandingPage;
+export default ProfilePage;

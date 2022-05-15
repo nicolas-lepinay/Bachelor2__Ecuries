@@ -1,13 +1,18 @@
-import React from 'react';
+import { useLayoutEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 import { useMeasure } from 'react-use';
 import { isWebpSupported } from 'react-image-webp/dist/utils';
 import useDarkMode from '../hooks/useDarkMode';
+import { profilePage } from '../menu'
+
+import ThemeContext from '../contexts/themeContext';
 
 import PageWrapper from '../layout/PageWrapper/PageWrapper';
 import Richie from '../assets/img/richie.png';
+import RedGirl from '../assets/img/redhead-girl.png';
+import RedGirlWebp from '../assets/img/redhead-girl.webp';
 import RichieWebp from '../assets/img/richie.webp';
 import BootstrapLogo from '../assets/img/bootstrap.svg';
 import StorybookLogo from '../assets/img/storybbok.png';
@@ -70,7 +75,7 @@ const useStyles = createUseStyles({
 	},
 
 	introImage: {
-		backgroundImage: `url(${isWebpSupported() ? RichieWebp : Richie})`,
+		backgroundImage: `url(${isWebpSupported() ? RedGirlWebp : RedGirl})`,
 		backgroundPosition: 'center',
 		backgroundRepeat: 'no-repeat',
 		backgroundSize: 'contain',
@@ -277,42 +282,22 @@ const useStyles = createUseStyles({
 	// stylelint-enable
 });
 
-const SummaryPage = () => {
+const HomePage = () => {
 	const classes = useStyles();
 	const [ref, { height }] = useMeasure();
 	const { darkModeStatus } = useDarkMode();
 
+    const { setRightPanel } = useContext(ThemeContext);
+
+    useLayoutEffect(() => {
+		setRightPanel(false);
+	});
+
 	return (
-		<PageWrapper ref={ref} title='React Admin Dashboard Template'>
-			{/* <SubHeader>
-				<SubHeaderLeft>
-					<span className='fw-bold'>React Admin Dashboard Template</span>
-					<SubheaderSeparator />
-					<span>
-						incl. Bootstrap{' '}
-						<sup>
-							<Badge color='primary' isLight rounded={1}>
-								5
-							</Badge>
-						</sup>
-					</span>
-				</SubHeaderLeft>
-				<SubHeaderRight>
-					<Button color='success' isLight icon='ShoppingCart' tag='a' href='/'>
-						Buy on Envato
-					</Button>
-					<Button
-						color='info'
-						isLight
-						tag='a'
-						href='mailto:info@omtanke.studio'
-						icon='MarkunreadMailbox'>
-						Support
-					</Button>
-				</SubHeaderRight>
-			</SubHeader> */}
-			<Page>
-				<div id='intro' className='scroll-margin'>
+		<PageWrapper className='no-class' ref={ref} title='Bienvenue sur Licorne'>
+			<SubHeader className='opacity-0'></SubHeader>
+			<Page container='fluid'>
+				<div id='intro-page' className='scroll-margin'>
 					<div className={classNames('row', 'h-fluid-min-100', classes.intro)}>
 						<div
 							className={classNames('col-lg-5', 'col-12', classes.introImageWrapper)}>
@@ -329,7 +314,7 @@ const SummaryPage = () => {
 							)}>
 							<div>
 								<h1 className='display-1 mb-4'>
-									Bienvenue sur {darkModeStatus ? <FullLogoWhite height={85} /> : <FullLogoBlack height={85} /> }
+									Bienvenue sur {darkModeStatus ? <FullLogoWhite height={100} /> : <FullLogoBlack height={100} /> }
 								</h1>
 								<p className='display-6 mb-4'>
 									On s'occupe de tout.
@@ -345,7 +330,7 @@ const SummaryPage = () => {
 									isOutline
 									icon='Person'
 									tag='a'
-									to='#bootstrap'>
+									to={profilePage.profile.path}>
 									Commencer
 								</Button>
 							</div>
@@ -552,6 +537,7 @@ const SummaryPage = () => {
 						/>
 					</div>
 				</div>
+
 				{/* <div id='bootstrap' className='row h-fluid-min-lg-100 scroll-margin'>
 					<div className='col-12'>
 						<Card stretch>
@@ -607,6 +593,7 @@ const SummaryPage = () => {
 						</Card>
 					</div>
 				</div> */}
+
 				{/* <div id='storybook' className='row h-fluid-min-lg-100 scroll-margin'>
 					<div className='col-12'>
 						<Card stretch>
@@ -722,4 +709,4 @@ const SummaryPage = () => {
 	);
 };
 
-export default SummaryPage;
+export default HomePage;
