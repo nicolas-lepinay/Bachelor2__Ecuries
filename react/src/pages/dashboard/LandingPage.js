@@ -1,4 +1,5 @@
 import React, { useContext, useLayoutEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import moment from 'moment';
 import classNames from 'classnames';
@@ -23,6 +24,12 @@ import Card, {
 	CardTabItem,
 	CardTitle,
 } from '../../components/bootstrap/Card';
+import Dropdown, {
+	DropdownItem,
+	DropdownMenu,
+	DropdownToggle,
+} from '../../components/bootstrap/Dropdown';
+import Popovers from '../../components/bootstrap/Popovers';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Input from '../../components/bootstrap/forms/Input';
 import InputGroup, { InputGroupText } from '../../components/bootstrap/forms/InputGroup';
@@ -53,6 +60,17 @@ const LandingPage = () => {
     const isAdmin = auth.user && Number(auth.user.role.id) === Number(ADMIN_ID);
     const isPro = auth.user && Number(auth.user.role.id) === Number(PRO_ID);
     const isClient = auth.user && Number(auth.user.role.id) === Number(CLIENT_ID);
+
+    const colorList = [
+        { value: 'info', description: 'Bleu'},
+        { value: 'primary', description: 'Violet'},
+        { value: 'secondary', description: 'Rose'},
+        { value: 'success', description: 'Vert'},
+        { value: 'warning', description: 'Jaune'},
+        { value: 'danger', description: 'Rouge'},
+        { value: 'light', description: 'Blanc'},
+        { value: 'dark', description: 'Noir'},
+    ];
 
     // 🐎 Fetch user's horse(s) :
     const { 
@@ -184,7 +202,7 @@ const LandingPage = () => {
 												/>
 											</div>
 											<div className='flex-grow-1 ms-3'>
-												<div className='h2 fw-bold'>
+												<div className='h2 fw-bold text-capitalize font-family-playfair'>
 													{auth.user.name || 'Prénom'}
                                                     {' '}
 													{auth.user.surname || 'Nom'}
@@ -251,6 +269,29 @@ const LandingPage = () => {
 								<p className='new-line'>
                                     {auth.user.biography || 'Dites-en nous plus à votre sujet.'}
                                 </p>
+                                <div className='col-auto pt-3'>
+                                    <Dropdown>
+                                        <DropdownToggle hasIcon={false}>
+                                            <Button color='dark' isLink isActive icon='MoreHoriz'></Button>
+                                        </DropdownToggle>
+                                        <DropdownMenu>
+                                        <DropdownItem isHeader>Couleur du profil</DropdownItem>
+                                        {colorList.map(
+                                            (color) => (
+                                                <DropdownItem key={color.value}>
+                                                    <div>
+                                                        <Icon
+                                                            icon='Circle'
+                                                            color={color.value}
+                                                        />
+                                                        {color.description}
+                                                    </div>
+                                                </DropdownItem>
+                                            )
+                                        )}
+                                        </DropdownMenu>
+                                    </Dropdown>
+								</div>
 							</CardBody>
 						</Card>
 					</div>
@@ -571,93 +612,96 @@ const LandingPage = () => {
 
                                 <div className='row row-cols-xxl-2 row-cols-lg-1'>
                                     {horses.map((horse) => (
-                                        <div key={horse.name} className='col'>
-                                            <Card>
-                                                <CardBody>
-                                                    <div className='row g-3'>
-                                                        <div className='col d-flex'>
-                                                            <div className='flex-shrink-0'>
-                                                                <div className='position-relative'>
-                                                                    <div
-                                                                        className='ratio ratio-1x1'
-                                                                        style={{ width: 100 }}>
+                                        <Link 
+                                            to={isAdmin || isPro ? `${queryPages.horses.path}/${horse.id}` : `${clientQueryPages.horses.path}/${horse.id}`}
+                                            style={{textDecoration: 'none', color: 'inherit'}}>
+                                            <div key={horse.name} className='col'>
+                                                <Card>
+                                                    <CardBody>
+                                                        <div className='row g-3'>
+                                                            <div className='col d-flex'>
+                                                                <div className='flex-shrink-0'>
+                                                                    <div className='position-relative'>
                                                                         <div
-                                                                            className={classNames(
-                                                                                `bg-l25-${horse.color}`,
-                                                                                'rounded-2',
-                                                                                'd-flex align-items-center justify-content-center',
-                                                                                'overflow-hidden',
-                                                                                'shadow',
-                                                                            )}>
-                                                                            <img
-                                                                                src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.url}` : `${defaultHorseAvatar}`}
-                                                                                alt={'My horse'}
-                                                                                width={100}
-                                                                            />
+                                                                            className='ratio ratio-1x1'
+                                                                            style={{ width: 100 }}>
+                                                                            <div
+                                                                                className={classNames(
+                                                                                    `bg-l25-${horse.color}`,
+                                                                                    'rounded-2',
+                                                                                    'd-flex align-items-center justify-content-center',
+                                                                                    'overflow-hidden',
+                                                                                    'shadow',
+                                                                                )}>
+                                                                                <img
+                                                                                    src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.url}` : `${defaultHorseAvatar}`}
+                                                                                    alt={'My horse'}
+                                                                                    width={100}
+                                                                                />
+                                                                            </div>
                                                                         </div>
+                                            
                                                                     </div>
-                                                                  
                                                                 </div>
-                                                            </div>
-                                                            <div className='flex-grow-1 ms-3 d-flex justify-content-between'>
-                                                                <div className='w-100'>
-                                                                    <div className='row'>
-                                                                        <div className='col'>
-                                                                            <div className='d-flex align-items-center'>
-                                                                                <div className='fw-bold fs-5 me-2'>
-                                                                                    {horse.name}
+                                                                <div className='flex-grow-1 ms-3 d-flex justify-content-between'>
+                                                                    <div className='w-100'>
+                                                                        <div className='row'>
+                                                                            <div className='col'>
+                                                                                <div className='d-flex align-items-center'>
+                                                                                    <div className='fw-bold fs-5 me-2 font-family-playfair'>
+                                                                                        {horse.name}
+                                                                                    </div>
+                                                                                    <small className={`border border-${horse?.color} border-2 text-${horse?.color} fw-bold px-2 py-1 rounded-1`}>
+                                                                                        {horse.breed || 'Un noble cheval'}
+                                                                                    </small>
                                                                                 </div>
-                                                                                <small className={`border border-${horse?.color} border-2 text-${horse?.color} fw-bold px-2 py-1 rounded-1`}>
-                                                                                    {horse.breed || 'Un noble cheval'}
-                                                                                </small>
+                                                                                <div className='text-muted'>
+                                                                                    {horse.owner.data.attributes.name} {horse.owner.data.attributes.surname}
+                                                                                </div>
                                                                             </div>
-
-                                                                            <div className='text-muted'>
-                                                                                {horse.owner.data.attributes.name} {horse.owner.data.attributes.surname}
+                                                                            {/* <div className='col-auto'>
+                                                                                <Button
+                                                                                    icon='Info'
+                                                                                    color='info'
+                                                                                    isLight
+                                                                                    hoverShadow='sm'
+                                                                                    tag='a'
+                                                                                    //to={`../${demoPages.appointment.subMenu.employeeID.path}/${user.id}`}
+                                                                                    //to={`/chevaux/${horse.id}`}
+                                                                                    to={isAdmin || isPro ? `${queryPages.horses.path}/${horse.id}` : `${clientQueryPages.horses.path}/${horse.id}`}
+                                                                                    data-tour={auth.user.name}
+                                                                                />
+                                                                            </div> */}
+                                                                        </div>
+                                                                        {/* {!!user?.services && (
+                                                                            <div className='row g-2 mt-3'>
+                                                                                {user?.services.map((service) => (
+                                                                                    <div
+                                                                                        key={service.name}
+                                                                                        className='col-auto'>
+                                                                                        <Badge
+                                                                                            isLight
+                                                                                            color={service.color}
+                                                                                            className='px-3 py-2'>
+                                                                                            <Icon
+                                                                                                icon={service.icon}
+                                                                                                size='lg'
+                                                                                                className='me-1'
+                                                                                            />
+                                                                                            {service.name}
+                                                                                        </Badge>
+                                                                                    </div>
+                                                                                ))}
                                                                             </div>
-                                                                        </div>
-                                                                        <div className='col-auto'>
-                                                                            <Button
-                                                                                icon='Info'
-                                                                                color='info'
-                                                                                isLight
-                                                                                hoverShadow='sm'
-                                                                                tag='a'
-                                                                                //to={`../${demoPages.appointment.subMenu.employeeID.path}/${user.id}`}
-                                                                                //to={`/chevaux/${horse.id}`}
-                                                                                to={isAdmin || isPro ? `${queryPages.horses.path}/${horse.id}` : `${clientQueryPages.horses.path}/${horse.id}`}
-                                                                                data-tour={auth.user.name}
-                                                                            />
-                                                                        </div>
+                                                                        )} */}
                                                                     </div>
-                                                                    {/* {!!user?.services && (
-                                                                        <div className='row g-2 mt-3'>
-                                                                            {user?.services.map((service) => (
-                                                                                <div
-                                                                                    key={service.name}
-                                                                                    className='col-auto'>
-                                                                                    <Badge
-                                                                                        isLight
-                                                                                        color={service.color}
-                                                                                        className='px-3 py-2'>
-                                                                                        <Icon
-                                                                                            icon={service.icon}
-                                                                                            size='lg'
-                                                                                            className='me-1'
-                                                                                        />
-                                                                                        {service.name}
-                                                                                    </Badge>
-                                                                                </div>
-                                                                            ))}
-                                                                        </div>
-                                                                    )} */}
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </CardBody>
-                                            </Card>
-                                        </div>
+                                                    </CardBody>
+                                                </Card>
+                                            </div>
+                                        </Link>
                                     ))}
                                 </div>
 

@@ -6,7 +6,7 @@ import Select from './bootstrap/forms/Select';
 import Option from './bootstrap/Option';
 
 export const PER_COUNT = {
-	3: 3,
+    3: 3,
 	5: 5,
 	10: 10,
 	25: 25,
@@ -65,7 +65,7 @@ const PaginationButtons = ({ setCurrentPage, currentPage, perPage, setPerPage, d
 
 		return (
 			<span className='pagination__desc'>
-				Showing {start} to {end > totalItems ? totalItems : end} of {totalItems} {label}
+				Lignes {start} à {end > totalItems ? totalItems : end} sur {totalItems} {label}
 			</span>
 		);
 	};

@@ -131,7 +131,7 @@ const CommonRightPanel = ({ setOpen, isOpen, employee, employees, appointments }
 				</div>
 				<div className='d-flex flex-column align-items-center mb-5'>
 					{/* <div className='h2 fw-bold'>{`${USERS.JOHN.name} ${USERS.JOHN.surname}`}</div> */}
-                    <div className='h2 fw-bold'>{`${employee?.name} ${employee?.surname}`}</div>
+                    <div className='h2 fw-bold text-capitalize'>{`${employee?.name} ${employee?.surname}`}</div>
 					<div className='h5 text-muted opacity-50'>{employee?.occupation || 'Professionel(le)'}</div>
 				</div>
 				<div

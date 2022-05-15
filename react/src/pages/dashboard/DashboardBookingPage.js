@@ -1,9 +1,9 @@
 // 📚 Librairies :
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
+import 'moment/locale/fr';
 import classNames from 'classnames';
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
-import 'moment/locale/fr';
 import { useFormik } from 'formik';
 import { Calendar as DatePicker } from 'react-date-range';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -568,7 +568,7 @@ const DashboardBookingPage = () => {
                             setToggleEmployeeList(!toggleEmployeeList);
                             toggleEmployeeList ? fillEmployeeList() : emptyEmployeeList();
                         } }
-						color={toggleEmployeeList ? 'light' : 'primary'}
+						color={toggleEmployeeList ? darkModeStatus ? 'dark' : 'light' : 'primary'}
 						aria-label='Select or unselect all employees'
                         size='lg'
                         title="Sélectionner / Déselectionner tous les professionnels"
@@ -576,7 +576,7 @@ const DashboardBookingPage = () => {
                     <Button
 						icon='FaceRetouchingNatural'
 						onClick={() => setToggleRightPanel(!toggleRightPanel)}
-						color={toggleRightPanel ? 'primary' : 'light'}
+						color={toggleRightPanel ? 'primary' : darkModeStatus ? 'dark' : 'light'}
 						aria-label='Toggle right panel'
                         size='lg'
                         title="Afficher l'aperçu du professionel"
@@ -584,7 +584,7 @@ const DashboardBookingPage = () => {
 					<Button
 						icon='Today'
 						onClick={() => setToggleCalendar(!toggleCalendar)}
-						color={toggleCalendar ? 'primary' : 'light'}
+						color={toggleCalendar ? 'primary' : darkModeStatus ? 'dark' : 'light'}
 						aria-label='Toggle calendar'
                         size='lg'
                         title="Afficher / Masquer le calendrier"

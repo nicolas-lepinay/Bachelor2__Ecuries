@@ -1036,6 +1036,13 @@ const professional_accounts = {
     icon: 'AccountHardHat',
 }
 
+const professional_accounts_for_clients = {
+    id: 'account-professional',
+    text: 'Professionnels',
+    path: 'les-professionnels',
+    icon: 'AccountHardHat',
+}
+
 const horse_accounts = {
     id: 'account-horse',
     text: 'Chevaux',
@@ -1090,8 +1097,8 @@ const accounts_for_clients = {
         path: 'comptes',
         icon: 'Person',
         subMenu: {
-            horses: horse_accounts_for_clients,      // Comptes chevaux
-            professionals: professional_accounts,   // Comptes professionels
+            horses: horse_accounts_for_clients,                  // Comptes chevaux
+            professionals: professional_accounts_for_clients,   // Comptes professionels
         },
     }
 }
@@ -1134,7 +1141,17 @@ export const queryPages = {
         id: 'horses-page',
         text: 'Chevaux',
         path: horse_accounts.path,
-    }
+    },
+    professionals: {
+        id: 'employees-page',
+        text: 'Professionnels',
+        path: professional_accounts.path,
+    },
+    users: {
+        id: 'users-page',
+        text: 'Propriétaires',
+        path: client_accounts.path,
+    },
 }
 
 export const clientQueryPages = {
@@ -1142,5 +1159,10 @@ export const clientQueryPages = {
         id: 'horses-page-for-client',
         text: 'Chevaux',
         path: horse_accounts_for_clients.path,
-    }
+    },
+    professionals: {
+        id: 'professionals-page-for-client',
+        text: 'Professionnels',
+        path: professional_accounts.path,
+    },
 }

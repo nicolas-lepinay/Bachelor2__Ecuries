@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import moment from 'moment';
+import 'moment/locale/fr';
 import classNames from 'classnames';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -9,6 +10,8 @@ import { getUserDataWithId } from '../../../common/data/userDummyData';
 // 🛠️ Hooks :
 import useAuth from '../../../hooks/useAuth';
 import useFetchHorses from '../../../hooks/useFetchHorses';
+import useSortableData from '../../../hooks/useSortableData';
+import useDarkMode from '../../../hooks/useDarkMode';
 
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Page from '../../../layout/Page/Page';
@@ -25,8 +28,12 @@ import Card, {
 	CardLabel,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
+
+import Popovers from '../../../components/bootstrap/Popovers';
 import Avatar from '../../../components/Avatar';
 import defaultHorseAvatar from '../../../assets/img/horse-avatars/defaultHorseAvatar.webp';
+import defaultAvatar from '../../../assets/img/wanna/defaultAvatar.webp';
+
 import Icon from '../../../components/icon/Icon';
 import { demoPages } from '../../../menu';
 import Badge from '../../../components/bootstrap/Badge';
@@ -35,19 +42,20 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
+import Alert from '../../../components/bootstrap/Alert';
+import PaginationButtons, { dataPagination, PER_COUNT } from '../../../components/PaginationButtons';
+
 import Chart from '../../../components/extras/Chart';
 import dummyEventsData from '../../../common/data/dummyEventsData';
 import { priceFormat } from '../../../helpers/helpers';
 import EVENT_STATUS from '../../../common/data/enumEventStatus';
-import Alert from '../../../components/bootstrap/Alert';
 import CommonAvatarTeam from '../../../components/common/CommonAvatarTeam';
 import COLORS from '../../../common/data/enumColors';
-import useDarkMode from '../../../hooks/useDarkMode';
 import useTourStep from '../../../hooks/useTourStep';
 
 function HorsePage() {
 
-    const { darkModeStatus } = useDarkMode();
+    const { darkModeStatus, themeStatus } = useDarkMode();
 
     // ⚙️ Strapi's API URL :
     const API_URL = process.env.REACT_APP_API_URL;
@@ -66,6 +74,23 @@ function HorsePage() {
         data: horse, 
         setData: setHorse } = useFetchHorses({ filters: `&filters[id]=${id}`, isUnique: true });
 
+    // Sort health_record table by date :
+    const { items: health_items, requestSort, getClassNamesFor } = useSortableData(horse.health_record ? horse.health_record : []);
+
+    // Pagination :
+    const [healthPerPage, setHealthPerPage] = useState(PER_COUNT['3']);
+    const [healthCurrentPage, setHealthCurrentPage] = useState(1);
+
+    const colorList = [
+        { value: 'info', description: 'Bleu'},
+        { value: 'primary', description: 'Violet'},
+        { value: 'secondary', description: 'Rose'},
+        { value: 'success', description: 'Vert'},
+        { value: 'warning', description: 'Jaune'},
+        { value: 'danger', description: 'Rouge'},
+        { value: 'light', description: 'Blanc'},
+        { value: 'dark', description: 'Noir'},
+    ];
     
     // Chargement :
     if(loadingHorse)
@@ -104,16 +129,52 @@ function HorsePage() {
 					<span className='fw-bold'>13 hours ago</span>
 				</SubHeaderRight>
 			</SubHeader> */}
-			<Page>
-				<div className='pt-3 pb-5 d-flex align-items-center'>
-					<span className='display-4 fw-bold me-3'>{horse.name}</span>
-					<span className={`border border-${horse.color} border-2 text-${horse.color} fw-bold px-3 py-2 rounded`}>
-						{horse.breed || 'Un noble cheval'}
-					</span>
-				</div>
-				<div className='row'>
-					<div className='col-lg-4'>
+			<Page container='fluid'>
+
+				<div className="row d-flex justify-content-center">
+
+                    <div className="col-xl-9">
+                        <div className='pt-3 pb-5 d-flex align-items-center'>
+                            <span className='display-4 fw-bold me-3 text-capitalize font-family-playfair'>{horse.name}</span>
+                            <span className={`border border-${horse.color} border-2 text-${horse.color} fw-bold px-3 py-2 rounded`}>
+                                {horse.breed || 'Un noble cheval'}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* EMPTY DIV FOR POSITIONING */}
+                    <div className="col-xl-1"></div>
+                    {/* EMPTY DIV */}
+                </div>
+
+				<div className='row d-flex justify-content-center'>
+					<div className='col-xl-3'>
 						<Card className='shadow-3d-info'>
+                            <CardHeader>
+                                <CardActions>
+                                    <Dropdown>
+                                        <DropdownToggle hasIcon={false}>
+                                            <Button color='dark' isLink isActive icon='MoreHoriz'></Button>
+                                        </DropdownToggle>
+                                        <DropdownMenu>
+                                        <DropdownItem isHeader>Couleur du profil</DropdownItem>
+                                        {colorList.map(
+                                            (color) => (
+                                                <DropdownItem key={color.value}>
+                                                    <div>
+                                                        <Icon
+                                                            icon='Circle'
+                                                            color={color.value}
+                                                        />
+                                                        {color.description}
+                                                    </div>
+                                                </DropdownItem>
+                                            )
+                                        )}
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                </CardActions>
+                            </CardHeader>
 							<CardBody>
 								<div className='row g-5'>
 									<div className='col-12 d-flex justify-content-center'>
@@ -121,7 +182,7 @@ function HorsePage() {
                                             src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.url}` : `${defaultHorseAvatar}`}
                                             srcSet={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.url}` : `${defaultHorseAvatar}`}
 											color={horse?.color}
-                                            size={142}
+                                            size={160}
 										/>
 									</div>
 									<div className='col-12'>
@@ -135,7 +196,7 @@ function HorsePage() {
 														<div className='text-muted'>
 															Propriétaire
 														</div>
-														<div className='fw-bold fs-5 mb-0'>
+														<div className='fw-bold fs-5 mb-0 text-capitalize font-family-playfair'>
 															{horse.owner.data.attributes.name} {horse.owner.data.attributes.surname}
 														</div>
 													</div>
@@ -179,10 +240,11 @@ function HorsePage() {
 								</div>
 							</CardBody>
 						</Card>
-						<Card>
+
+                        <Card>
 							<CardHeader>
-								<CardLabel icon='Stream' iconColor='warning'>
-									<CardTitle>Skill</CardTitle>
+								<CardLabel icon='AutoAwesome' iconColor='warning'>
+									<CardTitle>Apprentissage</CardTitle>
 								</CardLabel>
 							</CardHeader>
 							<CardBody>
@@ -219,477 +281,128 @@ function HorsePage() {
 								)}
 							</CardBody>
 						</Card>
-						{/* <Card>
-							<CardHeader>
-								<CardLabel icon='ShowChart' iconColor='secondary'>
-									<CardTitle>Statics</CardTitle>
-								</CardLabel>
-								<CardActions>
-									Only in <strong>{moment().format('MMM')}</strong>.
-								</CardActions>
-							</CardHeader>
-							<CardBody>
-								<div className='row g-4 align-items-center'>
-									<div className='col-xl-6'>
-										<div
-											className={classNames(
-												'd-flex align-items-center rounded-2 p-3',
-												{
-													'bg-l10-warning': !darkModeStatus,
-													'bg-lo25-warning': darkModeStatus,
-												},
-											)}>
-											<div className='flex-shrink-0'>
-												<Icon icon='DoneAll' size='3x' color='warning' />
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-3 mb-0'>15</div>
-												<div className='text-muted mt-n2 truncate-line-1'>
-													Completed tasks
-												</div>
-											</div>
-										</div>
-									</div>
-									<div className='col-xl-6'>
-										<div
-											className={classNames(
-												'd-flex align-items-center rounded-2 p-3',
-												{
-													'bg-l10-info': !darkModeStatus,
-													'bg-lo25-info': darkModeStatus,
-												},
-											)}>
-											<div className='flex-shrink-0'>
-												<Icon icon='Savings' size='3x' color='info' />
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-3 mb-0'>1,280</div>
-												<div className='text-muted mt-n2 truncate-line-1'>
-													Earning
-												</div>
-											</div>
-										</div>
-									</div>
-									<div className='col-xl-6'>
-										<div
-											className={classNames(
-												'd-flex align-items-center rounded-2 p-3',
-												{
-													'bg-l10-primary': !darkModeStatus,
-													'bg-lo25-primary': darkModeStatus,
-												},
-											)}>
-											<div className='flex-shrink-0'>
-												<Icon
-													icon='Celebration'
-													size='3x'
-													color='primary'
-												/>
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-3 mb-0'>76</div>
-												<div className='text-muted mt-n2 truncate-line-1'>
-													Occupancy
-												</div>
-											</div>
-										</div>
-									</div>
-									<div className='col-xl-6'>
-										<div
-											className={classNames(
-												'd-flex align-items-center rounded-2 p-3',
-												{
-													'bg-l10-success': !darkModeStatus,
-													'bg-lo25-success': darkModeStatus,
-												},
-											)}>
-											<div className='flex-shrink-0'>
-												<Icon icon='Timer' size='3x' color='success' />
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-3 mb-0'>42</div>
-												<div className='text-muted mt-n2'>Hours</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</CardBody>
-						</Card> */}
+
 					</div>
 
-					<div className='col-lg-8'>
+					<div className='col-xl-7'>
 						<Card className='shadow-3d-primary'>
-							<CardHeader>
+							<CardHeader borderSize={1}>
 								<CardLabel icon='AutoStories' iconColor='success'>
 									<CardTitle tag='h4' className='h5 mx-2'>
 										Carnet de santé
 									</CardTitle>
 								</CardLabel>
-								<CardActions>
-									{/* <Dropdown>
-										<DropdownToggle>
-											<Button color='info' icon='Compare' isLight>
-												Compared to{' '}
-												<strong>{moment().format('YYYY') - 1}</strong>.
-											</Button>
-										</DropdownToggle>
-										<DropdownMenu isAlignmentEnd size='sm'>
-											<DropdownItem>
-												<span>{moment().format('YYYY') - 2}</span>
-											</DropdownItem>
-											<DropdownItem>
-												<span>{moment().format('YYYY') - 3}</span>
-											</DropdownItem>
-										</DropdownMenu>
-									</Dropdown> */}
-								</CardActions>
 							</CardHeader>
-							<CardBody>
-								<div className='row g-4'>
-									<div className='col-md-6'>
-										<Card
-											className={`bg-l${
-												darkModeStatus ? 'o25' : '25'
-											}-primary bg-l${
-												darkModeStatus ? 'o50' : '10'
-											}-primary-hover transition-base rounded-2 mb-4`}
-											shadow='sm'>
-											<CardHeader className='bg-transparent'>
-												<CardLabel>
-													<CardTitle tag='h4' className='h5'>
-														Customer Happiness
-													</CardTitle>
-												</CardLabel>
-											</CardHeader>
-											<CardBody>
-												<div className='d-flex align-items-center pb-3'>
-													<div className='flex-shrink-0'>
-														<Icon
-															icon='EmojiEmotions'
-															size='4x'
-															color='primary'
-														/>
-													</div>
-													{/* <div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-3 mb-0'>
-															100%
-															<span className='text-info fs-5 fw-bold ms-3'>
-																0
-																<Icon icon='TrendingFlat' />
-															</span>
-														</div>
-														<div className='text-muted'>
-															Compared to ($5000 last year)
-														</div>
-													</div> */}
-												</div>
-											</CardBody>
-										</Card>
-										<Card
-											className={`bg-l${
-												darkModeStatus ? 'o25' : '25'
-											}-danger bg-l${
-												darkModeStatus ? 'o50' : '10'
-											}-danger-hover transition-base rounded-2 mb-0`}
-											shadow='sm'>
-											<CardHeader className='bg-transparent'>
-												<CardLabel>
-													<CardTitle tag='h4' className='h5'>
-														Injury
-													</CardTitle>
-												</CardLabel>
-											</CardHeader>
-											<CardBody>
-												<div className='d-flex align-items-center pb-3'>
-													<div className='flex-shrink-0'>
-														<Icon
-															icon='Healing'
-															size='4x'
-															color='danger'
-														/>
-													</div>
-													{/* <div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-3 mb-0'>
-															1
-															<span className='text-danger fs-5 fw-bold ms-3'>
-																-50%
-																<Icon icon='TrendingDown' />
-															</span>
-														</div>
-														<div className='text-muted'>
-															Compared to (2 last week)
-														</div>
-													</div> */}
-												</div>
-											</CardBody>
-										</Card>
-									</div>
-									<div className='col-md-6'>
-										<Card
-											className={`bg-l${
-												darkModeStatus ? 'o25' : '25'
-											}-success bg-l${
-												darkModeStatus ? 'o50' : '10'
-											}-success-hover transition-base rounded-2 mb-0`}
-											stretch
-											shadow='sm'>
-											<CardHeader className='bg-transparent'>
-												<CardLabel>
-													<CardTitle tag='h4' className='h5'>
-														Daily Occupancy
-													</CardTitle>
-												</CardLabel>
-											</CardHeader>
-											<CardBody className='pt-0'>
-												{/* <Chart
-													className='d-flex justify-content-center'
-													series={dayHours.series}
-													options={dayHours.options}
-													type={dayHours.options.chart.type}
-													height={dayHours.options.chart.height}
-													width={dayHours.options.chart.width}
-												/> */}
-												<div className='d-flex align-items-center pb-3'>
-													<div className='flex-shrink-0'>
-														<Icon
-															icon='Timer'
-															size='4x'
-															color='success'
-														/>
-													</div>
-													{/* <div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-3 mb-0'>
-															~22H
-															<span className='text-success fs-5 fw-bold ms-3'>
-																+12.5%
-																<Icon icon='TrendingUp' />
-															</span>
-														</div>
-														<div className='text-muted'>
-															Compared to (~19H 30M last week)
-														</div>
-													</div> */}
-												</div>
-											</CardBody>
-										</Card>
-									</div>
-								</div>
-							</CardBody>
-						</Card>
-						<Card>
-							<CardHeader>
-								<CardLabel icon='Task' iconColor='danger'>
-									<CardTitle>
-										<CardLabel>Assigned</CardLabel>
-									</CardTitle>
-								</CardLabel>
-							</CardHeader>
-							<CardBody>
-								<div className='table-responsive'>
+                            <CardBody>
+							{horse.health_record.length === 0
+                                ?
+                                <Alert color='warning' isLight icon='Report'>
+                                    La carnet de santé ne contient aucune entrée.
+                                </Alert>
+                                :
+                                <div className='table-responsive'>
 									<table className='table table-modern mb-0'>
 										<thead>
 											<tr>
-												<th>Date / Time</th>
-												<th>Customer</th>
-												<th>Service</th>
-												<th>Duration</th>
-												<th>Payment</th>
-												<th>Status</th>
+												<th></th>
+                                                <th>Auteur</th>
+												<th>Observations</th>
+												<th
+                                                    onClick={() => requestSort('date')}
+                                                    className='cursor-pointer text-decoration-underline'>
+                                                    Date{' '}
+                                                    <Icon
+                                                        size='lg'
+                                                        className={getClassNamesFor('date')}
+                                                        icon='KeyboardArrowDown'
+                                                    />
+                                                </th>
+												<th>Urgence</th>
 											</tr>
 										</thead>
-										<tbody>
-											{[].map((item) => (
-												<tr key={item.id}>
-													<td>
-														<div className='d-flex align-items-center'>
-															<span
-																className={classNames(
-																	'badge',
-																	'border border-2 border-light',
-																	'rounded-circle',
-																	'bg-success',
-																	'p-2 me-2',
-																	`bg-${item.status.color}`,
-																)}>
-																<span className='visually-hidden'>
-																	{item.status.name}
-																</span>
-															</span>
-															<span className='text-nowrap'>
-																{moment(
-																	`${item.date} ${item.time}`,
-																).format('MMM Do YYYY, h:mm a')}
-															</span>
-														</div>
-													</td>
-													<td>
-														<div>
-															<div>{item.customer.name}</div>
-															<div className='small text-muted'>
-																{item.customer.email}
-															</div>
-														</div>
-													</td>
-													<td>{item.service.name}</td>
-													<td>{item.duration}</td>
-													<td>
-														{item.payment && priceFormat(item.payment)}
-													</td>
-													<td>
-														<Dropdown>
-															<DropdownToggle hasIcon={false}>
-																<Button
-																	isLink
-																	color={item.status.color}
-																	icon='Circle'
-																	className='text-nowrap'>
-																	{item.status.name}
-																</Button>
-															</DropdownToggle>
-															<DropdownMenu>
-																{Object.keys(EVENT_STATUS).map(
-																	(key) => (
-																		<DropdownItem key={key}>
-																			<div>
-																				<Icon
-																					icon='Circle'
-																					color={
-																						EVENT_STATUS[
-																							key
-																						].color
-																					}
-																				/>
-																				{
-																					EVENT_STATUS[
-																						key
-																					].name
-																				}
-																			</div>
-																		</DropdownItem>
-																	),
-																)}
-															</DropdownMenu>
-														</Dropdown>
-													</td>
-												</tr>
-											))}
-										</tbody>
-									</table>
-								</div>
-								{![].length && (
-									<Alert color='warning' isLight icon='Report' className='mt-3'>
-										There is no scheduled and assigned task.
-									</Alert>
-								)}
-							</CardBody>
-						</Card>
 
-                        <Card>
-							<CardHeader>
-								<CardLabel icon='Task' iconColor='danger'>
-									<CardTitle>
-										<CardLabel>Assigned</CardLabel>
-									</CardTitle>
-								</CardLabel>
-							</CardHeader>
-							<CardBody>
-								<div className='table-responsive'>
-									<table className='table table-modern mb-0'>
-										<thead>
-											<tr>
-												<th>Date / Time</th>
-												<th>Customer</th>
-												<th>Service</th>
-												<th>Duration</th>
-												<th>Payment</th>
-												<th>Status</th>
-											</tr>
-										</thead>
 										<tbody>
-											{[].map((item) => (
-												<tr key={item.id}>
-													<td>
-														<div className='d-flex align-items-center'>
-															<span
-																className={classNames(
-																	'badge',
-																	'border border-2 border-light',
-																	'rounded-circle',
-																	'bg-success',
-																	'p-2 me-2',
-																	`bg-${item.status.color}`,
-																)}>
-																<span className='visually-hidden'>
-																	{item.status.name}
-																</span>
-															</span>
-															<span className='text-nowrap'>
-																{moment(
-																	`${item.date} ${item.time}`,
-																).format('MMM Do YYYY, h:mm a')}
-															</span>
-														</div>
-													</td>
-													<td>
-														<div>
-															<div>{item.customer.name}</div>
-															<div className='small text-muted'>
-																{item.customer.email}
-															</div>
-														</div>
-													</td>
-													<td>{item.service.name}</td>
-													<td>{item.duration}</td>
-													<td>
-														{item.payment && priceFormat(item.payment)}
-													</td>
-													<td>
-														<Dropdown>
-															<DropdownToggle hasIcon={false}>
-																<Button
-																	isLink
-																	color={item.status.color}
-																	icon='Circle'
-																	className='text-nowrap'>
-																	{item.status.name}
-																</Button>
-															</DropdownToggle>
-															<DropdownMenu>
-																{Object.keys(EVENT_STATUS).map(
-																	(key) => (
-																		<DropdownItem key={key}>
-																			<div>
-																				<Icon
-																					icon='Circle'
-																					color={
-																						EVENT_STATUS[
-																							key
-																						].color
-																					}
-																				/>
-																				{
-																					EVENT_STATUS[
-																						key
-																					].name
-																				}
-																			</div>
-																		</DropdownItem>
-																	),
-																)}
-															</DropdownMenu>
-														</Dropdown>
-													</td>
-												</tr>
-											))}
+										{dataPagination(health_items, healthCurrentPage, healthPerPage).map((item) => (
+											<tr key={`health_record-${item.id}`}>
+                                                <td className='align-top'>
+                                                    <Button
+                                                        isOutline={!darkModeStatus}
+                                                        color='dark'
+                                                        isLight={darkModeStatus}
+                                                        className={classNames({
+                                                            'border-light': !darkModeStatus,
+                                                        }, 'mt-3')}
+                                                        icon='Info'
+                                                        // onClick={handleUpcomingDetails}
+                                                        aria-label='Detailed information'
+                                                    />
+                                                </td>
+                                                <td className='align-top'>
+                                                <Popovers
+                                                    trigger='hover'
+                                                    placement='bottom'
+                                                    animation={true}
+                                                    desc={
+                                                        <>
+                                                            <div className='h6 text-center text-capitalize'><b>{`${item.employee.data.attributes.name} ${item.employee.data.attributes.surname}`}</b></div>
+                                                            <div className='text-muted text-center text-capitalize'>{item.employee.data.attributes.occupation}</div>
+                                                        </>
+                                                    }>
+                                                    <div className="position-relative">
+                                                        <Avatar
+                                                            srcSet={item.employee.data.attributes.avatar ? `${API_URL}${item.employee.data.attributes.avatar.data.attributes.url}` : `${defaultAvatar}`}
+                                                            src={item.employee.data.attributes.avatar ? `${API_URL}${item.employee.data.attributes.avatar.data.attributes.url}` : `${defaultAvatar}`}
+                                                            size={64}
+                                                            border={4}
+                                                            borderColor={themeStatus}
+                                                            className='cursor-pointer'
+                                                        />
+                                                    </div>
+                                                    </Popovers>
+												</td>
+                                    
+                                                {/* <td>
+                                                    <Icon icon={item.icon} size='lg' color='dark' />
+                                                </td> */}
+                                                <td className='align-top'>{item.message}</td>
+
+                                                <td className='align-top'>
+                                                    <div className='text-nowrap mt-2'>
+                                                        {moment(
+                                                            `${item?.date}`,
+                                                        ).format('L')}
+                                                    </div>
+                                                </td>
+
+                                                <td className='align-top'>
+                                                    <Button
+                                                        isLink
+                                                        color={item.color}
+                                                        icon='Circle'
+                                                        className='text-nowrap'
+                                                        style={{cursor: 'default'}}
+                                                        >
+                                                            {item.color === 'success' && 'Faible'}
+                                                            {item.color === 'warning' && 'Modérée'}
+                                                            {item.color === 'danger' && 'Élevée'}
+                                                            {item.color !== 'success' && item.color !== 'warning' && item.color !== 'danger' && 'Inconnue'}
+                                                    </Button> 
+                                                </td>
+                                            </tr>
+										))}
 										</tbody>
 									</table>
 								</div>
-								{![].length && (
-									<Alert color='warning' isLight icon='Report' className='mt-3'>
-										There is no scheduled and assigned task.
-									</Alert>
-								)}
+                            }
 							</CardBody>
+                            <PaginationButtons
+                                data={health_items}
+                                label='du carnet de santé'
+                                setCurrentPage={setHealthCurrentPage}
+                                currentPage={healthCurrentPage}
+                                perPage={healthPerPage}
+                                setPerPage={setHealthPerPage}
+                            />
 						</Card>
 					</div>
 				</div>

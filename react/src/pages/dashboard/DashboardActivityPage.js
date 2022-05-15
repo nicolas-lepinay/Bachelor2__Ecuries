@@ -1,9 +1,9 @@
 // 📚 Librairies :
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
+import 'moment/locale/fr';
 import classNames from 'classnames';
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
-import 'moment/locale/fr';
 import { useFormik } from 'formik';
 import { Calendar as DatePicker } from 'react-date-range';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -455,7 +455,7 @@ const DashboardActivityPage = () => {
         setSelectedHorse(horse)
     }
 
-    const [toggleHorseList, setToggleHorseList] = useState(false);
+    const [toggleHorseList, setToggleHorseList] = useState(true);
     
     const fillHorseList = () => {
         const list = {};
@@ -789,10 +789,10 @@ const DashboardActivityPage = () => {
                     <Button
 						icon='Workspaces'
 						onClick={() => {
-                            setToggleHorseList(!toggleHorseList);
-                            toggleHorseList ? fillHorseList() : emptyHorseList();
+                            !toggleHorseList ? fillHorseList() : emptyHorseList();
+                            setToggleHorseList(toggleHorseList =>!toggleHorseList);
                         } }
-						color={toggleHorseList ? 'light' : 'primary'}
+						color={toggleHorseList ? 'primary' : darkModeStatus ? 'dark' : 'light'}
 						aria-label='Select or unselect all horses'
                         size='lg'
                         title="Sélectionner / Déselectionner tous les chevaux"
@@ -800,7 +800,7 @@ const DashboardActivityPage = () => {
 					<Button
 						icon='HorseVariant'
 						onClick={() => setToggleRightPanel(!toggleRightPanel)}
-						color={toggleRightPanel ? 'primary' : 'light'}
+						color={toggleRightPanel ? 'primary' : darkModeStatus ? 'dark' : 'light'}
 						aria-label='Toggle right panel'
                         size='lg'
                         title="Afficher / Masquer l'aperçu du cheval"
@@ -808,7 +808,7 @@ const DashboardActivityPage = () => {
 					<Button
 						icon='Today'
 						onClick={() => setToggleCalendar(!toggleCalendar)}
-						color={toggleCalendar ? 'primary' : 'light'}
+						color={toggleCalendar ? 'primary' : darkModeStatus ? 'dark' : 'light'}
 						aria-label='Toggle calendar & charts'ù                        
                         size='lg'
                         title="Afficher / Masquer le calendrier"
@@ -844,14 +844,14 @@ const DashboardActivityPage = () => {
 												<div className='h6'><b>{horse.name}</b></div>
 											</>
 										}>
-										<div className='position-relative d-flex flex-column align-items-center mx-3'>
+										<div className='position-relative d-flex flex-column align-items-center mx-2' style={{maxWidth: '66px'}}>
 											<Avatar
 												srcSet={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultHorseAvatar}`}
 												src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.formats?.thumbnail?.url}` : `${defaultHorseAvatar}`}
 												color={horse?.color}
 												size={64}
 												border={4}
-												className='cursor-pointer mb-2'
+												className='cursor-pointer mb-3'
 												borderColor={
 													horseList[horse.id]
 														? 'info'

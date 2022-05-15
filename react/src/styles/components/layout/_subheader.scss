@@ -19,7 +19,7 @@
 	// margin-top: map.get($content, padding-y) * -1;
     margin-top: 1.5rem;
 	margin-bottom: map.get($content, padding-y);
-	// background-color: rgba(map.get($subheader, background-color), map.get($subheader, opacity));
+	background-color: rgba(map.get($subheader, background-color), map.get($subheader, opacity));
 	// box-shadow: map.get($header, box-shadow);
 	// stylelint-disable declaration-colon-newline-after
 	color: if(
