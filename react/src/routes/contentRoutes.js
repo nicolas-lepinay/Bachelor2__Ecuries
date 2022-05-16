@@ -24,7 +24,6 @@ const LANDING = {
 	// DASHBOARD: lazy(() => import('../pages/dashboard/DashboardPage')),
     DASHBOARD: lazy(() => import('../pages/ProfilePage')),
 	DASHBOARD_BOOKING: lazy(() => import('../pages/dashboard/DashboardBookingPage')),
-	SUMMARY: lazy(() => import('../pages/SummaryPage')),
 };
 const SINGLE = {
 	BOXED: lazy(() => import('../pages/presentation/single-pages/SingleBoxedPage')),

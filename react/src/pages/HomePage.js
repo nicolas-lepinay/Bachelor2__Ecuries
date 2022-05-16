@@ -60,8 +60,8 @@ import Item13Webp from '../assets/img/animation-items/item13.webp';
 import Item14 from '../assets/img/animation-items/item14.png';
 import Item14Webp from '../assets/img/animation-items/item14.webp';
 import Logo from '../components/Logo';
-import FullLogoWhite from '../components/FullLogoWhite';
-import FullLogoBlack from '../components/FullLogoBlack';
+import FullLogoWhite from '../components/FullLogoLight';
+import FullLogoBlack from '../components/FullLogoDark';
 
 const useStyles = createUseStyles({
 	// stylelint-disable
@@ -294,7 +294,7 @@ const HomePage = () => {
 	});
 
 	return (
-		<PageWrapper className='no-class' ref={ref} title='Bienvenue sur Licorne'>
+		<PageWrapper ref={ref} title='Bienvenue sur Equestria'>
 			<SubHeader className='opacity-0'></SubHeader>
 			<Page container='fluid'>
 				<div id='intro-page' className='scroll-margin'>
@@ -328,7 +328,7 @@ const HomePage = () => {
 									size='lg'
 									shadow='lg'
 									isOutline
-									icon='Person'
+									icon='PlayArrow'
 									tag='a'
 									to={profilePage.profile.path}>
 									Commencer

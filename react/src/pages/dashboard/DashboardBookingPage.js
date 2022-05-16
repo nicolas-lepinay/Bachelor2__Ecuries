@@ -204,10 +204,14 @@ const DashboardBookingPage = () => {
 	const [toggleRightPanel, setToggleRightPanel] = useState(true);
 
     // Id du rôle 'Admin' :
-    const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; 
+    const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; // Id du rôle 'Admin'
+    const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
+    const CLIENT_ID = process.env.REACT_APP_CLIENT_ID; // Id du rôle 'Client'
 
-    // Boolean isAdmin :
+    // Booleans :
     const isAdmin = Number(auth.user.role.id) === Number(ADMIN_ID);
+    const isPro = Number(auth.user.role.id) === Number(PRO_ID);
+    const isClient = Number(auth.user.role.id) === Number(CLIENT_ID);
 
     // 👩‍🚀 Fetch all employees :
     const { 
@@ -306,6 +310,10 @@ const DashboardBookingPage = () => {
 	// Item edit panel status
 	const [toggleInfoEventCanvas, setToggleInfoEventCanvas] = useState(false);
 	const setInfoEvent = () => setToggleInfoEventCanvas(!toggleInfoEventCanvas);
+
+    const [toggleClientCanvas, setToggleClientCanvas] = useState(false);
+	const setClientEvent = () => setToggleClientCanvas(!toggleClientCanvas);
+    
 	const [eventAdding, setEventAdding] = useState(false);
 
 	// Calendar Unit Type
@@ -323,8 +331,10 @@ const DashboardBookingPage = () => {
 
 	// New Event
 	const handleSelect = ({ start, end }) => {
-		setEventAdding(true);
-		setEventItem({ start, end });
+        if(isAdmin || isPro) {
+            setEventAdding(true);
+            setEventItem({ start, end });
+        }
 	};
 
     const handleEmployeeListChange = (employee) => {
@@ -704,7 +714,8 @@ const DashboardBookingPage = () => {
 											scrollToTime={new Date(1970, 1, 1, 6)}
 											defaultDate={new Date()}
 											onSelectEvent={(event) => {
-												setInfoEvent();
+												(isAdmin || isPro) && setInfoEvent();
+                                                (isClient) && setClientEvent();
 												setEventItem(event);
 											}}
 											onSelectSlot={handleSelect}
@@ -1000,6 +1011,197 @@ const DashboardBookingPage = () => {
 									</CardBody>
 								</Card>
 							</div>
+
+							{/* Employee */}
+							<div className='col-12'>
+								<Card className='mb-2 bg-l10-primary' shadow='sm'>
+									<CardHeader className='bg-l25-primary'>
+										<CardLabel icon='Person Add' iconColor='primary'>
+											<CardTitle className='text-primary'>Professionnel(le)</CardTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody>
+										<FormGroup id='employee.id'>
+											<Select
+												placeholder='Veuillez choisir...'
+												value={formik.values?.employee?.id}
+												onChange={formik.handleChange}
+												ariaLabel='Employee select'>
+												{employees.map( employee => (
+													<Option
+														key={employee.username}
+														value={employee.id}>
+														{`${employee.name} ${employee.surname}`}
+													</Option>
+												))}
+											</Select>
+										</FormGroup>
+									</CardBody>
+								</Card>
+							</div>
+
+                            {/* Confirm event */}
+                            {/* (Uniquement Admin + Uniquement pour la modification d'un évènement existant) */}
+                                {/* <div className='col-12'>
+                                    <Card className={`mt-2 mb-2 bg-l10-${formik.values.confirmed ? 'success' : 'danger'}`} shadow='sm'>
+                                        <CardBody>
+                                            <FormGroup id='confirmed'>
+                                                <ChecksGroup isInline>
+                                                    <Checks
+                                                        type='switch'
+                                                        value='true'
+                                                        name='confirmed'
+                                                        checked={formik.values.confirmed}
+                                                        onChange={formik.handleChange}
+                                                        label={formik.values.confirmed ? 'Le rendez-vous est confirmé.' : "Le rendez-vous n'est pas confirmé."}
+                                                    />
+                                                    <Icon
+                                                        icon='Circle'
+                                                        className={classNames(
+                                                            formik.values.confirmed ? 'text-success' : 'text-danger',
+                                                            'animate__animated animate__heartBeat animate__infinite animate__slower',
+                                                        )}
+                                                    />
+                                                </ChecksGroup>
+                                            </FormGroup>
+                                        </CardBody>
+                                    </Card>
+                                </div> */}
+
+                            <div className='d-flex justify-content-between py-3 mb-4'>
+                                <div>
+                                    <Button 
+                                        color='info' 
+                                        icon='Save'
+                                        type='submit'
+                                        disabled={formik?.values?.name === '' 
+                                            || formik.values?.employee?.id === '' 
+                                            || formik.values?.start === '' 
+                                            || !formik.values?.name 
+                                            || !formik.values?.employee?.id 
+                                            || !formik.values?.start }
+                                        >
+                                        Sauvegarder
+                                    </Button>
+                                </div>
+
+                                { !eventAdding &&
+                                    <div className=''>
+                                    <Button 
+                                        color='danger' 
+                                        icon='Delete'
+                                        isOutline
+                                        onClick={ () => setTriggerModal(true)}
+                                        >
+                                        Supprimer
+                                    </Button>
+                                </div>
+                                }
+                            </div>
+						</div>
+					</OffCanvasBody>
+				</OffCanvas>
+
+                <OffCanvas
+					setOpen={(status) => {
+						setToggleClientCanvas(status);
+						setEventAdding(status);
+					}}
+					isOpen={toggleClientCanvas}
+					titleId='canvas-title'>
+					<OffCanvasHeader
+						setOpen={(status) => {
+							setToggleClientCanvas(status);
+							setEventAdding(status);
+						}}
+						className='p-4'>
+						<OffCanvasTitle id='canvas-title' tag='h3'>
+							S'inscrire à un rendez-vous
+						</OffCanvasTitle>
+					</OffCanvasHeader>
+					<OffCanvasBody tag='form' onSubmit={formik.handleSubmit} className='p-4'>
+						<div className='row g-4'> 
+
+							{/* Name */}
+							<div className='col-12'>
+                                <InputGroup className='mb-2'>
+                                    <InputGroupText>Intitulé</InputGroupText>
+                                    <Input
+                                        id='name'
+                                        placeholder="Nom de l'évènement"
+                                        aria-label='name'
+                                        size='lg'
+                                        value={formik.values.name}
+                                        readOnly
+                                    />
+                                </InputGroup>
+							</div>
+
+                            {/* Description & Icône */}
+
+                            {formik.values.description && 
+                            <div className='col-12'>
+                                <Textarea
+                                    id='description'
+                                    placeholder='Écrire une description...'
+                                    value={formik.values.description}
+                                    readOnly
+                                />
+                            </div>}
+
+							{/* Date */}
+							<div className='col-12'>
+								<Card className='mb-2 bg-l10-info' shadow='sm'>
+									<CardHeader className='bg-l25-info'>
+										<CardLabel icon='DateRange' iconColor='info'>
+											<CardTitle className='text-info'>
+												Date et horaires
+											</CardTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody>
+										<div className='row g-3'>
+
+											{!formik.values.eventAllDay && (
+												<div className='col-12'>
+													<FormGroup label='Date de fin'>
+														<Input
+															type='datetime-local'
+                                                            min="2022-05-15T08:30"
+                                                            max="2022-05-17T08:30"
+                                                            //max={new Date().toISOString().split("T")[0]}
+														/>
+													</FormGroup>
+												</div>
+											)}
+										</div>
+									</CardBody>
+								</Card>
+							</div>
+
+                            <InputGroup className='mb-2'>
+                                <InputGroupText>Début</InputGroupText>
+                                <Input
+                                    id='name'
+                                    placeholder="Nom de l'évènement"
+                                    aria-label='name'
+                                    size='lg'
+                                    value={moment(formik.values.start).format('ddd Do MMMM YYYY, à LT')}
+                                    readOnly
+                                />
+                            </InputGroup>
+
+                            <InputGroup className='mb-2'>
+                                <InputGroupText>Fin</InputGroupText>
+                                <Input
+                                    id='name'
+                                    placeholder="Nom de l'évènement"
+                                    aria-label='name'
+                                    size='lg'
+                                    value={moment(formik.values.end).format('ddd Do MMMM YYYY, à LT')}
+                                    readOnly
+                                />
+                            </InputGroup>
 
 							{/* Employee */}
 							<div className='col-12'>

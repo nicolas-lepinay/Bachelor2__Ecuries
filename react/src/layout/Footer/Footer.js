@@ -16,7 +16,7 @@ const Footer = () => {
 			<div className='container-fluid'>
 				<div className='row'>
 					<div className='col'>
-						<span className='fw-light' style={{letterSpacing: '1px'}}>リコルヌ • <span className='fw-bold gradient-text'>licorne™</span> • 🦄</span>
+						<span className='fw-light' style={{letterSpacing: '1px'}}><span className='fw-bold gradient-text'> 𝐄𝐪𝐮𝐞𝐬𝐭𝐫𝐢𝐚™</span></span>
 					</div>
 					<div className='col-auto'>
 						<a
