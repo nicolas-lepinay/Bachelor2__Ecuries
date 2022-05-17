@@ -526,8 +526,8 @@ const DashboardActivityPage = () => {
             }
 		},
 		onSubmit: (values, { resetForm  }) => {
-            console.log("selectedHorses : ")
-            console.log(selectedHorses)
+            values.horses = selectedHorses; // !important
+            
             // Validation :
             if(values.name === '' 
                 || !values?.name 
@@ -560,8 +560,6 @@ const DashboardActivityPage = () => {
                 handlePost(values)
             // ✨ MODIFICATION D'UN EVENEMENT EXISTANT ✨
 			} else {
-                console.log("MODIFICATION D'UNE ACTIVITE : ")
-                console.log(values)
                 handleUpdate(values, ACTIVITIES_ROUTE);
             }
 			setToggleInfoActivityCanvas(false);

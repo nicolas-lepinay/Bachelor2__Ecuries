@@ -47,6 +47,9 @@
       "type": "component",
       "repeatable": true,
       "component": "horse-appointment.horse-appointment"
+    },
+    "maximum_horses": {
+      "type": "integer"
     }
   }
 }
