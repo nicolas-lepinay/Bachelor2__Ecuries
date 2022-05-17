@@ -317,7 +317,7 @@ const HomePage = () => {
 									Bienvenue sur {darkModeStatus ? <FullLogoWhite height={100} /> : <FullLogoBlack height={100} /> }
 								</h1>
 								<p className='display-6 mb-4'>
-									On s'occupe de tout.
+									On s'occupe de vos écuries.
 								</p>
 								<p className='h2 mb-5'>
 									Prenez un café et {' '}

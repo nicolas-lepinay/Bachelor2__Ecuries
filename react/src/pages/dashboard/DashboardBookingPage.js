@@ -456,6 +456,63 @@ const DashboardBookingPage = () => {
 		},
 	});
 
+    const clientFormik = useFormik({
+		initialValues: {
+            id: '',
+			name: '',
+			start: '',
+			end: '',
+            confirmed: '',
+            description: '',
+            icon: '',
+            employee: {
+                id: '',
+            },
+		},
+		onSubmit: (values, { resetForm }) => {
+            // Validation :
+            if(values.name === '' 
+                || !values?.name 
+                || values?.start === '' 
+                || !values?.start 
+                || values?.end === '' 
+                || !values?.end === '' 
+                || values?.employee?.id === '' 
+                || !values?.employee?.id)
+                    return
+
+            // Je supprime tous les champs vide ou null/undefined (mais pas false!) :
+            for (const key in values) {
+                if (values[key] === '' || values[key] === null || values[key] === undefined) {
+                    delete values[key];
+                }
+            }
+            // Supprime le champ 'eventAllDay' :
+            delete values["eventAllDay"];
+
+            // Si le bouton 'Aucune icône' est cochée, je set l'icône à null pour la supprimer de la base de données :
+            if(values.icon === 'Block')
+                values.icon = null;
+
+            // Cast de l'employeeId en int :
+            values.employee.id = Number(values.employee.id);
+
+            // ✨ AJOUT D'UN NOUVEL EVENEMENT ✨
+			if (eventAdding) {
+                !values.icon && delete values["icon"];
+                isAdmin ? values.confirmed = true : values.confirmed = false;
+                handlePost(values)
+            // ✨ MODIFICATION D'UN EVENEMENT EXISTANT ✨
+			} else {
+                handleUpdate(values);
+            }
+			setToggleInfoEventCanvas(false);
+			setEventAdding(false);
+			setEventItem(null);
+            resetForm({ values: ''});
+		},
+	});
+
     const handlePost = async (newData) => {
 
         try {
@@ -773,7 +830,8 @@ const DashboardBookingPage = () => {
 					</div>
 				</div> */}
 
-				<OffCanvas
+				{eventItem && 
+                    <OffCanvas
 					setOpen={(status) => {
 						setToggleInfoEventCanvas(status);
 						setEventAdding(status);
@@ -1100,8 +1158,9 @@ const DashboardBookingPage = () => {
                             </div>
 						</div>
 					</OffCanvasBody>
-				</OffCanvas>
+				</OffCanvas>}
 
+                {eventItem && 
                 <OffCanvas
 					setOpen={(status) => {
 						setToggleClientCanvas(status);
@@ -1116,68 +1175,53 @@ const DashboardBookingPage = () => {
 						}}
 						className='p-4'>
 						<OffCanvasTitle id='canvas-title' tag='h3'>
-							S'inscrire à un rendez-vous
+							S'inscrire au rendez-vous
 						</OffCanvasTitle>
 					</OffCanvasHeader>
-					<OffCanvasBody tag='form' onSubmit={formik.handleSubmit} className='p-4'>
-						<div className='row g-4'> 
+					<OffCanvasBody tag='form' onSubmit={clientFormik.handleSubmit} className='p-4'>
 
+                        <div className='d-flex justify-content-center mb-3'>
+                            <Avatar
+                                srcSet={eventItem?.employee?.data?.attributes?.avatar ? `${API_URL}${eventItem?.employee?.data?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
+                                src={eventItem?.employee?.data?.attributes?.avatar ? `${API_URL}${eventItem?.employee?.data?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
+                                color={eventItem?.employee?.data?.attributes?.color}
+                                shadow='default'
+                            />
+                        </div>
+                        <div className='d-flex flex-column align-items-center mb-5'>
+                            <div className='h2 fw-bold text-capitalize'>{`${eventItem?.employee?.data?.attributes?.name} ${eventItem?.employee?.data?.attributes?.surname}`}</div>
+                            <div className='h5 text-muted opacity-50 mb-4'>{eventItem?.employee?.data?.attributes?.occupation || 'Professionel(le)'}</div>
+                            <div className='h6 text-muted opacity-75'>{eventItem?.employee?.data?.attributes?.email}</div>
+                            <div className='h6 text-muted opacity-75'>{eventItem?.employee?.data?.attributes?.phone}</div>
+                        </div> 
+
+
+
+						<div className='row g-4'> 
 							{/* Name */}
 							<div className='col-12'>
                                 <InputGroup className='mb-2'>
-                                    <InputGroupText>Intitulé</InputGroupText>
+                                    <InputGroupText>
+                                        {eventItem?.icon ? <Icon icon={eventItem?.icon} size='2x' color='primary' /> : 'Intitulé' }
+                                    </InputGroupText>
+
                                     <Input
-                                        id='name'
-                                        placeholder="Nom de l'évènement"
                                         aria-label='name'
                                         size='lg'
-                                        value={formik.values.name}
+                                        value={eventItem?.name}
                                         readOnly
                                     />
                                 </InputGroup>
 							</div>
 
-                            {/* Description & Icône */}
-
+                            {/* Description */}
                             {formik.values.description && 
                             <div className='col-12'>
                                 <Textarea
-                                    id='description'
-                                    placeholder='Écrire une description...'
-                                    value={formik.values.description}
+                                    value={eventItem?.description}
                                     readOnly
                                 />
                             </div>}
-
-							{/* Date */}
-							<div className='col-12'>
-								<Card className='mb-2 bg-l10-info' shadow='sm'>
-									<CardHeader className='bg-l25-info'>
-										<CardLabel icon='DateRange' iconColor='info'>
-											<CardTitle className='text-info'>
-												Date et horaires
-											</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody>
-										<div className='row g-3'>
-
-											{!formik.values.eventAllDay && (
-												<div className='col-12'>
-													<FormGroup label='Date de fin'>
-														<Input
-															type='datetime-local'
-                                                            min="2022-05-15T08:30"
-                                                            max="2022-05-17T08:30"
-                                                            //max={new Date().toISOString().split("T")[0]}
-														/>
-													</FormGroup>
-												</div>
-											)}
-										</div>
-									</CardBody>
-								</Card>
-							</div>
 
                             <InputGroup className='mb-2'>
                                 <InputGroupText>Début</InputGroupText>
@@ -1186,7 +1230,7 @@ const DashboardBookingPage = () => {
                                     placeholder="Nom de l'évènement"
                                     aria-label='name'
                                     size='lg'
-                                    value={moment(formik.values.start).format('ddd Do MMMM YYYY, à LT')}
+                                    value={moment(eventItem?.start).format('ddd Do MMMM YYYY, à LT')}
                                     readOnly
                                 />
                             </InputGroup>
@@ -1198,66 +1242,11 @@ const DashboardBookingPage = () => {
                                     placeholder="Nom de l'évènement"
                                     aria-label='name'
                                     size='lg'
-                                    value={moment(formik.values.end).format('ddd Do MMMM YYYY, à LT')}
+                                    value={moment(eventItem?.end).format('ddd Do MMMM YYYY, à LT')}
                                     readOnly
                                 />
                             </InputGroup>
 
-							{/* Employee */}
-							<div className='col-12'>
-								<Card className='mb-2 bg-l10-primary' shadow='sm'>
-									<CardHeader className='bg-l25-primary'>
-										<CardLabel icon='Person Add' iconColor='primary'>
-											<CardTitle className='text-primary'>Professionnel(le)</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody>
-										<FormGroup id='employee.id'>
-											<Select
-												placeholder='Veuillez choisir...'
-												value={formik.values?.employee?.id}
-												onChange={formik.handleChange}
-												ariaLabel='Employee select'>
-												{employees.map( employee => (
-													<Option
-														key={employee.username}
-														value={employee.id}>
-														{`${employee.name} ${employee.surname}`}
-													</Option>
-												))}
-											</Select>
-										</FormGroup>
-									</CardBody>
-								</Card>
-							</div>
-
-                            {/* Confirm event */}
-                            {/* (Uniquement Admin + Uniquement pour la modification d'un évènement existant) */}
-                                {/* <div className='col-12'>
-                                    <Card className={`mt-2 mb-2 bg-l10-${formik.values.confirmed ? 'success' : 'danger'}`} shadow='sm'>
-                                        <CardBody>
-                                            <FormGroup id='confirmed'>
-                                                <ChecksGroup isInline>
-                                                    <Checks
-                                                        type='switch'
-                                                        value='true'
-                                                        name='confirmed'
-                                                        checked={formik.values.confirmed}
-                                                        onChange={formik.handleChange}
-                                                        label={formik.values.confirmed ? 'Le rendez-vous est confirmé.' : "Le rendez-vous n'est pas confirmé."}
-                                                    />
-                                                    <Icon
-                                                        icon='Circle'
-                                                        className={classNames(
-                                                            formik.values.confirmed ? 'text-success' : 'text-danger',
-                                                            'animate__animated animate__heartBeat animate__infinite animate__slower',
-                                                        )}
-                                                    />
-                                                </ChecksGroup>
-                                            </FormGroup>
-                                        </CardBody>
-                                    </Card>
-                                </div> */}
 
                             <div className='d-flex justify-content-between py-3 mb-4'>
                                 <div>
@@ -1272,26 +1261,13 @@ const DashboardBookingPage = () => {
                                             || !formik.values?.employee?.id 
                                             || !formik.values?.start }
                                         >
-                                        Sauvegarder
+                                        Confirmer
                                     </Button>
                                 </div>
-
-                                { !eventAdding &&
-                                    <div className=''>
-                                    <Button 
-                                        color='danger' 
-                                        icon='Delete'
-                                        isOutline
-                                        onClick={ () => setTriggerModal(true)}
-                                        >
-                                        Supprimer
-                                    </Button>
-                                </div>
-                                }
                             </div>
 						</div>
 					</OffCanvasBody>
-				</OffCanvas>
+				</OffCanvas>}
 
 				<CommonRightPanel
                     setOpen={setToggleRightPanel} 

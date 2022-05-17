@@ -59,7 +59,11 @@ function HorsePage() {
 
     // ⚙️ Strapi's API URL :
     const API_URL = process.env.REACT_APP_API_URL;
-
+    
+    // ⚙️ Role IDs
+    const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; // Id du rôle 'Admin'
+    const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
+    const CLIENT_ID = process.env.REACT_APP_CLIENT_ID; // Id du rôle 'Client'
     const data = getUserDataWithId(2);
 
     // Horse's ID :
@@ -355,6 +359,7 @@ function HorsePage() {
                                                             size={64}
                                                             border={4}
                                                             borderColor={themeStatus}
+                                                            color={item.employee.data.attributes.color}
                                                             className='cursor-pointer'
                                                         />
                                                     </div>
@@ -404,7 +409,129 @@ function HorsePage() {
                                 setPerPage={setHealthPerPage}
                             />
 						</Card>
+
+                        <Card className='shadow-3d-primary'>
+                            <CardHeader borderSize={1}>
+                                <CardLabel icon='Today' iconColor='danger'>
+                                    <CardTitle tag='h4' className='h5 mx-2'>
+                                        Rendez-vous
+                                    </CardTitle>
+                                </CardLabel>
+                            </CardHeader>
+                            <CardBody>
+                            {horse.appointments.data.length === 0
+                                ?
+                                <Alert color='warning' isLight icon='Report'>
+                                    Aucun rendez-vous à venir.
+                                </Alert>
+                                :
+                                <div className='table-responsive'>
+                                    <table className='table table-modern mb-0'>
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th
+                                                    onClick={() => requestSort('date')}
+                                                    className='cursor-pointer text-decoration-underline'>
+                                                    Date{' '}
+                                                    <Icon
+                                                        size='lg'
+                                                        className={getClassNamesFor('date')}
+                                                        icon='KeyboardArrowDown'
+                                                    />
+                                                </th>
+                                                <th>Heure</th>
+                                                <th>Intitulé</th>
+                                                <th>Intitulé</th>
+
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                        {dataPagination(health_items, healthCurrentPage, healthPerPage).map((item) => (
+                                            <tr key={`health_record-${item.id}`}>
+                                                <td className='align-top'>
+                                                    <Button
+                                                        isOutline={!darkModeStatus}
+                                                        color='dark'
+                                                        isLight={darkModeStatus}
+                                                        className={classNames({
+                                                            'border-light': !darkModeStatus,
+                                                        }, 'mt-3')}
+                                                        icon='Info'
+                                                        // onClick={handleUpcomingDetails}
+                                                        aria-label='Detailed information'
+                                                    />
+                                                </td>
+                                                <td className='align-top'>
+                                                <Popovers
+                                                    trigger='hover'
+                                                    placement='bottom'
+                                                    animation={true}
+                                                    desc={
+                                                        <>
+                                                            <div className='h6 text-center text-capitalize'><b>{`${item.employee.data.attributes.name} ${item.employee.data.attributes.surname}`}</b></div>
+                                                            <div className='text-muted text-center text-capitalize'>{item.employee.data.attributes.occupation}</div>
+                                                        </>
+                                                    }>
+                                                    <div className="position-relative">
+                                                        <Avatar
+                                                            srcSet={item.employee.data.attributes.avatar ? `${API_URL}${item.employee.data.attributes.avatar.data.attributes.url}` : `${defaultAvatar}`}
+                                                            src={item.employee.data.attributes.avatar ? `${API_URL}${item.employee.data.attributes.avatar.data.attributes.url}` : `${defaultAvatar}`}
+                                                            size={64}
+                                                            border={4}
+                                                            borderColor={themeStatus}
+                                                            className='cursor-pointer'
+                                                        />
+                                                    </div>
+                                                    </Popovers>
+                                                </td>
+                                    
+                                                {/* <td>
+                                                    <Icon icon={item.icon} size='lg' color='dark' />
+                                                </td> */}
+                                                <td className='align-top'>{item.message}</td>
+
+                                                <td className='align-top'>
+                                                    <div className='text-nowrap mt-2'>
+                                                        {moment(
+                                                            `${item?.date}`,
+                                                        ).format('L')}
+                                                    </div>
+                                                </td>
+
+                                                <td className='align-top'>
+                                                    <Button
+                                                        isLink
+                                                        color={item.color}
+                                                        icon='Circle'
+                                                        className='text-nowrap'
+                                                        style={{cursor: 'default'}}
+                                                        >
+                                                            {item.color === 'success' && 'Faible'}
+                                                            {item.color === 'warning' && 'Modérée'}
+                                                            {item.color === 'danger' && 'Élevée'}
+                                                            {item.color !== 'success' && item.color !== 'warning' && item.color !== 'danger' && 'Inconnue'}
+                                                    </Button> 
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            </CardBody>
+                            <PaginationButtons
+                                data={health_items}
+                                label='du carnet de santé'
+                                setCurrentPage={setHealthCurrentPage}
+                                currentPage={healthCurrentPage}
+                                perPage={healthPerPage}
+                                setPerPage={setHealthPerPage}
+                            />
+                        </Card>
 					</div>
+
 				</div>
 			</Page>
 		</PageWrapper>

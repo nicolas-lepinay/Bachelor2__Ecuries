@@ -119,7 +119,8 @@ $page: (
 $footer: (
 	height: 3rem,
 	background-color: $white,
-	dark-background-color: shade-color($dark-body-bg, 70),
+	// dark-background-color: shade-color($dark-body-bg, 70),
+    dark-background-color: $dark-body-bg,
 	color: $body-color,
 	color-dark: $dark-body-color,
 	opacity: 0.5,

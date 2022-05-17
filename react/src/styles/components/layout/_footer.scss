@@ -20,7 +20,7 @@
 	background-color: rgba(map.get($footer, background-color), map.get($footer, opacity));
 	color: map.get($footer, color);
 	@include dark-mode {
-		background-color: rgba(map.get($footer, dark-background-color), map.get($footer, opacity));
+        background-color: rgba(map.get($footer, dark-background-color), map.get($footer, opacity));
 		border-top-color: map.get($footer, dark-border-color);
 		color: map.get($footer, color-dark);
 	}

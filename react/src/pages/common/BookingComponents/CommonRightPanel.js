@@ -91,28 +91,6 @@ const CommonRightPanel = ({ setOpen, isOpen, employee, employees, appointments }
 						</div>
 					</div>
 					<div className='col-auto'>
-						{/* <Dropdown>
-							<DropdownToggle hasIcon={false}>
-								<Button
-									icon='MoreHoriz'
-									color={themeStatus}
-									hoverShadow='default'
-									isLight={darkModeStatus}
-								/>
-							</DropdownToggle>
-							<DropdownMenu isAlignmentEnd>
-								<DropdownItem>
-									<Button
-										color='link'
-										icon='Close'
-										onClick={() => {
-											setOpen(false);
-										}}>
-										Fermer
-									</Button>
-								</DropdownItem>
-							</DropdownMenu>
-						</Dropdown> */}
                         <Button
                             color='light'
                             icon='Close'
