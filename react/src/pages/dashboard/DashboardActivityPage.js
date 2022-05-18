@@ -729,6 +729,10 @@ const DashboardActivityPage = () => {
         formikAppointment.setValues({});
         formikActivity.setValues({});
 
+        // Je détruis l'event quand je ferme le panel de droite, pour que les nouveaux events générés après soient bien vides :
+        if(!toggleInfoActivityCanvas && !toggleInfoAppointmentCanvas)
+            setEventItem(null)
+
 		if (eventItem) {
             // Si l'event est un rendez-vous...
             if(eventItem.hasOwnProperty('confirmed')) {
@@ -774,7 +778,7 @@ const DashboardActivityPage = () => {
             }
         }
 		return () => {};
-	}, [eventItem]);
+	}, [eventItem, toggleInfoActivityCanvas, toggleInfoAppointmentCanvas]);
 	// END:: Calendar
 
 	const [toggleCalendar, setToggleCalendar] = useState(true);

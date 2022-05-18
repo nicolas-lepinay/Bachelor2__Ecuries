@@ -1067,9 +1067,9 @@ const horse_accounts_for_clients = {
 }
 
 const client_accounts = {
-    id: 'account-horse',
+    id: 'account-client',
     text: 'Propriétaires',
-    path: 'comptes/propriétaires',
+    path: 'comptes/proprietaires',
     icon: 'PersonHeart',
 }
 

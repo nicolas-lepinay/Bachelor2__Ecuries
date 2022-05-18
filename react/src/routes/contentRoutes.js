@@ -208,15 +208,18 @@ const DASHBOARDS = {
 }
 
 const ACCOUNTS = {
+    HORSE_LIST: lazy(() => import('../pages/accounts/horses/HorseList')),
 	HORSE_PAGE: lazy(() => import('../pages/accounts/horses/HorsePage')),
+    EMPLOYEE_LIST: lazy(() => import('../pages/accounts/employees/EmployeeList')),
     EMPLOYEE_PAGE: lazy(() => import('../pages/accounts/employees/EmployeePage')),
+	USER_LIST: lazy(() => import('../pages/accounts/users/UserList')),
 	USER_PAGE: lazy(() => import('../pages/accounts/users/UserPage')),
 }
 
 const admin = [
     {
 		path: adminMenu.accounts.accounts.subMenu.horses.path,
-		element: <h1>COMPTES DES CHEVAUX</h1>,
+		element: <ACCOUNTS.HORSE_LIST />,
 		exact: true,
 	},
     {
@@ -226,12 +229,22 @@ const admin = [
     },
     {
         path: adminMenu.accounts.accounts.subMenu.professionals.path,
-		element: <h1>PROFILS DES PROFESSIONNELS (Admin)</h1>,
+		element: <ACCOUNTS.EMPLOYEE_LIST />,
 		exact: true,
     },
     {
         path: `${queryPages.professionals.path}/:id`,
         element: <ACCOUNTS.EMPLOYEE_PAGE />,
+        exact: true,
+    },
+    {
+        path: adminMenu.accounts.accounts.subMenu.clients.path,
+        element: <ACCOUNTS.USER_LIST />,
+		exact: true,
+    },
+    {
+        path: `${queryPages.users.path}/:id`,
+        element: <ACCOUNTS.USER_PAGE />,
         exact: true,
     },
 ];

@@ -608,7 +608,6 @@ const ProfilePage = () => {
 									Vous retrouverez ici la liste de vos chevaux.
 								</Alert>
 
-
                                 <div className='row row-cols-xxl-2 row-cols-lg-1'>
                                     {horses.map((horse) => (
                                         <Link 
@@ -704,9 +703,11 @@ const ProfilePage = () => {
                                     ))}
                                 </div>
 
-
-
-
+                                {horses && horses.length < 1 &&
+                                <Alert isLight className='border-0' shadow='md' icon='Info' color='warning'>
+                                    Vous n'avez aucun cheval enregistré.
+                                </Alert>
+                                }
 
 							</CardTabItem>
 

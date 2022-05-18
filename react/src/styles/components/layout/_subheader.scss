@@ -9,15 +9,14 @@
 	@include padding(map.get($subheader, padding-y) map.get($subheader, padding-x));
 	@include backdrop-filter-blur(map.get($subheader, blur));
 
-	position: sticky;
+	//position: sticky;
 	z-index: math.round($zindex-sticky - 1);
 	top: 0;
 	display: flex;
 	min-height: map.get($subheader, height);
 	align-items: center;
 	border-bottom: map.get($subheader, border-size) solid map.get($subheader, border-color);
-	// margin-top: map.get($content, padding-y) * -1;
-    margin-top: 1.5rem;
+	margin-top: map.get($content, padding-y) * -1;
 	margin-bottom: map.get($content, padding-y);
 	background-color: rgba(map.get($subheader, background-color), map.get($subheader, opacity));
 	// box-shadow: map.get($header, box-shadow);

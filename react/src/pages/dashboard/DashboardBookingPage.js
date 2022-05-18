@@ -362,10 +362,7 @@ const DashboardBookingPage = () => {
 
     const [eventIsFull, setEventIsFull] = useState(false)
 
-    // Horses selected by client when registering to an event :
-    const [selectedHorses, setSelectedHorses] = useState([]); // [ { id: '', name: '', ownerId: '' }, { id: '', name: '', ownerId: '' } ]
-
-    // Akk horses registered to an appointment :
+    // All horses registered to an appointment :
     const [registeredHorses, setRegisteredHorses] = useState([]);
 
 	useEffect(() => {
@@ -421,8 +418,13 @@ const DashboardBookingPage = () => {
             employee: {
                 id: '',
             },
+            horses: [],
 		},
 		onSubmit: (values, { resetForm }) => {
+            values.horses = registeredHorses; // !important
+
+            console.log(values)
+
             // Validation :
             if(values.name === '' 
                 || !values?.name 
@@ -470,41 +472,15 @@ const DashboardBookingPage = () => {
     const clientFormik = useFormik({
 		initialValues: {
             id: '',
-            horses: selectedHorses,
+            horses: [],
 		},
 		onSubmit: (values, { resetForm }) => {
-            values.horses = selectedHorses; // !important
+            values.horses = registeredHorses; // !important
 
-            // Validation :
-            if(values?.horses.some( horse => horse?.id === '' || !horse?.id) 
-                || values?.horses?.length === 0)
-                return
+            console.log(values)
 
-            // Je supprime tous les champs vide ou null/undefined (mais pas false!) :
-            for (const key in values) {
-                if (values[key] === '' || values[key] === null || values[key] === undefined) {
-                    delete values[key];
-                }
-            }
-            // Supprime le champ 'eventAllDay' :
-            delete values["eventAllDay"];
-
-            // Si le bouton 'Aucune icône' est cochée, je set l'icône à null pour la supprimer de la base de données :
-            if(values.icon === 'Block')
-                values.icon = null;
-
-            // Cast de l'employeeId en int :
-            values.employee.id = Number(values.employee.id);
-
-            // ✨ AJOUT D'UN NOUVEL EVENEMENT ✨
-			if (eventAdding) {
-                !values.icon && delete values["icon"];
-                isAdmin ? values.confirmed = true : values.confirmed = false;
-                handlePost(values)
-            // ✨ MODIFICATION D'UN EVENEMENT EXISTANT ✨
-			} else {
-                handleUpdate(values);
-            }
+            handleUpdate(values);
+            
 			setToggleInfoEventCanvas(false);
 			setEventAdding(false);
 			setEventItem(null);
@@ -565,11 +541,21 @@ const DashboardBookingPage = () => {
             });
         
             setAppointments(updatedAppointments);
-            showNotification(
+
+            isClient ?
+            showNotification( // Prise d'un rendez-vous
+                'Confirmation de votre rendez-vous', // title
+				"Votre demande de rendez-vous a été enregistré.", // message
+                'success' // type
+			)
+            :
+            showNotification( // Modification d'un rendez-vous
                 'Mise à jour.', // title
 				"Le rendez-vous a été modifié.", // message
                 'success' // type
 			);
+            
+            ;
         } catch(err) {
             console.log("UPDATE | Appointment | Le rendez-vous n'a pas pu être modifié dans la base de données. | " + err);
             showNotification(
@@ -607,7 +593,7 @@ const DashboardBookingPage = () => {
         setRegisteredHorses([])
         setEventIsFull(false)
 
-        // Je détruis l'event quand je ferme le panel de droite, pour que les nouveaux events soient bien vides :
+        // Je détruis l'event quand je ferme le panel de droite, pour que les nouveaux events générés après soient bien vides :
         if(!toggleInfoEventCanvas && !toggleClientCanvas)
             setEventItem(null)
 
@@ -628,20 +614,7 @@ const DashboardBookingPage = () => {
                 maximum_horses: eventItem?.maximum_horses,
 			});
             // CLIENT :                
-            eventItem?.horses && 
             eventItem?.horses?.data &&
-
-            // Selected horses :
-            eventItem.horses.data.map( horse => {
-                horse?.attributes?.owner?.data?.id === auth.user.id &&
-                setSelectedHorses( old => [...old, { 
-                    id: horse?.id,
-                    name: horse?.attributes?.name,
-                    ownerId: horse?.attributes?.owner?.data?.id
-                }]) // User's horses registered to the appointment 
-            })
-
-            // Registered horses :
             eventItem?.horses?.data.map( horse => {
                 setRegisteredHorses( old => [...old, { 
                     id: horse?.id,
@@ -650,12 +623,10 @@ const DashboardBookingPage = () => {
                 }]) // User's horses registered to the appointment 
             })
             
-            // setRegisteredHorses(eventItem.horses?.data ||  []); // All horses registered to the appointment
-
             clientFormik.setValues({
 				...formik.values,
 				id: eventItem.id,
-				//horses: eventItem.horses?.data ||  [],
+				horses: [],
 			});
             eventItem?.maximum_horses && setEventIsFull(parseInt(eventItem?.maximum_horses) - eventItem.horses.data.length < 1)
         }
@@ -860,7 +831,7 @@ const DashboardBookingPage = () => {
                                                 color={formik.values?.confirmed ? 'success' : 'danger'}
                                                 icon='Circle'
                                                 className='text-nowrap'>
-                                                {eventItem?.confirmed ? 'Confirmé' : 'En attente de confirmation'}
+                                                {formik.values?.confirmed ? 'Confirmé' : 'En attente de confirmation'}
                                             </Button>
                                         </DropdownToggle>
                                         
@@ -962,20 +933,41 @@ const DashboardBookingPage = () => {
                                         id='maximum_horses'
                                         title='Participants'
                                         icon='Groups'>
-                                        <InputGroup className='mb-2'>
+                                        <InputGroup className='mb-4'>
                                             <InputGroupText>Maximum</InputGroupText>
                                             <Input
                                                 id='maximum_horses'
                                                 name='maximum_horses'
-                                                placeholder='Nombre maximal...'
+                                                placeholder='Nombre maximal'
                                                 type='Number'
-                                                min={1}
+                                                min={registeredHorses.length > 0 ? registeredHorses.length : 1}
                                                 max={999}
                                                 size='lg'
                                                 onChange={formik.handleChange}
                                                 value={formik.values.maximum_horses}
                                             />
                                         </InputGroup>
+
+
+                                        <div className='col-12'>
+                                        {/* All horses registered to the event */}
+                                        {registeredHorses.map( horse => (
+                                            <Button
+                                                value={horse?.id}
+                                                icon={isAdmin ? 'Close' : ''}
+                                                color='info'
+                                                size='sm'
+                                                className='mr-3 mb-3'
+                                                disabled={!isAdmin}
+                                                onClick={() => {
+                                                    isAdmin && setRegisteredHorses(registeredHorses.filter(h=>h?.id != horse?.id))
+                                                }}
+                                            >
+                                                {horse?.name}
+                                            </Button>
+                                        ))}
+                                        </div>
+
                                     </AccordionItem>
                                 </Accordion>
                             </div>
@@ -1251,7 +1243,6 @@ const DashboardBookingPage = () => {
                                                 className='mr-3 mb-4'
                                                 onClick={() => {
                                                     setRegisteredHorses(registeredHorses.filter(h=>h?.id != horse?.id))
-                                                    setSelectedHorses(selectedHorses.filter(h=>h?.id != horse?.id))
                                                 }}
                                             >
                                                 {horse?.name}
@@ -1263,20 +1254,17 @@ const DashboardBookingPage = () => {
 										<FormGroup id='horses' >
                                             <Select
 												placeholder='Veuillez choisir un cheval...'
-												value={registeredHorses}
+												//value={registeredHorses}
                                                 id='horses'
                                                 name='horses'
                                                 disabled={registeredHorses.length >= eventItem?.maximum_horses}
                                                 onChange={ (e) => {
-
                                                     const newHorse = { 
                                                         id: e.target.value.split(';')[0], 
                                                         name: e.target.value.split(';')[1], 
                                                         ownerId: e.target.value.split(';')[2]
                                                     };
-                                                    setSelectedHorses(old => [...old, newHorse])
                                                     setRegisteredHorses(old => [...old, newHorse])
-                                                    clientFormik.setFieldValue("horses", registeredHorses)
                                                 }}
 												ariaLabel='Horse select'>
 												{auth.user.horses.filter( horse => !registeredHorses.some(h => h.id == horse.id)).map( horse => (
@@ -1290,9 +1278,6 @@ const DashboardBookingPage = () => {
 											</Select>
 										</FormGroup>                        
                                         }
-                                        <button onClick={() => console.log(registeredHorses)}>SHOW registeredHorses</button>
-                                        <button onClick={() => console.log(selectedHorses)}>SHOW selectedHorses</button>
-                                        <button onClick={() => console.log(auth.user.horses)}>SHOW auth.user.horses</button>
 									</CardBody>
 								</Card>
                                 :
@@ -1309,7 +1294,7 @@ const DashboardBookingPage = () => {
                             {!eventIsFull && auth.user.horses.length > 0 &&
                             <div className='d-flex justify-content-between py-3 mb-4'>
                                 <div>
-                                    {/* <Button 
+                                    <Button 
                                         color='info' 
                                         icon='Save'
                                         type='submit'
@@ -1318,7 +1303,7 @@ const DashboardBookingPage = () => {
                                         //     || clientFormik.values.horses.some( horse => horse?.id === '' || !horse?.id) }
                                         >
                                         Confirmer
-                                    </Button> */}
+                                    </Button>
                                 </div>
                             </div>}
 						</div>

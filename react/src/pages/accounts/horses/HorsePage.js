@@ -57,6 +57,9 @@ function HorsePage() {
 
     const { darkModeStatus, themeStatus } = useDarkMode();
 
+    // Horse's ID :
+    const { id } = useParams();
+
     // ⚙️ Strapi's API URL :
     const API_URL = process.env.REACT_APP_API_URL;
     
@@ -66,11 +69,12 @@ function HorsePage() {
     const CLIENT_ID = process.env.REACT_APP_CLIENT_ID; // Id du rôle 'Client'
     const data = getUserDataWithId(2);
 
-    // Horse's ID :
-    const { id } = useParams();
-
     // 🦸 User:
     const auth = useAuth();
+
+    const isAdmin = auth.user && Number(auth.user.role.id) === Number(ADMIN_ID);
+    const isPro = auth.user && Number(auth.user.role.id) === Number(PRO_ID);
+    const isClient = auth.user && Number(auth.user.role.id) === Number(CLIENT_ID);
 
     // 🐎 Fetch horse by ID :
     const { 
@@ -107,7 +111,7 @@ function HorsePage() {
         );
 
     // Accès interdit :
-    if(horse.owner && Number(horse.owner.data.id) !== Number(auth.user.id))
+    if(horse.owner && isClient && Number(horse.owner.data.id) !== Number(auth.user.id))
         return <Navigate to="/"/>
 
 	return (
