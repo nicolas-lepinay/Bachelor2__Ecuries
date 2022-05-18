@@ -745,7 +745,7 @@ const InputGroupPage = () => {
 							<CardHeader>
 								<CardLabel>
 									<CardTitle>Custom Forms</CardTitle>
-								</CardLabel>
+								</CardLabel> 
 								<CardActions>
 									<CommonStoryBtn to='/docs/forms-inputgroup--custom' />
 								</CardActions>

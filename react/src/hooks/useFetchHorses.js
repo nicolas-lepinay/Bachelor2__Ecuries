@@ -12,7 +12,6 @@ const useFetchHorses = ({
     isUnique = false,
     } = {}) => {
     
-    // filters = filters ? filters : '';
 
     // ⚙️ Strapi's URL :
     const API_URL = process.env.REACT_APP_API_URL;

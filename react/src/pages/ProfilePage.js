@@ -33,9 +33,9 @@ import Popovers from '../components/bootstrap/Popovers';
 import FormGroup from '../components/bootstrap/forms/FormGroup';
 import Input from '../components/bootstrap/forms/Input';
 import InputGroup, { InputGroupText } from '../components/bootstrap/forms/InputGroup';
-import showNotification from '../components/extras/showNotification';
 import Icon from '../components/icon/Icon';
 import Alert from '../components/bootstrap/Alert';
+import showNotification from '../components/extras/showNotification';
 import Avatar from '../components/Avatar';
 import defaultAvatar from '../assets/img/wanna/defaultAvatar.webp';
 import defaultHorseAvatar from '../assets/img/horse-avatars/defaultHorseAvatar.webp';
@@ -105,11 +105,11 @@ const ProfilePage = () => {
 
     const formikAddress = useFormik({
 		initialValues: {
-            id: auth.user.address?.id,
-			street: auth.user.address?.street,
-			city: auth.user.address?.city,
-			country: auth.user.address?.country,
-			zipcode: auth.user.address?.zipcode,
+            id: auth.user?.address?.id,
+			street: auth.user?.address?.street,
+			city: auth.user?.address?.city,
+			country: auth.user?.address?.country,
+			zipcode: auth.user?.address?.zipcode,
 		},
 		onSubmit: (values) => {
             // Delete empty fields :
@@ -248,22 +248,12 @@ const ProfilePage = () => {
 							</CardBody>
 						</Card>
 
-						{/* <Card>
-							<CardBody>
-								<div className='d-flex justify-content-between'>
-									<p>Complete Your Profile</p>
-									<p className='fw-bold'>90%</p>
-								</div>
-								<Progress value={90} />
-							</CardBody>
-						</Card> */}
-
 						<Card className='px-5 py-4'>
-							<CardHeader>
-								<CardLabel>
-									<CardTitle>À propos</CardTitle>
-								</CardLabel>
-							</CardHeader>
+                            <CardHeader>
+                                    <CardLabel icon='AutoAwesome' iconColor='warning'>
+                                        <CardTitle>Biographie</CardTitle>
+                                    </CardLabel>
+                                </CardHeader>
 							<CardBody>
 								<p className='new-line'>
                                     {auth.user.biography || 'Dites-en nous plus à votre sujet.'}
@@ -296,80 +286,6 @@ const ProfilePage = () => {
 					</div>
 
 					<div className='col-xxl-8 col-xl-6'>
-						{/* <Card
-							className={classNames('shadow-3d-info', 'mb-5', {
-								'bg-lo10-info': darkModeStatus,
-								'bg-l25-info': !darkModeStatus,
-							})}>
-							<Carousel
-								isHoverPause
-								isRide
-								height={height || 305}
-								isDark={darkModeStatus}>
-								<CarouselSlide>
-									<div className='row align-items-center h-100'>
-										<div
-											className='col-6 carousel-slide-bg'
-											style={{ backgroundImage: `url(${WannaImg1})` }}
-										/>
-										<div className='col-6'>
-											<h2>New Products</h2>
-											<p className='lead'>New products ready for sale.</p>
-											<Button
-												color={darkModeStatus ? 'light' : 'dark'}
-												onClick={() =>
-													navigate(
-														`../${demoPages.sales.subMenu.productsGrid.path}`,
-													)
-												}>
-												Click
-											</Button>
-										</div>
-									</div>
-								</CarouselSlide>
-								<CarouselSlide background={WannaImg5} />
-								<CarouselSlide>
-									<div className='row align-items-center h-100'>
-										<div className='col-6 text-end'>
-											<h2>Customize</h2>
-											<h5>You can design your own screens</h5>
-											<Button
-												color={darkModeStatus ? 'light' : 'dark'}
-												onClick={() =>
-													navigate(
-														`../${demoPages.sales.subMenu.dashboard.path}`,
-													)
-												}>
-												Click
-											</Button>
-										</div>
-										<div
-											className='col-6 carousel-slide-bg'
-											style={{ backgroundImage: `url(${WannaImg2})` }}
-										/>
-									</div>
-								</CarouselSlide>
-								<CarouselSlide background={WannaImg6} />
-							</Carousel>
-						</Card> */}
-
-						{/* <Card>
-							<CardHeader>
-								<CardLabel icon='PhotoSizeSelectActual' iconColor='info'>
-									<CardTitle>Photos and Videos</CardTitle>
-								</CardLabel>
-								<CardActions>
-									<Button
-										color='info'
-										isLight
-										onClick={() => setGallerySeeAll(true)}>
-										See All
-									</Button>
-								</CardActions>
-							</CardHeader>
-							<CardBody>{_gallery}</CardBody>
-						</Card> */}
-
 						<Card hasTab>
 							<CardTabItem id='profile' title='Profil' icon='Contacts'>
 								<Alert isLight className='border-0' shadow='md' icon='LocalPolice'>
@@ -469,15 +385,6 @@ const ProfilePage = () => {
 										</CardFooterRight>
 									</CardFooter>
 								</Card>
-								{/* <Alert
-									isLight
-									className='border-0'
-									shadow='md'
-									icon='Public'
-									color='warning'>
-									As soon as you save the information, it will be shown to
-									everyone automatically.
-								</Alert> */}
 							</CardTabItem>
 
 							<CardTabItem id='address' title='Adresse' icon='HolidayVillage'>
@@ -492,19 +399,6 @@ const ProfilePage = () => {
 									</CardHeader>
 									<CardBody>
 										<div className='row g-4'>
-											{/* <FormGroup
-												className='col-10'
-												id='street'
-												label='Rue'>
-												<Input
-													placeholder='Adresse de la rue'
-													autoComplete='address-line1'
-													onChange={formikAddress.handleChange}
-													value={formikAddress.values.street}
-												/>
-											</FormGroup> */}
-
-
                                             <FormGroup className='col-10'>
                                                 <InputGroup>
                                                     <InputGroupText id='street'>Rue</InputGroupText>
@@ -516,18 +410,6 @@ const ProfilePage = () => {
                                                     />
                                                 </InputGroup>
                                             </FormGroup>
-
-											{/* <FormGroup
-												className='col-md-4'
-												id='city'
-												label='Ville'>
-												<Input
-													placeholder='Ville'
-													autoComplete='address-level2'
-													onChange={formikAddress.handleChange}
-													value={formikAddress.values.city}
-												/>
-											</FormGroup> */}
 
                                             <FormGroup className='col-md-3'>
                                                 <InputGroup>
@@ -554,18 +436,6 @@ const ProfilePage = () => {
                                                 </InputGroup>
                                             </FormGroup>
 
-											{/* <FormGroup
-												className='col-md-4'
-												id='country'
-												label='Pays'>
-												<Input
-													placeholder='Pays'
-													autoComplete='country-name'
-													onChange={formikAddress.handleChange}
-													value={formikAddress.values.country}
-												/>
-											</FormGroup> */}
-
                                             <FormGroup className='col-md-3'>
                                                 <InputGroup>
                                                     <InputGroupText id='country'>Pays</InputGroupText>
@@ -577,19 +447,6 @@ const ProfilePage = () => {
                                                     />
                                                 </InputGroup>
                                             </FormGroup>
-
-											{/* <FormGroup
-												className='col-md-2'
-												id='zipcode'
-												label='Code postal'>
-												<Input
-													placeholder='Code postal'
-													autoComplete='postal-code'
-                                                    pattern="[0-9]+"
-													onChange={formikAddress.handleChange}
-													value={formikAddress.values.zipcode}
-												/>
-											</FormGroup> */}
 
 										</div>
 									</CardBody>
@@ -653,45 +510,12 @@ const ProfilePage = () => {
                                                                                         {horse.breed || 'Un noble cheval'}
                                                                                     </small>
                                                                                 </div>
-                                                                                <div className='text-muted'>
+                                                                                <div className='h6 text-muted opacity-50 mt-2'>
                                                                                     {horse.owner.data.attributes.name} {horse.owner.data.attributes.surname}
                                                                                 </div>
                                                                             </div>
-                                                                            {/* <div className='col-auto'>
-                                                                                <Button
-                                                                                    icon='Info'
-                                                                                    color='info'
-                                                                                    isLight
-                                                                                    hoverShadow='sm'
-                                                                                    tag='a'
-                                                                                    //to={`../${demoPages.appointment.subMenu.employeeID.path}/${user.id}`}
-                                                                                    //to={`/chevaux/${horse.id}`}
-                                                                                    to={isAdmin || isPro ? `${queryPages.horses.path}/${horse.id}` : `${clientQueryPages.horses.path}/${horse.id}`}
-                                                                                    data-tour={auth.user.name}
-                                                                                />
-                                                                            </div> */}
                                                                         </div>
-                                                                        {/* {!!user?.services && (
-                                                                            <div className='row g-2 mt-3'>
-                                                                                {user?.services.map((service) => (
-                                                                                    <div
-                                                                                        key={service.name}
-                                                                                        className='col-auto'>
-                                                                                        <Badge
-                                                                                            isLight
-                                                                                            color={service.color}
-                                                                                            className='px-3 py-2'>
-                                                                                            <Icon
-                                                                                                icon={service.icon}
-                                                                                                size='lg'
-                                                                                                className='me-1'
-                                                                                            />
-                                                                                            {service.name}
-                                                                                        </Badge>
-                                                                                    </div>
-                                                                                ))}
-                                                                            </div>
-                                                                        )} */}
+                                                                        
                                                                     </div>
                                                                 </div>
                                                             </div>

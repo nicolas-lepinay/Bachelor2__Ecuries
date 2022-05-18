@@ -4,6 +4,7 @@ import moment from 'moment';
 import 'moment/locale/fr';
 import classNames from 'classnames';
 import CircularProgress from '@mui/material/CircularProgress';
+import Spinner from '../../../components/bootstrap/Spinner'
 
 import { getUserDataWithId } from '../../../common/data/userDummyData';
 
@@ -78,8 +79,9 @@ function HorsePage() {
 
     // 🐎 Fetch horse by ID :
     const { 
-        loading: loadingHorse,
         data: horse, 
+        loading: loadingHorse,
+        error,
         setData: setHorse } = useFetchHorses({ filters: `&filters[id]=${id}`, isUnique: true });
 
     // Sort health_record table by date :
@@ -105,7 +107,19 @@ function HorsePage() {
         return (
             <PageWrapper title='Chargement...'>
                 <div className='position-absolute top-50 start-50 translate-middle'>
-                    <CircularProgress color="info" />
+                    <Spinner size={62} color="info" />
+                </div>
+            </PageWrapper>
+        );
+
+    // Erreur :
+    if(error)
+        return (
+            <PageWrapper title="Une erreur s'est produite">
+                <div className='position-absolute top-50 start-50 translate-middle'>
+                    <Alert icon='Report' isLight color="danger" className='new-line'>
+                        {`Nous n'avons pas pu charger les données du cheval\n(${error}).`}
+                    </Alert>
                 </div>
             </PageWrapper>
         );
@@ -116,27 +130,6 @@ function HorsePage() {
 
 	return (
 		<PageWrapper title={horse.name}>
-
-			{/* <SubHeader>
-				<SubHeaderLeft>
-					<Button
-						color='info'
-						isLink
-						icon='ArrowBack'
-						tag='a'
-						to={`../${demoPages.appointment.subMenu.employeeList.path}`}>
-						Back to List
-					</Button>
-					<SubheaderSeparator />
-					<CommonAvatarTeam isAlignmentEnd>
-						<strong>Sports</strong> Team
-					</CommonAvatarTeam>
-				</SubHeaderLeft>
-				<SubHeaderRight>
-					<span className='text-muted fst-italic me-2'>Last update:</span>
-					<span className='fw-bold'>13 hours ago</span>
-				</SubHeaderRight>
-			</SubHeader> */}
 			<Page container='fluid'>
 
 				<div className="row d-flex justify-content-center">

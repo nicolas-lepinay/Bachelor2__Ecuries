@@ -3,7 +3,10 @@ import { useEffect, useState } from 'react';
 // 🅰️ Axios :
 import axios from 'axios';
 
-const useFetchClients = () => {
+const useFetchClients = ({
+    filters = '',
+    isUnique = false,
+    } = {}) => {
 
     // ⚙️ Strapi's URL :
     const API_URL = process.env.REACT_APP_API_URL;
@@ -12,7 +15,7 @@ const useFetchClients = () => {
     // ⚙️ CLIENT ID :
     const CLIENT_ID = process.env.REACT_APP_CLIENT_ID; // Id du rôle 'Client'
 
-    const query = `${USERS_ROUTE}?populate=*&filters[role][id]=${CLIENT_ID}`;
+    const query = `${USERS_ROUTE}?populate=*&filters[role][id]=${CLIENT_ID}${filters}`;
 
     const [data, setData] = useState([]);
     const [error, setError] = useState(null);
@@ -23,7 +26,7 @@ const useFetchClients = () => {
             setLoading(true);
             try {
                 const res = await axios.get(`${API_URL}${query}`);
-                setData(res.data);
+                isUnique ? setData(res.data[0]) : setData(res.data);
             } catch(err) {
                 setError(err)
                 console.log('USE FETCH CLIENTS | ' + query + ' | ' + err)

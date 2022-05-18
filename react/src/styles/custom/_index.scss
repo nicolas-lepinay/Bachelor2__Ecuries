@@ -112,3 +112,10 @@ input:-webkit-autofill:focus {
     background-clip: text;
     color: transparent;
 }
+
+.link-hover {
+    transition: color 0.2s ease-in-out;
+    &:hover {
+        color: $primary;
+    }
+}
