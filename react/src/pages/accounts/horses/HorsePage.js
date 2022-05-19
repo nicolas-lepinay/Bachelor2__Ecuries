@@ -21,7 +21,6 @@ import SubHeader, {
 	SubHeaderRight,
 	SubheaderSeparator,
 } from '../../../layout/SubHeader/SubHeader';
-import Button from '../../../components/bootstrap/Button';
 import Card, {
 	CardActions,
 	CardBody,
@@ -30,7 +29,24 @@ import Card, {
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 
+import Alert from '../../../components/bootstrap/Alert';
+import Label from '../../../components/bootstrap/forms/Label';
+import Button from '../../../components/bootstrap/Button';
+import Accordion, { AccordionItem } from '../../../components/bootstrap/Accordion';
+import FormGroup from '../../../components/bootstrap/forms/FormGroup';
+import Input from '../../../components/bootstrap/forms/Input';
+import Checks, { ChecksGroup } from '../../../components/bootstrap/forms/Checks';
+import Select from '../../../components/bootstrap/forms/Select';
+import Textarea from '../../../components/bootstrap/forms/Textarea';
+import InputGroup, { InputGroupText } from '../../../components/bootstrap/forms/InputGroup';
 import Popovers from '../../../components/bootstrap/Popovers';
+import Option from '../../../components/bootstrap/Option';
+
+import OffCanvas, {
+    OffCanvasBody,
+	OffCanvasHeader,
+	OffCanvasTitle } from '../../../components/bootstrap/OffCanvas';
+
 import Avatar from '../../../components/Avatar';
 import defaultHorseAvatar from '../../../assets/img/horse-avatars/defaultHorseAvatar.webp';
 import defaultAvatar from '../../../assets/img/wanna/defaultAvatar.webp';
@@ -43,7 +59,6 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
-import Alert from '../../../components/bootstrap/Alert';
 import PaginationButtons, { dataPagination, PER_COUNT } from '../../../components/PaginationButtons';
 
 import Chart from '../../../components/extras/Chart';
@@ -90,6 +105,13 @@ function HorsePage() {
     // Pagination :
     const [healthPerPage, setHealthPerPage] = useState(PER_COUNT['3']);
     const [healthCurrentPage, setHealthCurrentPage] = useState(1);
+
+    // Open Health Record OffCanvas details :
+    const [toggleHealthInfoCanvas, setToggleHealthInfoCanvas] = useState(false);
+	const setInfoRecord = () => setToggleHealthInfoCanvas(!toggleHealthInfoCanvas);
+
+    // Set item to display in OffCanvas :
+	const [eventItem, setEventItem] = useState(null);
 
     const colorList = [
         { value: 'info', description: 'Bleu'},
@@ -334,7 +356,10 @@ function HorsePage() {
                                                             'border-light': !darkModeStatus,
                                                         }, 'mt-3')}
                                                         icon='Info'
-                                                        // onClick={handleUpcomingDetails}
+                                                        onClick={() => {
+                                                            setInfoRecord();
+                                                            setEventItem(item);
+                                                        }}
                                                         aria-label='Detailed information'
                                                     />
                                                 </td>
@@ -366,7 +391,10 @@ function HorsePage() {
                                                 {/* <td>
                                                     <Icon icon={item.icon} size='lg' color='dark' />
                                                 </td> */}
-                                                <td className='align-top'>{item.message}</td>
+                                                <td className='align-top'>
+                                                    {item?.field ? <b>{`${item.field} : `}</b> : ''}
+                                                    {item.message}
+                                                </td>
 
                                                 <td className='align-top'>
                                                     <div className='text-nowrap mt-2'>
@@ -530,6 +558,183 @@ function HorsePage() {
 					</div>
 
 				</div>
+
+
+                {/* Détails d'une entrée du carnet de santé */}
+
+                <OffCanvas
+					setOpen={(status) => {
+						setToggleHealthInfoCanvas(status);
+                        //setEventAdding(status);
+					}}
+					isOpen={toggleHealthInfoCanvas}
+					titleId='canvas-title'>
+					<OffCanvasHeader
+						setOpen={(status) => {
+							setToggleHealthInfoCanvas(status);
+							//setEventAdding(status);
+						}}
+						className='p-4'>
+						<OffCanvasTitle id='canvas-title' tag='h3'>
+							Carnet de santé
+						</OffCanvasTitle>
+					</OffCanvasHeader>
+					<OffCanvasBody 
+                        tag='form' 
+                        //onSubmit={clientFormik.handleSubmit} 
+                        className='p-4'>
+
+                        <div className='d-flex justify-content-center mb-3'>
+                            <Avatar
+                                srcSet={eventItem?.employee?.data?.attributes?.avatar ? `${API_URL}${eventItem?.employee?.data?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
+                                src={eventItem?.employee?.data?.attributes?.avatar ? `${API_URL}${eventItem?.employee?.data?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
+                                color={eventItem?.employee?.data?.attributes?.color}
+                                shadow='default'
+                            />
+                        </div>
+                        <div className='d-flex flex-column align-items-center mb-5'>
+                            <div className='h2 fw-bold text-capitalize'>{eventItem?.employee?.data?.attributes?.name} {eventItem?.employee?.data?.attributes?.surname}</div>
+                            <div className='h5 text-muted opacity-75 mb-4'>{eventItem?.employee?.data?.attributes?.occupation || 'Professionel(le)'}</div>
+                            <div className='h6 text-muted opacity-50'>{eventItem?.employee?.data?.attributes?.email}</div>
+                            <div className='h6 text-muted opacity-50'>{eventItem?.employee?.data?.attributes?.phone}</div>
+                        </div> 
+
+						<div className='row g-4'> 
+
+                            {/* Urgence */}
+                            <div className="col-12">
+                                <Dropdown 
+                                    id='urgency'
+                                    className='mb-2' 
+                                    >
+                                    <DropdownToggle hasIcon={false}>
+                                        <Button
+                                            isLight
+                                            color={eventItem?.color}
+                                            icon='Circle'
+                                            className='text-nowrap'
+                                            size='lg'
+                                        >
+                                            {eventItem?.color === 'success' && 'Urgence faible'}
+                                            {eventItem?.color === 'warning' && 'Urgence modérée'}
+                                            {eventItem?.color === 'danger' && 'Urgence élevée'}
+                                        </Button>
+                                    </DropdownToggle>
+                                
+                                    <DropdownMenu >
+                                        <DropdownItem
+                                            name='confirmed'
+                                            value='success'
+                                            //onClick={() => formik.setFieldValue("confirmed", true)}
+                                            >
+                                            <div>
+                                                <Icon
+                                                    icon='Circle'
+                                                    color='success'
+                                                />
+                                                Faible
+                                            </div>
+                                        </DropdownItem>
+                                        <DropdownItem
+                                            name='confirmed'
+                                            value="warning"
+                                            //onClick={() => formik.setFieldValue("confirmed", false)}
+                                            >
+                                            <div>
+                                                <Icon
+                                                    icon='Circle'
+                                                    color='warning'
+                                                />
+                                                Modérée
+                                            </div>
+                                        </DropdownItem>
+                                        <DropdownItem
+                                            name='confirmed'
+                                            value='danger'
+                                            //onClick={() => formik.setFieldValue("confirmed", false)}
+                                            >
+                                            <div>
+                                                <Icon
+                                                    icon='Circle'
+                                                    color='danger'
+                                                />
+                                                Élevée
+                                            </div>
+                                        </DropdownItem>
+                                    </DropdownMenu>
+                                </Dropdown>
+                            </div>
+
+                            {/* Date */}
+                            <div className="col-12">
+                                <InputGroup className='mb-2'>
+                                    <InputGroupText>Date</InputGroupText>
+                                    <Input
+                                        type='date'
+                                        value={moment(eventItem?.date).format(moment.HTML5_FMT.DATE)}
+                                        size='lg'
+                                        disabled={!isAdmin && !isPro}
+                                    />
+                                </InputGroup>
+                            </div>
+
+							{/* Field */}
+							<div className='col-12'>
+                                <InputGroup className='mb-2'>
+                                    <InputGroupText>
+                                        {
+                                        eventItem?.icon ? 
+                                        <Icon 
+                                            icon={eventItem?.icon} 
+                                            size='2x' 
+                                            color={eventItem?.employee?.data?.attributes?.color}
+                                        /> 
+                                        : 
+                                        'Champ' 
+                                        }
+                                    </InputGroupText>
+
+                                    <Input
+                                        aria-label='name'
+                                        size='lg'
+                                        value={eventItem?.field}
+                                        disabled={!isAdmin && !isPro}
+                                    />
+                                </InputGroup>
+							</div>
+
+                            {/* Message */}
+                            <div className='col-12'>
+                                <Textarea
+                                    name="description"
+                                    value={eventItem?.message}
+                                    className='py-3 px-4'
+                                    style={{minHeight: '120px'}}
+                                    disabled={!isAdmin && !isPro}
+                                />
+                            </div>
+			  
+                            {(isAdmin || isPro) && 
+                            <div className='d-flex justify-content-between py-3 mb-4'>
+                                <div>
+                                    <Button 
+                                        color='info' 
+                                        icon='Save'
+                                        type='submit'
+                                        // disabled={
+                                        //     clientFormik.values.horses?.length === 0
+                                        //     || clientFormik.values.horses.some( horse => horse?.id === '' || !horse?.id) }
+                                        >
+                                        Confirmer
+                                    </Button>
+                                </div>
+                            </div>}
+						</div>
+					</OffCanvasBody>
+				</OffCanvas>
+
+
+
 			</Page>
 		</PageWrapper>
 	);

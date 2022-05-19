@@ -894,6 +894,7 @@ const DashboardBookingPage = () => {
                                         <Textarea
                                             id='description'
                                             placeholder='Écrire une description...'
+                                            className='py-3 px-4'
                                             onChange={formik.handleChange}
                                             value={formik.values?.description}
                                         />
@@ -1169,7 +1170,7 @@ const DashboardBookingPage = () => {
                             <div className='col-12'>
                                 <Textarea
                                     value={eventItem?.description}
-                                    className='p-4'
+                                    className='py-3 px-4'
                                     readOnly
                                 />
                             </div>}
