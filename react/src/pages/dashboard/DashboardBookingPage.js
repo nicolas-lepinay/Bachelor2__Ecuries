@@ -51,7 +51,6 @@ import Modal, {
     ModalHeader,
     ModalTitle } from '../../components/bootstrap/Modal'
 
-
 import CommonUpcomingEvents from '../common/CommonUpcomingEvents';
 import Avatar, { AvatarGroup } from '../../components/Avatar';
 import defaultAvatar from '../../assets/img/wanna/defaultAvatar.webp';
@@ -88,7 +87,6 @@ const localizer = momentLocalizer(moment);
 const now = new Date();
 
 const Circle = ({ color }) => {
-
     return(
         <Icon
             icon='Circle'
@@ -98,8 +96,7 @@ const Circle = ({ color }) => {
                 'animate__animated animate__heartBeat animate__infinite animate__slower',
             )}
         />
-    )
-}
+    )};
 
 const MyEvent = (data) => {
 	const { darkModeStatus } = useDarkMode();
@@ -213,6 +210,7 @@ const DashboardBookingPage = () => {
     const isAdmin = Number(auth.user.role.id) === Number(ADMIN_ID);
     const isPro = Number(auth.user.role.id) === Number(PRO_ID);
     const isClient = Number(auth.user.role.id) === Number(CLIENT_ID);
+    const [isAuthor, setIsAuthor] = useState(false); // Is the user a professional in charge of an appointment
 
     // 👩‍🚀 Fetch all employees :
     const { 
@@ -587,12 +585,13 @@ const DashboardBookingPage = () => {
         }
     }
 
-
+    
 	useEffect(() => {
         formik.setValues({})
         setRegisteredHorses([])
         setEventIsFull(false)
-
+        setIsAuthor(false)
+                
         // Je détruis l'event quand je ferme le panel de droite, pour que les nouveaux events générés après soient bien vides :
         if(!toggleInfoEventCanvas && !toggleClientCanvas)
             setEventItem(null)
@@ -628,13 +627,16 @@ const DashboardBookingPage = () => {
 				id: eventItem.id,
 				horses: [],
 			});
-            eventItem?.maximum_horses && setEventIsFull(parseInt(eventItem?.maximum_horses) - eventItem.horses.data.length < 1)
+            eventItem?.maximum_horses && setEventIsFull(parseInt(eventItem?.maximum_horses) - eventItem.horses.data.length < 1) // Le rendez-vous est-il complet ?
+            setIsAuthor(Number(auth.user.id) === Number(eventItem?.employee?.data?.id)); // Le user loggé est-il le professionel responsable du rendez-vous ?
         }
 		return () => {};
 	}, [eventItem, toggleClientCanvas, toggleInfoEventCanvas]);
 	// END:: Calendar
 
 	const [toggleCalendar, setToggleCalendar] = useState(true);
+
+    // Open '🗑️ Delete' modal :
     const [triggerModal, setTriggerModal] = useState(false);
 
     return (
@@ -814,7 +816,7 @@ const DashboardBookingPage = () => {
 						}}
 						className='p-4'>
 						<OffCanvasTitle id='canvas-title' tag='h3'>
-							{eventAdding ? 'Ajouter un évènement' : "Modifier l'évènement"}
+							{eventAdding ? 'Ajouter un évènement' : isAdmin || isAuthor ? "Modifier l'évènement" : "Détails de l'évènement"}
 						</OffCanvasTitle>
 					</OffCanvasHeader>
 					<OffCanvasBody tag='form' onSubmit={formik.handleSubmit} className='p-4'>
@@ -1061,9 +1063,11 @@ const DashboardBookingPage = () => {
 										<FormGroup id='employee.id'>
 											<Select
 												placeholder='Veuillez choisir...'
-												value={formik.values?.employee?.id}
+												value={eventAdding && !isAdmin ? auth.user.id : formik.values?.employee?.id} // Les nouveaux RDV (eventAdding) créés par un pro. (!isAdmin) ont forcément l'id du pro.
 												onChange={formik.handleChange}
-												ariaLabel='Employee select'>
+												ariaLabel='Employee select'
+                                                disabled={!isAdmin}
+                                            >
 												{employees.map( employee => (
 													<Option
 														key={employee.username}
@@ -1077,7 +1081,10 @@ const DashboardBookingPage = () => {
 								</Card>
 							</div>
 
-                            <div className='d-flex justify-content-between py-3 mb-4'>
+                            {/* Tout le monde peut ajouter un nouveau RDV (eventAdding est true), 
+                            mais si eventAdding est false, seuls l'auteur du RVD et l'admin peuvent sauvegarder */}
+                            <div className='d-flex align-items-center justify-content-between py-3 mb-4'>
+                                {(eventAdding || (!eventAdding && (isAdmin || isAuthor))) &&
                                 <div>
                                     <Button 
                                         color='info' 
@@ -1093,9 +1100,12 @@ const DashboardBookingPage = () => {
                                         Sauvegarder
                                     </Button>
                                 </div>
+                                }
 
-                                { !eventAdding &&
-                                    <div className=''>
+                                {/* Pour supprimer un RDV : eventAdding doit être faux (RDV existant only) 
+                                et le user doit être admin (isAdmin) ou le pro. responsable du RDV (isAuthor) */}
+                                { !eventAdding && (isAdmin || isAuthor) &&
+                                <div>
                                     <Button 
                                         color='danger' 
                                         icon='Delete'

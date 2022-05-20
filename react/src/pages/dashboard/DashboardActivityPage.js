@@ -1201,7 +1201,7 @@ const DashboardActivityPage = () => {
                                 </div>
 
                                 { !eventAdding &&
-                                    <div className=''>
+                                <div>
                                     <Button 
                                         color='danger' 
                                         icon='Delete'

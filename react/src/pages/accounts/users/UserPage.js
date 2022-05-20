@@ -248,6 +248,7 @@ function UserPage() {
                                             `border-2 border-${user.confirmed ? 'success' : 'danger'}`,
                                             'mx-3 text-uppercase',
                                         )}
+                                        disabled={!isAdmin}
                                     >
                                         {user.confirmed ? 'Confirmé' : 'En attente'}
                                     </Button>
@@ -303,7 +304,7 @@ function UserPage() {
                                                 </DropdownItem>
                                             )
                                         )}
-                                        <Button type='submit' color='info' isLink isOutline icon='Save' className='mx-3 my-3'>
+                                        <Button type='submit' color='info' isLink isOutline icon='Save' className='mx-3 my-3' disabled={!isAdmin}>
 											Appliquer
 										</Button>
                                         </DropdownMenu>
@@ -341,6 +342,11 @@ function UserPage() {
                                                                 </div>
                                                             </Link>
                                                         ))}
+                                                        {user?.horses.length < 1 &&
+                                                        <div className='fw-bold fs-5 mb-0'>
+                                                            <i>Aucun cheval enregistré.</i>
+                                                        </div>
+                                                        }
                                                     </div>
                                                 </div>
                                             </div>
@@ -503,7 +509,7 @@ function UserPage() {
 									</CardBody>
 									<CardFooter>
 										<CardFooterRight>
-											<Button type='submit' color='primary' icon='Save'>
+											<Button type='submit' color='primary' icon='Save' disabled={!isAdmin}>
 												Appliquer
 											</Button>
 										</CardFooterRight>
@@ -578,7 +584,7 @@ function UserPage() {
 									</CardBody>
 									<CardFooter>
 										<CardFooterRight>
-											<Button type='submit' color='info' icon='Save'>
+											<Button type='submit' color='info' icon='Save' disabled={!isAdmin}>
 												Appliquer
 											</Button>
 										</CardFooterRight>

@@ -101,7 +101,7 @@ function UserList() {
         <PageWrapper title={adminMenu.accounts.accounts.subMenu.clients.text}>
             <Page >
                 <div className='h1 font-family-playfair d-flex justify-content-center mb-5'>Liste des utilisateurs</div>
-                <div className='row row-cols-lg-2 row-cols-1'>
+                <div className='row row-cols-lg-2 row-cols-1 mt-5'>
                     {clients.map((user) => (
                         <div key={user.username} className='col mx-auto'>
                             <Card >
@@ -152,12 +152,13 @@ function UserList() {
                                                                     <DropdownToggle hasIcon={false}>
                                                                         <Button 
                                                                             color={user.confirmed ? 'success' : 'danger'} 
-                                                                            isOutline
-                                                                            size='sm' 
                                                                             className={classNames(
                                                                                 `border-2 border-${user.confirmed ? 'success' : 'danger'}`,
                                                                                 'mx-3 text-uppercase',
                                                                             )}
+                                                                            isOutline
+                                                                            size='sm' 
+                                                                            disabled={!isAdmin}
                                                                         >
                                                                             {user.confirmed ? 'Confirmé' : 'En attente'}
                                                                         </Button>

@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
+import { useFormik } from 'formik';
+import classNames from 'classnames';
 import moment from 'moment';
 import 'moment/locale/fr';
-import classNames from 'classnames';
-import CircularProgress from '@mui/material/CircularProgress';
-import Spinner from '../../../components/bootstrap/Spinner'
-
-import { getUserDataWithId } from '../../../common/data/userDummyData';
 
 // 🛠️ Hooks :
 import useAuth from '../../../hooks/useAuth';
 import useFetchHorses from '../../../hooks/useFetchHorses';
+import useFetchEmployees from '../../../hooks/useFetchEmployees';
 import useSortableData from '../../../hooks/useSortableData';
 import useDarkMode from '../../../hooks/useDarkMode';
+
+import Spinner from '../../../components/bootstrap/Spinner';
 
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Page from '../../../layout/Page/Page';
@@ -60,30 +60,36 @@ import Dropdown, {
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
 import PaginationButtons, { dataPagination, PER_COUNT } from '../../../components/PaginationButtons';
+import showNotification from '../../../components/extras/showNotification';
 
-import Chart from '../../../components/extras/Chart';
-import dummyEventsData from '../../../common/data/dummyEventsData';
-import { priceFormat } from '../../../helpers/helpers';
-import EVENT_STATUS from '../../../common/data/enumEventStatus';
-import CommonAvatarTeam from '../../../components/common/CommonAvatarTeam';
-import COLORS from '../../../common/data/enumColors';
-import useTourStep from '../../../hooks/useTourStep';
+import Modal, {
+    ModalBody,
+    ModalFooter,
+    ModalHeader,
+    ModalTitle } from '../../../components/bootstrap/Modal'
+
+import { getUserDataWithId } from '../../../common/data/userDummyData';
+
+// 🅰️ Axios :
+import axios from 'axios';
 
 function HorsePage() {
 
+    const data = getUserDataWithId(2);
+
     const { darkModeStatus, themeStatus } = useDarkMode();
 
-    // Horse's ID :
+    // 🐴 Horse's ID :
     const { id } = useParams();
 
     // ⚙️ Strapi's API URL :
     const API_URL = process.env.REACT_APP_API_URL;
-    
+    const HORSES_ROUTE = process.env.REACT_APP_HORSES_ROUTE;
+
     // ⚙️ Role IDs
     const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; // Id du rôle 'Admin'
     const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
     const CLIENT_ID = process.env.REACT_APP_CLIENT_ID; // Id du rôle 'Client'
-    const data = getUserDataWithId(2);
 
     // 🦸 User:
     const auth = useAuth();
@@ -92,27 +98,7 @@ function HorsePage() {
     const isPro = auth.user && Number(auth.user.role.id) === Number(PRO_ID);
     const isClient = auth.user && Number(auth.user.role.id) === Number(CLIENT_ID);
 
-    // 🐎 Fetch horse by ID :
-    const { 
-        data: horse, 
-        loading: loadingHorse,
-        error,
-        setData: setHorse } = useFetchHorses({ filters: `&filters[id]=${id}`, isUnique: true });
-
-    // Sort health_record table by date :
-    const { items: health_items, requestSort, getClassNamesFor } = useSortableData(horse.health_record ? horse.health_record : []);
-
-    // Pagination :
-    const [healthPerPage, setHealthPerPage] = useState(PER_COUNT['3']);
-    const [healthCurrentPage, setHealthCurrentPage] = useState(1);
-
-    // Open Health Record OffCanvas details :
-    const [toggleHealthInfoCanvas, setToggleHealthInfoCanvas] = useState(false);
-	const setInfoRecord = () => setToggleHealthInfoCanvas(!toggleHealthInfoCanvas);
-
-    // Set item to display in OffCanvas :
-	const [eventItem, setEventItem] = useState(null);
-
+    // 🌈 Liste des couleurs :
     const colorList = [
         { value: 'info', description: 'Bleu'},
         { value: 'primary', description: 'Violet'},
@@ -123,6 +109,160 @@ function HorsePage() {
         { value: 'light', description: 'Blanc'},
         { value: 'dark', description: 'Noir'},
     ];
+
+    // 🐴 Fetch horse by ID :
+    const { 
+        data: horse, 
+        loading: loadingHorse,
+        error,
+        setData: setHorse } = useFetchHorses({ filters: `&filters[id]=${id}`, isUnique: true });
+
+    // 👩‍🚀👨‍🚀 Fetch list of employees :
+    const { data: employees } = useFetchEmployees();
+
+    // 📆 Sort health_record and appointments tables by date :
+    const { items: health_items, requestSort, getClassNamesFor } = useSortableData(horse.health_record ? horse.health_record : []);
+    const { items: appointment_items, requestSort: requestSortAppointment, getClassNamesFor: getClassNamesForAppointment } = useSortableData(horse?.appointments?.data ? horse?.appointments?.data : []);
+
+    // 📑 Pagination :
+    const [healthPerPage, setHealthPerPage] = useState(PER_COUNT['3']);
+    const [healthCurrentPage, setHealthCurrentPage] = useState(1);
+
+    const [appointmentPerPage, setAppointmentPerPage] = useState(PER_COUNT['3']);
+    const [appointmentCurrentPage, setAppointmentCurrentPage] = useState(1);
+
+    // Open Health Record OffCanvas details :
+    const [toggleHealthInfoCanvas, setToggleHealthInfoCanvas] = useState(false);
+	const setInfoRecord = () => setToggleHealthInfoCanvas(!toggleHealthInfoCanvas);
+
+    // Set item to be displayed in OffCanvas :
+	const [eventItem, setEventItem] = useState(null);
+
+    // Open '🗑️ Delete' modal :
+    const [triggerModal, setTriggerModal] = useState(false);
+
+    // Is user a record's author ? :
+    const [isHealthRecordAuthor, setIsHealthRecordAuthor] = useState(false);
+
+    // 📝 Formik for Health Record :
+    const formikHealth = useFormik({
+        initialValues: {
+            id: '',
+            message: '',
+            field: '',
+            date: '',
+            color: '',
+            employee: {
+                id: '',
+            },
+        },
+        onSubmit: (values, { resetForm }) => {
+            // Return if no message :
+            if(!values?.message || values?.message === '')
+                return
+
+            // Replace other necessary empty fields:
+            if(!values?.color)
+                values.color = 'success';
+
+            if(!values?.date)
+                values.date = moment().format(moment.HTML5_FMT.DATE);
+
+            if(!values?.employee?.id)
+                values.employee = {
+                    id: auth.user.id
+                };
+            
+            eventItem ? handleUpdate(values) : handlePost(values);
+
+            setToggleHealthInfoCanvas(false);
+			setEventItem(null);
+            resetForm({ values: ''});
+        }
+    });
+
+    const handleUpdate = async (newData) => {
+        const updatedHealthRecord = horse.health_record.map( item => {
+            if(item.id == newData.id)
+                return newData
+            return {
+                id: item.id,
+            };
+        })
+        const dataToSend = {
+            health_record: updatedHealthRecord,
+        }
+        try {
+            const res = await axios.put(`${API_URL}${HORSES_ROUTE}/${horse?.id}?populate=owner&populate=avatar&populate=health_record.employee.avatar&populate=appointments&populate=activities`, { data: dataToSend });
+            const resData = res.data.data;
+            setHorse({id: resData.id, ...resData.attributes}); // Update horse
+            showNotification(
+                'Mise à jour', // title
+				`Le carnet de santé de ${horse?.name} a été modifié.`, // message
+                'success' // type
+			);
+        } catch(err) {
+            console.log(`UPDATE | Health Record | Le carnet de santé du cheval “${horse?.name}” n'a pas pu être modifié dans la base de données. | ` + err);
+            showNotification(
+                'Mise à jour.', // title
+				"Oops ! Une erreur s'est produite. Le carnet de santé n'a pas pu être modifié.", // message
+                'danger' // type
+			);
+        }
+    }
+
+    const handlePost = async (newData) => {
+        let updatedHealthRecord = [newData];
+
+        horse.health_record.map( item => {
+            updatedHealthRecord.push({ id: item.id })
+        })
+        const dataToSend = {
+            health_record: updatedHealthRecord,
+        }
+        try {
+            const res = await axios.put(`${API_URL}${HORSES_ROUTE}/${horse?.id}?populate=owner&populate=avatar&populate=health_record.employee.avatar&populate=appointments&populate=activities`, { data: dataToSend });
+            const resData = res.data.data;
+            setHorse({id: resData.id, ...resData.attributes}); // Update horse
+            showNotification(
+                'Mise à jour', // title
+				`Une nouvelle entrée a été ajoutée au carnet de santé de ${horse?.name}.`, // message
+                'success' // type
+			);
+        } catch(err) {
+            console.log(`UPDATE | Health Record | Le carnet de santé du cheval “${horse?.name}” n'a pas pu être modifié dans la base de données. | ` + err);
+            showNotification(
+                'Mise à jour.', // title
+				"Oops ! Une erreur s'est produite. Le carnet de santé n'a pas pu être modifié.", // message
+                'danger' // type
+			);
+        }
+    }
+
+    useEffect(() => {
+        if(!toggleHealthInfoCanvas) {
+            formikHealth.setValues({});
+            setEventItem(null);
+            setIsHealthRecordAuthor(false);
+        }
+
+        if(horse && eventItem) {
+            formikHealth.setValues({
+                ...formikHealth.values,
+                id: eventItem?.id,
+                message: eventItem?.message,
+                field: eventItem?.field,
+                date: eventItem?.date,
+                color: eventItem?.color,
+                employee: {
+                    id: eventItem?.employee?.data?.id
+                }
+            });
+            setIsHealthRecordAuthor(Number(auth.user.id) === Number(eventItem?.employee?.data?.id))
+        }
+        return () => {};
+    }, [horse, eventItem, toggleHealthInfoCanvas]);
+
     
     // Chargement :
     if(loadingHorse)
@@ -315,7 +455,18 @@ function HorsePage() {
 										Carnet de santé
 									</CardTitle>
 								</CardLabel>
-							</CardHeader>
+                                <CardActions>
+                                    {(isAdmin || isPro) &&
+                                    <Button
+                                        color='info'
+                                        icon='Add'
+                                        isLight
+                                        onClick={() => { setInfoRecord() }}
+                                    >
+                                        Nouveau
+                                    </Button>}
+                                </CardActions>
+                            </CardHeader>
                             <CardBody>
 							{horse.health_record.length === 0
                                 ?
@@ -455,90 +606,74 @@ function HorsePage() {
                                         <thead>
                                             <tr>
                                                 <th></th>
+                                                <th>Intitulé</th>
+                                                <th>Professionnel(le)</th>
+
                                                 <th
-                                                    onClick={() => requestSort('date')}
+                                                    onClick={() => requestSortAppointment('start')}
                                                     className='cursor-pointer text-decoration-underline'>
-                                                    Date{' '}
+                                                    Début{' '}
                                                     <Icon
                                                         size='lg'
-                                                        className={getClassNamesFor('date')}
+                                                        className={getClassNamesForAppointment('start')}
                                                         icon='KeyboardArrowDown'
                                                     />
                                                 </th>
-                                                <th>Heure</th>
-                                                <th>Intitulé</th>
-                                                <th>Intitulé</th>
 
+                                                <th>Fin</th>
                                             </tr>
                                         </thead>
 
                                         <tbody>
-                                        {dataPagination(health_items, healthCurrentPage, healthPerPage).map((item) => (
-                                            <tr key={`health_record-${item.id}`}>
-                                                <td className='align-top'>
+                                        {dataPagination(appointment_items, appointmentCurrentPage, appointmentPerPage).map((item) => (
+                                            <tr key={`appointment-${item.id}`}>
+                                                <td>
                                                     <Button
                                                         isOutline={!darkModeStatus}
                                                         color='dark'
                                                         isLight={darkModeStatus}
                                                         className={classNames({
                                                             'border-light': !darkModeStatus,
-                                                        }, 'mt-3')}
+                                                        })}
                                                         icon='Info'
-                                                        // onClick={handleUpcomingDetails}
+                                                        onClick={() => console.log(item)}
                                                         aria-label='Detailed information'
                                                     />
                                                 </td>
-                                                <td className='align-top'>
-                                                <Popovers
-                                                    trigger='hover'
-                                                    placement='bottom'
-                                                    animation={true}
-                                                    desc={
-                                                        <>
-                                                            <div className='h6 text-center text-capitalize'><b>{`${item.employee.data.attributes.name} ${item.employee.data.attributes.surname}`}</b></div>
-                                                            <div className='text-muted text-center text-capitalize'>{item.employee.data.attributes.occupation}</div>
-                                                        </>
-                                                    }>
-                                                    <div className="position-relative">
-                                                        <Avatar
-                                                            srcSet={item.employee.data.attributes.avatar ? `${API_URL}${item.employee.data.attributes.avatar.data.attributes.url}` : `${defaultAvatar}`}
-                                                            src={item.employee.data.attributes.avatar ? `${API_URL}${item.employee.data.attributes.avatar.data.attributes.url}` : `${defaultAvatar}`}
-                                                            size={64}
-                                                            border={4}
-                                                            borderColor={themeStatus}
-                                                            className='cursor-pointer'
-                                                        />
-                                                    </div>
-                                                    </Popovers>
-                                                </td>
-                                    
-                                                {/* <td>
-                                                    <Icon icon={item.icon} size='lg' color='dark' />
-                                                </td> */}
-                                                <td className='align-top'>{item.message}</td>
 
-                                                <td className='align-top'>
-                                                    <div className='text-nowrap mt-2'>
-                                                        {moment(
-                                                            `${item?.date}`,
-                                                        ).format('L')}
+                                                <td>
+                                                    <b>{item.attributes.name}</b>
+                                                </td>
+
+                                                <td>
+                                                    {/* {item.attributes.employee.data.attributes.username} */}
+                                                    <div className='d-flex'>
+                                                        <div className='flex-shrink-0'>
+                                                            <Avatar
+                                                                srcSet={item.attributes.employee.data.attributes.avatar ? `${API_URL}${item.attributes.employee.data.attributes.avatar.data.attributes.url}` : `${defaultAvatar}`}
+                                                                src={item.attributes.employee.data.attributes.avatar ? `${API_URL}${item.attributes.employee.data.attributes.avatar.data.attributes.url}` : `${defaultAvatar}`}
+                                                                size={64}
+                                                                border={4}
+                                                                borderColor={themeStatus}
+                                                                color={item.attributes.employee.data.attributes.color}
+                                                                className='cursor-pointer'
+                                                            />
+                                                        </div>
+                                                        <div className='flex-grow-1 ms-3 d-flex align-items-center text-nowrap'>
+                                                            <div>
+                                                                <div>{item.attributes.employee.data.attributes.name} {item.attributes.employee.data.attributes.surname}</div>
+                                                                <div className='small text-muted'>{item.attributes.employee.data.attributes.email}</div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </td>
 
-                                                <td className='align-top'>
-                                                    <Button
-                                                        isLink
-                                                        color={item.color}
-                                                        icon='Circle'
-                                                        className='text-nowrap'
-                                                        style={{cursor: 'default'}}
-                                                        >
-                                                            {item.color === 'success' && 'Faible'}
-                                                            {item.color === 'warning' && 'Modérée'}
-                                                            {item.color === 'danger' && 'Élevée'}
-                                                            {item.color !== 'success' && item.color !== 'warning' && item.color !== 'danger' && 'Inconnue'}
-                                                    </Button> 
+                                                <td>{moment(item.attributes.start).calendar()}</td>
+
+                                                <td>
+                                                    {moment(item.attributes.end).calendar()}
                                                 </td>
+
                                             </tr>
                                         ))}
                                         </tbody>
@@ -547,21 +682,19 @@ function HorsePage() {
                             }
                             </CardBody>
                             <PaginationButtons
-                                data={health_items}
-                                label='du carnet de santé'
-                                setCurrentPage={setHealthCurrentPage}
-                                currentPage={healthCurrentPage}
-                                perPage={healthPerPage}
-                                setPerPage={setHealthPerPage}
+                                data={appointment_items}
+                                label="de l'agenda de rendez-vous"
+                                setCurrentPage={setAppointmentCurrentPage}
+                                currentPage={appointmentCurrentPage}
+                                perPage={appointmentPerPage}
+                                setPerPage={setAppointmentPerPage}
                             />
                         </Card>
 					</div>
-
 				</div>
 
 
                 {/* Détails d'une entrée du carnet de santé */}
-
                 <OffCanvas
 					setOpen={(status) => {
 						setToggleHealthInfoCanvas(status);
@@ -581,51 +714,72 @@ function HorsePage() {
 					</OffCanvasHeader>
 					<OffCanvasBody 
                         tag='form' 
-                        //onSubmit={clientFormik.handleSubmit} 
+                        onSubmit={formikHealth.handleSubmit} 
                         className='p-4'>
 
-                        <div className='d-flex justify-content-center mb-3'>
-                            <Avatar
-                                srcSet={eventItem?.employee?.data?.attributes?.avatar ? `${API_URL}${eventItem?.employee?.data?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
-                                src={eventItem?.employee?.data?.attributes?.avatar ? `${API_URL}${eventItem?.employee?.data?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
-                                color={eventItem?.employee?.data?.attributes?.color}
-                                shadow='default'
-                            />
-                        </div>
-                        <div className='d-flex flex-column align-items-center mb-5'>
-                            <div className='h2 fw-bold text-capitalize'>{eventItem?.employee?.data?.attributes?.name} {eventItem?.employee?.data?.attributes?.surname}</div>
-                            <div className='h5 text-muted opacity-75 mb-4'>{eventItem?.employee?.data?.attributes?.occupation || 'Professionel(le)'}</div>
-                            <div className='h6 text-muted opacity-50'>{eventItem?.employee?.data?.attributes?.email}</div>
-                            <div className='h6 text-muted opacity-50'>{eventItem?.employee?.data?.attributes?.phone}</div>
-                        </div> 
+                        {eventItem ?
+                        <>
+                            <div className='d-flex justify-content-center mb-3'>
+                                <Avatar
+                                    srcSet={eventItem?.employee?.data?.attributes?.avatar ? `${API_URL}${eventItem?.employee?.data?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
+                                    src={eventItem?.employee?.data?.attributes?.avatar ? `${API_URL}${eventItem?.employee?.data?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
+                                    color={eventItem?.employee?.data?.attributes?.color}
+                                    shadow='default'
+                                />
+                            </div>
+                            <div className='d-flex flex-column align-items-center mb-5'>
+                                <div className='h2 fw-bold text-capitalize'>{eventItem?.employee?.data?.attributes?.name} {eventItem?.employee?.data?.attributes?.surname}</div>
+                                <div className='h5 text-muted opacity-75 mb-4'>{eventItem?.employee?.data?.attributes?.occupation || 'Professionel(le)'}</div>
+                                <div className='h6 text-muted opacity-50'>{eventItem?.employee?.data?.attributes?.email}</div>
+                                <div className='h6 text-muted opacity-50'>{eventItem?.employee?.data?.attributes?.phone}</div>
+                            </div>
+                        </>
+                        :
+                        <>
+                            <div className='d-flex justify-content-center mb-3'>
+                                <Avatar
+                                    srcSet={auth.user?.avatar ? `${API_URL}${auth.user?.avatar?.url}` : `${defaultAvatar}`}
+                                    src={auth.user?.avatar ? `${API_URL}${auth.user?.avatar?.url}` : `${defaultAvatar}`}
+                                    color={auth.user?.color}
+                                    shadow='default'
+                                />
+                            </div>
+                            <div className='d-flex flex-column align-items-center mb-5'>
+                                <div className='h2 fw-bold text-capitalize'>{auth.user.name} {auth.user.surname}</div>
+                                <div className='h5 text-muted opacity-75 mb-4'>{auth.user.occupation || 'Professionel(le)'}</div>
+                                <div className='h6 text-muted opacity-50'>{auth.user.email}</div>
+                                <div className='h6 text-muted opacity-50'>{auth.user?.phone}</div>
+                            </div>
+                        </>
+                        }
 
 						<div className='row g-4'> 
-
                             {/* Urgence */}
                             <div className="col-12">
                                 <Dropdown 
-                                    id='urgency'
+                                    id='color'
                                     className='mb-2' 
                                     >
                                     <DropdownToggle hasIcon={false}>
                                         <Button
                                             isLight
-                                            color={eventItem?.color}
+                                            color={formikHealth.values.color || 'success'}
                                             icon='Circle'
                                             className='text-nowrap'
                                             size='lg'
+                                            disabled={eventItem && !isAdmin && !isHealthRecordAuthor}
                                         >
-                                            {eventItem?.color === 'success' && 'Urgence faible'}
-                                            {eventItem?.color === 'warning' && 'Urgence modérée'}
-                                            {eventItem?.color === 'danger' && 'Urgence élevée'}
+                                            {(formikHealth.values.color === 'success' || !formikHealth.values.color) && 'Urgence faible'}
+                                            {formikHealth.values.color === 'warning' && 'Urgence modérée'}
+                                            {formikHealth.values.color === 'danger' && 'Urgence élevée'}
                                         </Button>
                                     </DropdownToggle>
                                 
                                     <DropdownMenu >
                                         <DropdownItem
-                                            name='confirmed'
+                                            name='color'
                                             value='success'
-                                            //onClick={() => formik.setFieldValue("confirmed", true)}
+                                            onClick={() => formikHealth.setFieldValue("color", 'success')}
                                             >
                                             <div>
                                                 <Icon
@@ -636,9 +790,9 @@ function HorsePage() {
                                             </div>
                                         </DropdownItem>
                                         <DropdownItem
-                                            name='confirmed'
-                                            value="warning"
-                                            //onClick={() => formik.setFieldValue("confirmed", false)}
+                                            name='color'
+                                            value='warning'
+                                            onClick={() => formikHealth.setFieldValue("color", 'warning')}
                                             >
                                             <div>
                                                 <Icon
@@ -649,9 +803,9 @@ function HorsePage() {
                                             </div>
                                         </DropdownItem>
                                         <DropdownItem
-                                            name='confirmed'
+                                            name='color'
                                             value='danger'
-                                            //onClick={() => formik.setFieldValue("confirmed", false)}
+                                            onClick={() => formikHealth.setFieldValue("color", 'danger')}
                                             >
                                             <div>
                                                 <Icon
@@ -665,40 +819,24 @@ function HorsePage() {
                                 </Dropdown>
                             </div>
 
-                            {/* Date */}
-                            <div className="col-12">
-                                <InputGroup className='mb-2'>
-                                    <InputGroupText>Date</InputGroupText>
-                                    <Input
-                                        type='date'
-                                        value={moment(eventItem?.date).format(moment.HTML5_FMT.DATE)}
-                                        size='lg'
-                                        disabled={!isAdmin && !isPro}
-                                    />
-                                </InputGroup>
-                            </div>
-
 							{/* Field */}
 							<div className='col-12'>
                                 <InputGroup className='mb-2'>
                                     <InputGroupText>
-                                        {
-                                        eventItem?.icon ? 
                                         <Icon 
-                                            icon={eventItem?.icon} 
-                                            size='2x' 
-                                            color={eventItem?.employee?.data?.attributes?.color}
+                                            icon='Edit' 
+                                            //size='2x' 
                                         /> 
-                                        : 
-                                        'Champ' 
-                                        }
                                     </InputGroupText>
 
                                     <Input
-                                        aria-label='name'
-                                        size='lg'
-                                        value={eventItem?.field}
-                                        disabled={!isAdmin && !isPro}
+                                        aria-label='field'
+                                        id='field'
+                                        //size='lg'
+                                        placeholder="Intitulé de l'observation..."
+                                        value={formikHealth.values.field}
+                                        onChange={formikHealth.handleChange}
+                                        disabled={eventItem && !isAdmin && !isHealthRecordAuthor}
                                     />
                                 </InputGroup>
 							</div>
@@ -706,34 +844,118 @@ function HorsePage() {
                             {/* Message */}
                             <div className='col-12'>
                                 <Textarea
-                                    name="description"
-                                    value={eventItem?.message}
-                                    className='py-3 px-4'
-                                    style={{minHeight: '120px'}}
-                                    disabled={!isAdmin && !isPro}
+                                    id="message"
+                                    placeholder="Contenu de l'observation..."
+                                    value={formikHealth.values.message}
+                                    onChange={formikHealth.handleChange}
+                                    className='py-3 px-4 mb-2'
+                                    style={{minHeight: '150px'}}
+                                    disabled={eventItem && !isAdmin && !isHealthRecordAuthor}
                                 />
                             </div>
+
+                            {/* Date */}
+                            <div className="col-12">
+                                <InputGroup className='mb-2'>
+                                    <InputGroupText>
+                                        <Icon icon='AccessTime' />
+                                    </InputGroupText>
+                                    <Input
+                                        id='date'
+                                        type='date'
+                                        value={moment(formikHealth.values.date).format(moment.HTML5_FMT.DATE)}
+                                        onChange={formikHealth.handleChange}
+                                        disabled={eventItem && !isAdmin && !isHealthRecordAuthor}
+                                    />
+                                </InputGroup>
+                            </div>
+
+                            {/* Employee */}
+                            <div className="col-12">
+                                <InputGroup className='mb-2'>
+                                    <InputGroupText>
+                                        <Icon icon='PersonAdd' /> 
+                                    </InputGroupText>
+                                    <Select
+                                        id='employee.id'
+                                        placeholder='Écrit par...'
+                                        value={formikHealth.values?.employee?.id || auth.user.id}
+                                        onChange={formikHealth.handleChange}
+                                        ariaLabel='Employee select'
+                                        disabled={!isAdmin}
+                                    >
+                                        {employees.map( employee => (
+                                            <Option
+                                                key={employee.username}
+                                                value={employee.id}>
+                                                {`${employee.name} ${employee.surname}`}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </InputGroup>
+                            </div>
 			  
-                            {(isAdmin || isPro) && 
-                            <div className='d-flex justify-content-between py-3 mb-4'>
+                            <div className='d-flex align-items-center justify-content-between py-4 mb-4'>
+                                {/* Bouton 'Confirmer' : uniquement pour les nouvelles entrées (!eventItem),
+                                OU les entrées existantes si le user est Admin ou l'auteur de l'entrée  */}
+                                {(!eventItem || (isAdmin || isHealthRecordAuthor)) && 
                                 <div>
                                     <Button 
                                         color='info' 
                                         icon='Save'
                                         type='submit'
-                                        // disabled={
-                                        //     clientFormik.values.horses?.length === 0
-                                        //     || clientFormik.values.horses.some( horse => horse?.id === '' || !horse?.id) }
-                                        >
+                                        disabled={!formikHealth.values.message}
+                                    >
                                         Confirmer
                                     </Button>
-                                </div>
-                            </div>}
+                                </div>}
+
+                                {/* Bouton 'Supprimer' : uniquement pour les entrées existantes (eventItem),
+                                ET si le user est Admin ou l'auteur de l'entrée  */}
+                                {(eventItem && (isAdmin || isHealthRecordAuthor)) && 
+                                <div>
+                                    <Button 
+                                        color='danger' 
+                                        icon='Delete'
+                                        isOutline
+                                        onClick={ () => setTriggerModal(true)}
+                                    >
+                                        Supprimer
+                                    </Button>
+                                </div>}
+                            </div>
 						</div>
 					</OffCanvasBody>
 				</OffCanvas>
 
-
+                <Modal
+                    isOpen={triggerModal}
+                    setIsOpen={setTriggerModal}
+                    titleId='confirmationModal'
+                    isCentered isAnimation >
+                        <ModalHeader setIsOpen={setTriggerModal}>
+                            <ModalTitle id='confirmationModal'>Supprimer une observation</ModalTitle>
+                        </ModalHeader>
+                        <ModalBody className='text-center new-line'>{`Voulez-vous supprimer cette observation ?\nCette observation sera définitivement supprimée du carnet de santé.`}</ModalBody>
+                        <ModalFooter>
+                            <Button
+                                color='light'
+                                className='border-0'
+                                isOutline
+                                onClick={() => setTriggerModal(false)} >
+                                Annuler
+                            </Button>
+                            <Button 
+                                color='danger' 
+                                icon='Delete'
+                                onClick={ () => {
+                                    //handleDelete();
+                                    setTriggerModal(false);
+                                } }>
+                                Confirmer
+                            </Button>
+                        </ModalFooter>
+                </Modal>
 
 			</Page>
 		</PageWrapper>

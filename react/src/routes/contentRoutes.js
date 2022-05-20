@@ -252,8 +252,33 @@ const admin = [
 const professional = [
     {
 		path: professionalMenu.accounts.accounts.subMenu.horses.path,
-		element: <h1>COMPTES DES CHEVAUX</h1>,
+		element: <ACCOUNTS.HORSE_LIST />,
 		exact: true,
+	},
+    {
+        path: `${queryPages.horses.path}/:id`,
+        element: <ACCOUNTS.HORSE_PAGE />,
+        exact: true,
+    },
+    {
+        path: professionalMenu.accounts.accounts.subMenu.professionals.path,
+		element: <ACCOUNTS.EMPLOYEE_LIST />,
+		exact: true,
+    },
+    {
+        path: `${queryPages.professionals.path}/:id`,
+        element: <ACCOUNTS.EMPLOYEE_PAGE />,
+        exact: true,
+    },
+    {
+        path: professionalMenu.accounts.accounts.subMenu.clients.path,
+        element: <ACCOUNTS.USER_LIST />,
+		exact: true,
+    },
+    {
+        path: `${queryPages.users.path}/:id`,
+        element: <ACCOUNTS.USER_PAGE />,
+        exact: true,
     },
 ];
 
