@@ -4,7 +4,7 @@ const surfing = {
 	color: 'info',
 };
 const kiteSurfing = {
-	name: 'Kite Surfing',
+	name: 'Dressage',
 	icon: 'Kitesurfing',
 	color: 'danger',
 };
@@ -24,12 +24,12 @@ const handball = {
 	color: 'warning',
 };
 const iceSkating = {
-	name: 'Ice Skating',
+	name: "Saut d'obstacles",
 	icon: 'IceSkating',
 	color: 'info',
 };
 const snowboarding = {
-	name: 'Snowboarding',
+	name: 'Voltige',
 	icon: 'Snowboarding',
 	color: 'warning',
 };

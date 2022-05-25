@@ -207,6 +207,8 @@ const MyWeekEvent = (data) => {
 };
 
 const DashboardActivityPage = () => {
+
+
     
     // 🛠️ Hooks :
     const auth = useAuth(); // 🦸
@@ -215,11 +217,15 @@ const DashboardActivityPage = () => {
 
 	const [toggleRightPanel, setToggleRightPanel] = useState(true);
 
-    // Id du rôle 'Admin' :
+    // Id des rôles :
     const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; 
+    const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
+    const CLIENT_ID = process.env.REACT_APP_CLIENT_ID; // Id du rôle 'Client'
 
-    // Boolean isAdmin :
+    // Booleans :
     const isAdmin = Number(auth.user.role.id) === Number(ADMIN_ID);
+    const isPro = Number(auth.user.role.id) === Number(PRO_ID);
+    const isClient = Number(auth.user.role.id) === Number(CLIENT_ID);
 
     // 🐎 Fetch all horses :
     const { 
@@ -413,6 +419,8 @@ const DashboardActivityPage = () => {
 
 	// Selected Event
 	const [eventItem, setEventItem] = useState(null);
+    console.log(eventItem)
+
 	// Calendar View Mode
 	const [viewMode, setViewMode] = useState(Views.MONTH);
 	// Calendar Date
@@ -425,6 +433,10 @@ const DashboardActivityPage = () => {
     // Appointment edit panel status :
     const [toggleInfoAppointmentCanvas, setToggleInfoAppointmentCanvas] = useState(false);
 	const setInfoAppointment = () => setToggleInfoAppointmentCanvas(!toggleInfoAppointmentCanvas);
+
+    // Client panel :
+    const [toggleClientCanvas, setToggleClientCanvas] = useState(false);
+	const setInfoClient = () => setToggleClientCanvas(!toggleClientCanvas);
 
 	const [eventAdding, setEventAdding] = useState(false);
 
@@ -443,8 +455,10 @@ const DashboardActivityPage = () => {
 
 	// New Event
 	const handleSelect = ({ start, end }) => {
-		setEventAdding(true);
-		setEventItem({ start, end });
+        if(isAdmin || isPro) {
+            setEventAdding(true);
+        }
+        setEventItem({ start, end });
 	};
 
     const handleHorseListChange = (horse) => {
@@ -730,7 +744,7 @@ const DashboardActivityPage = () => {
         formikActivity.setValues({});
 
         // Je détruis l'event quand je ferme le panel de droite, pour que les nouveaux events générés après soient bien vides :
-        if(!toggleInfoActivityCanvas && !toggleInfoAppointmentCanvas)
+        if(!toggleInfoActivityCanvas && !toggleInfoAppointmentCanvas && !toggleClientCanvas)
             setEventItem(null)
 
 		if (eventItem) {
@@ -919,7 +933,10 @@ const DashboardActivityPage = () => {
 											defaultDate={new Date()}
 											onSelectEvent={(event) => {
 												setEventItem(event);
-												event.hasOwnProperty('confirmed') ? setInfoAppointment() : setInfoActivity();
+                                                if(isAdmin || isPro)
+												    event.hasOwnProperty('confirmed') ? setInfoAppointment() : setInfoActivity();
+                                                else
+                                                    setInfoClient();
 											}}
 											onSelectSlot={handleSelect}
 											onView={handleViewMode}
@@ -1480,6 +1497,91 @@ const DashboardActivityPage = () => {
                                 </div>
                                 }
                             </div>
+						</div>
+					</OffCanvasBody>
+				</OffCanvas>
+
+                {/* CLIENT : Visualiser un évènement */} 
+                <OffCanvas
+					setOpen={(status) => {
+						setToggleClientCanvas(status);
+					}}
+					isOpen={toggleClientCanvas}
+					titleId='canvas-title'>
+					<OffCanvasHeader
+						setOpen={(status) => {
+							setToggleClientCanvas(status);
+						}}
+						className='p-4'>
+						<OffCanvasTitle id='canvas-title' tag='h3'>
+							Détails de l'activité
+						</OffCanvasTitle>
+					</OffCanvasHeader>
+					<OffCanvasBody className='p-4'>
+
+                        <div className='d-flex justify-content-center mb-3'>
+                            <Avatar
+                                srcSet={eventItem?.employee?.data?.attributes?.avatar ? `${API_URL}${eventItem?.employee?.data?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
+                                src={eventItem?.employee?.data?.attributes?.avatar ? `${API_URL}${eventItem?.employee?.data?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
+                                color={eventItem?.employee?.data?.attributes?.color}
+                                shadow='default'
+                            />
+                        </div>
+                        <div className='d-flex flex-column align-items-center mb-5'>
+                            <div className='h2 fw-bold text-capitalize'>{`${eventItem?.employee?.data?.attributes?.name} ${eventItem?.employee?.data?.attributes?.surname}`}</div>
+                            <div className='h5 text-muted opacity-75 mb-4'>{eventItem?.employee?.data?.attributes?.occupation || 'Professionel(le)'}</div>
+                            <div className='h6 text-muted opacity-50'>{eventItem?.employee?.data?.attributes?.email}</div>
+                            <div className='h6 text-muted opacity-50'>{eventItem?.employee?.data?.attributes?.phone}</div>
+                        </div> 
+
+						<div className='row g-4'> 
+							{/* Name */}
+							<div className='col-12'>
+                                <InputGroup className='mb-2'>
+                                    <InputGroupText>
+                                        {eventItem?.icon ? <Icon icon={eventItem?.icon} size='2x' color='primary' /> : 'Intitulé' }
+                                    </InputGroupText>
+
+                                    <Input
+                                        aria-label='name'
+                                        size='lg'
+                                        value={eventItem?.name}
+                                        readOnly
+                                    />
+                                </InputGroup>
+							</div>
+
+                            {/* Description */}
+                            {eventItem?.description && 
+                            <div className='col-12'>
+                                <Textarea
+                                    value={eventItem?.description}
+                                    className='py-3 px-4'
+                                    readOnly
+                                />
+                            </div>}
+
+                            <InputGroup className='mb-2'>
+                                <InputGroupText>Début</InputGroupText>
+                                <Input
+                                    id='debut'
+                                    aria-label='début'
+                                    size='lg'
+                                    value={moment(eventItem?.start).format('ddd Do MMMM YYYY, à LT')}
+                                    readOnly
+                                />
+                            </InputGroup>
+
+                            <InputGroup className='mb-2'>
+                                <InputGroupText>Fin</InputGroupText>
+                                <Input
+                                    id='fin'
+                                    aria-label='fin'
+                                    size='lg'
+                                    value={moment(eventItem?.end).format('ddd Do MMMM YYYY, à LT')}
+                                    readOnly
+                                />
+                            </InputGroup>
 						</div>
 					</OffCanvasBody>
 				</OffCanvas>

@@ -6,7 +6,10 @@ import { Navigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 
 // Menu :
-import { dashboardMenu, loginPage } from '../../menu';
+import { landingPage, loginPage } from '../../menu';
+
+// Spinner :
+import Spinner from '../../components/bootstrap/Spinner';
 
 // 📚 Libraries :
 import PropTypes from 'prop-types';
@@ -26,12 +29,13 @@ const PageWrapper = forwardRef(({ title, description, className, isLoginPage, ch
 			.setAttribute('content', description || process.env.REACT_APP_META_DESC);
 	});
 
+    if(auth.user && isLoginPage) 
+        return <Navigate replace to={landingPage.landing.path} />
+
     if(!auth.user && !isLoginPage) 
         return <Navigate replace to={loginPage.login.path} />
     
-    if(auth.user && isLoginPage) 
-        return <Navigate replace to={dashboardMenu.dashboard.path} />
-    
+
 	return (
 		<div ref={ref} className={className === 'no-class' ? classNames('page-wrapper') : classNames('page-wrapper', 'container-fluid', className)}>
 			{children}

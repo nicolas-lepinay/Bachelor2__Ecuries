@@ -7,9 +7,11 @@ import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../../layout/SubHea
 import Icon from '../../../components/icon/Icon';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
+
+import SkeletonScreen from '../../../components/SkeletonScreeen';
+
 import Card, { CardBody } from '../../../components/bootstrap/Card';
 import Avatar, { AvatarGroup } from '../../../components/Avatar';
-import USERS from '../../../common/data/userDummyData';
 import Badge from '../../../components/bootstrap/Badge';
 import Button from '../../../components/bootstrap/Button';
 import Dropdown, {
@@ -96,6 +98,10 @@ function UserList() {
     useLayoutEffect(() => {
 		setRightPanel(false);
 	});
+
+    // Chargement :
+    if(loading)
+        return <SkeletonScreen />
 
     return (
         <PageWrapper title={adminMenu.accounts.accounts.subMenu.clients.text}>

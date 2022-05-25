@@ -1,5 +1,5 @@
 // 🌌 React :
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect, useMemo } from 'react'
 
 // 🗝️ Auth Context :
 import { AuthContext } from '../contexts/AuthContext';
@@ -13,9 +13,35 @@ function useProvideAuth() {
     const USERS_ROUTE = process.env.REACT_APP_USERS_ROUTE;
 
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("persevere_user")) || null);
+    //const [user, setUser] = useState(null);
+
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    /*
+    useEffect( () => {
+        setLoading(true)
+        const localData = JSON.parse(localStorage.getItem("persevere_user")); // { id: 3 }
+
+        const fetchUser = async () => {
+            if(localData?.id) {
+                try {
+                    const res = await axios.get(`${API_URL}${USERS_ROUTE}?filters[id]=${localData.id}`);
+                    setUser(res.data[0])
+                }
+                catch(err) {
+                    console.log("AUTH | SET USER | " + err)
+                    setError(err)
+                }
+                finally {
+                    setLoading(false)
+                }
+            }
+        }
+        fetchUser();
+    }, [])
+    */
 
     // LOGIN
     const login = async ({ identifier, password }) => {
@@ -30,6 +56,7 @@ function useProvideAuth() {
                 user = { ...user, ...fullUserData};
                 setUser(user);
                 localStorage.setItem("persevere_user", JSON.stringify(user)); // Send user to local storage
+                //localStorage.setItem("persevere_user", JSON.stringify({ id: user.id })); // Send user's id to local storage
                 console.log(`CONNEXION | Connexion réussie. Bienvenue, ${user?.name} ${user?.surname}.`);
             } else {
                 console.log("CONNEXION | Ce compte n'a pas encore été confirmé par un administrateur.");
@@ -62,19 +89,19 @@ function useProvideAuth() {
             // Set user to 'Unconfirmed' and update their role :
             await axios.put(`${API_URL}${USERS_ROUTE}/${data.user.id}`, { confirmed: false, role })
             console.log(`INSCRIPTION | Le compte de ${data.user.username} a bien été créé. Un administrateur doit confirmer son inscription.`)
-            setLoading(false)
             setSuccess({
                 action: 'register', 
                 message: 'Votre inscription a été prise en compte.\nVotre compte doit être validé par un administrateur.'
             })
         } catch(err) {
             console.log("INSCRIPTION | Une erreur est survenue lors de la tentative d'inscription. | " + err)
-            setLoading(false)
             setError({ 
                 status: err.response.status,
                 action: 'register',
                 message: `Oops ! Une erreur s'est produite pendant l'inscription (code ${err.response.status}).`,
             })
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -82,6 +109,7 @@ function useProvideAuth() {
     const logout = () => {
         setUser(null);
         localStorage.removeItem("persevere_user");
+        setLoading(false);
     }
 
     // UPDATE USER
@@ -93,20 +121,20 @@ function useProvideAuth() {
             const fullUserData = fullUser.data[0];
             setUser({ ...fullUserData});
             localStorage.setItem("persevere_user", JSON.stringify({ ...fullUserData}));
-            setLoading(false);
             setSuccess({
                 action: 'update', 
                 message: "L'utilisateur a été mis à jour.",
             })
             console.log("MISE A JOUR | L'utilisateur a été mis à jour.")
         } catch(err) {
-            setLoading(false)
             setError({ 
                 status: err.response.status,
                 action: 'update',
                 message: `Une erreur est survenue (code ${err.response.status}).`,
             })
             console.log("MISE A JOUR | Une erreur est survenue lors de la tentative de mise à jour de l'utilisateur. | " + err)
+        } finally {
+            setLoading(false);
         }
     }
 

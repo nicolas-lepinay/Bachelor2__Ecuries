@@ -295,7 +295,7 @@ const client = [
     },
     {
         path: clientMenu.accounts.accounts.subMenu.professionals.path,
-		element: <h1>PROFILS DES PROFESSIONNELS (Clients)</h1>,
+		element: <ACCOUNTS.EMPLOYEE_LIST />,
 		exact: true,
     },
     {
@@ -341,25 +341,7 @@ const auth = [
     }
 ];
 
-const queries = [
-    {
-        path: queryPages.horses.path,
-        element: <ACCOUNTS.HORSE_PAGE />,
-        exact: true,
-    },
-    {
-        path: queryPages.professionals.path,
-        element: <ACCOUNTS.EMPLOYEE_PAGE />,
-        exact: true,
-    },
-    {
-        path: queryPages.users.path,
-        element: <ACCOUNTS.USER_PAGE />,
-        exact: true,
-    },
-]
-
-const contents = { admin, professional, client, common, auth, queries };
+const contents = { admin, professional, client, common, auth };
 
 export default contents;
 

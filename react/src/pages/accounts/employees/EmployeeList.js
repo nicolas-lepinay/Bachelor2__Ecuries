@@ -7,6 +7,9 @@ import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../../layout/SubHea
 import Icon from '../../../components/icon/Icon';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
+
+import SkeletonScreen from '../../../components/SkeletonScreeen';
+
 import Card, { CardBody } from '../../../components/bootstrap/Card';
 import Avatar, { AvatarGroup } from '../../../components/Avatar';
 import USERS from '../../../common/data/userDummyData';
@@ -98,6 +101,10 @@ function EmployeeList() {
 		setRightPanel(false);
 	});
 
+    // Chargement :
+    if(loading)
+        return <SkeletonScreen />
+
     return (
         <PageWrapper title={adminMenu.accounts.accounts.subMenu.professionals.text}>
             <Page >
@@ -140,16 +147,7 @@ function EmployeeList() {
                                                                 <div className='fw-bold fs-5 me-2 font-family-playfair'>
                                                                     {`${user?.name} ${user?.surname}`}
                                                                 </div>
-                                                                {/* <small 
-                                                                    className={classNames(
-                                                                        `border-${user.confirmed ? 'success' : 'danger'}`,
-                                                                        `text-${user.confirmed ? 'success' : 'danger'}`,
-                                                                        'border border-2 fw-bold px-3 py-1 rounded-1 text-uppercase mx-2',                                                                        
-                                                                    )}>
-                                                                    {user.confirmed ? 'Confirmé' : 'En attente'}
-                                                                </small> */}
-
-                                                                <Dropdown>
+                                                                {(isAdmin || isPro) && <Dropdown>
                                                                     <DropdownToggle hasIcon={false}>
                                                                         {Number(user.role.id) === Number(ADMIN_ID) ?
                                                                         <Button 
@@ -198,7 +196,7 @@ function EmployeeList() {
                                                                             </div>
                                                                         </DropdownItem>
                                                                     </DropdownMenu>
-                                                                </Dropdown>
+                                                                </Dropdown>}
                                                             </div>
 
                                                             <div className='h5 text-muted opacity-75 mb-4'>

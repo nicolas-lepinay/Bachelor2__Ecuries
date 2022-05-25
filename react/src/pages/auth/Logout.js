@@ -1,9 +1,5 @@
 // 🌌 React :
-import { useState, useContext, useEffect } from "react";
-import {useNavigate} from 'react-router-dom';
-
-// 🦸 User Context :
-import { UserContext } from '../../contexts/UserContext';
+import { useEffect } from "react";
 
 // 🛠️ useAuth hook :
 import useAuth from '../../hooks/useAuth';
@@ -11,10 +7,8 @@ import useAuth from '../../hooks/useAuth';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 
 function Logout() {
-    // 🦸 User:
-    const { user, setUser } = useContext(UserContext);
+
     const auth = useAuth();
-    const navigate = useNavigate();
 
     // useEffect( () => {
     //     setUser(null);

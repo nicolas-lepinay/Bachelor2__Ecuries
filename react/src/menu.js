@@ -1172,6 +1172,6 @@ export const clientQueryPages = {
     professionals: {
         id: 'professionals-page-for-client',
         text: 'Professionnels',
-        path: professional_accounts.path,
+        path: professional_accounts_for_clients.path,
     },
 }

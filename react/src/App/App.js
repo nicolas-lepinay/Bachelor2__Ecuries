@@ -14,7 +14,7 @@ import Footer from '../layout/Footer/Footer';
 import Aside from '../layout/Aside/Aside';
 import Wrapper from '../layout/Wrapper/Wrapper';
 import Portal from '../layout/Portal/Portal';
-import { dashboardMenu, demoPages, layoutMenu } from '../menu';
+import { layoutMenu, loginPage } from '../menu';
 import { Toast, ToastContainer } from '../components/bootstrap/Toasts';
 import useDarkMode from '../hooks/useDarkMode';
 import COLORS from '../common/data/enumColors';
@@ -70,13 +70,13 @@ const App = () => {
 	});
 
 	//	Add paths to the array that you don't want to be "Aside".
-	const withOutAsidePages = [demoPages.login.path, demoPages.signUp.path, layoutMenu.blank.path];
+	const withOutAsidePages = [loginPage.login.path, layoutMenu.blank.path];
 
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem("persevere_user")) || null);
-    const currentUser = useMemo( () => ({user, setUser}), [user, setUser] );
+    // const [user, setUser] = useState(JSON.parse(localStorage.getItem("persevere_user")) || null);
+    // const currentUser = useMemo( () => ({user, setUser}), [user, setUser] );
 
 	return (
-        <UserContext.Provider value={currentUser}>
+        // <UserContext.Provider value={currentUser}>
             <ProvideAuth>
                 <ThemeProvider theme={theme}>
                     <ToastProvider components={{ ToastContainer, Toast }}>
@@ -94,15 +94,6 @@ const App = () => {
                                     overflow: fullScreenStatus && 'scroll',
                                 }}>
                                 <Routes>
-                                    {/* {withOutAsidePages.map((path) => (
-                                        <>
-                                            {!user && <Route key={path} path={path} />}
-                                            {user && <Route key={path} path={path} element={<Navigate replace to={dashboardMenu.dashboard.path} />} />}
-                                        </>
-                                    ))}
-                                    {!user && <Route path='*' element={<Navigate replace to={demoPages.login.path} />} />}
-                                    {user && <Route path='*' element={<Aside />} />} */}
-
                                     {withOutAsidePages.map((path) => (
                                         <Route key={path} path={path} />
                                     ))}
@@ -118,7 +109,7 @@ const App = () => {
                     </ToastProvider>
                 </ThemeProvider>
             </ProvideAuth>
-        </UserContext.Provider>
+        // </UserContext.Provider>
 	);
 };
 

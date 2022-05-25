@@ -603,13 +603,14 @@ const ProfilePage = () => {
 							</CardTabItem>
 						</Card>
 
-                        <Card>
+
+                        {isAdmin && <Card>
 							<CardHeader>
 								<CardLabel icon='ShowChart' iconColor='secondary'>
 									<CardTitle>Statistiques</CardTitle>
 								</CardLabel>
 								<CardActions>
-									Only in <strong>{moment().format('MMM')}</strong>.
+									Au mois de <strong>{moment().format('MMMM')}</strong>
 								</CardActions>
 							</CardHeader>
 							<CardBody>
@@ -631,8 +632,8 @@ const ProfilePage = () => {
 												/>
 											</div>
 											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-3 mb-0'>183K</div>
-												<div className='text-muted mt-n2'>Sales</div>
+												<div className='fw-bold fs-3 mb-0'>23K</div>
+												<div className='text-muted mt-n2'>de chiffre d'affaire</div>
 											</div>
 										</div>
 									</div>
@@ -649,8 +650,8 @@ const ProfilePage = () => {
 												<Icon icon='Person' size='3x' color='info' />
 											</div>
 											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-3 mb-0'>1247</div>
-												<div className='text-muted mt-n2'>Customers</div>
+												<div className='fw-bold fs-3 mb-0'>12</div>
+												<div className='text-muted mt-n2'>partenaires professionnels</div>
 											</div>
 										</div>
 									</div>
@@ -664,11 +665,11 @@ const ProfilePage = () => {
 												},
 											)}>
 											<div className='flex-shrink-0'>
-												<Icon icon='Inventory2' size='3x' color='primary' />
+												<Icon icon='Horse' size='3x' color='primary' />
 											</div>
 											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-3 mb-0'>500+</div>
-												<div className='text-muted mt-n2'>Products</div>
+												<div className='fw-bold fs-3 mb-0'>25</div>
+												<div className='text-muted mt-n2'>pensionnaires</div>
 											</div>
 										</div>
 									</div>
@@ -685,14 +686,14 @@ const ProfilePage = () => {
 												<Icon icon='Money' size='3x' color='success' />
 											</div>
 											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-3 mb-0'>112,458</div>
-												<div className='text-muted mt-n2'>Profits</div>
+												<div className='fw-bold fs-3 mb-0'>12K</div>
+												<div className='text-muted mt-n2'>de bénéfices</div>
 											</div>
 										</div>
 									</div>
 								</div>
 							</CardBody>
-						</Card>
+						</Card>}
 					</div>
 				</div>
 

@@ -475,8 +475,6 @@ const DashboardBookingPage = () => {
 		onSubmit: (values, { resetForm }) => {
             values.horses = registeredHorses; // !important
 
-            console.log(values)
-
             handleUpdate(values);
             
 			setToggleInfoEventCanvas(false);

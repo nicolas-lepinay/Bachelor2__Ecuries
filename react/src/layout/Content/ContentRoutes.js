@@ -26,9 +26,9 @@ const ContentRoutes = () => {
 
     useEffect(() => {
         if(user) {
-            isAdmin && setFilteredContents([ ...admin, ...common, ...auth, ...queries ]);
-            isPro && setFilteredContents([ ...professional, ...common, ...auth, ...queries ]);
-            isClient && setFilteredContents([ ...client, ...common, ...auth, ...queries ]);
+            isAdmin && setFilteredContents([ ...admin, ...common, ...auth ]);
+            isPro && setFilteredContents([ ...professional, ...common, ...auth ]);
+            isClient && setFilteredContents([ ...client, ...common, ...auth ]);
         } else {
             setFilteredContents([ ...auth])
         }
