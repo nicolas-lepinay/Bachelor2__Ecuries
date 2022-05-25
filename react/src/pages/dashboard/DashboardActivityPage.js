@@ -52,6 +52,7 @@ import Modal, {
 
 
 import CommonUpcomingEvents from '../common/CommonUpcomingEvents';
+import Alert from '../../components/bootstrap/Alert';
 import Avatar, { AvatarGroup } from '../../components/Avatar';
 import defaultAvatar from '../../assets/img/wanna/defaultAvatar.webp';
 import defaultHorseAvatar from '../../assets/img/horse-avatars/defaultHorseAvatar.webp';
@@ -227,11 +228,14 @@ const DashboardActivityPage = () => {
     const isPro = Number(auth.user.role.id) === Number(PRO_ID);
     const isClient = Number(auth.user.role.id) === Number(CLIENT_ID);
 
+    // Filter owner's horse(s) if user is not admin or pro :
+    const filters = (!isAdmin && !isPro) ? `&filters[owner][id]=${auth.user.id}` : ''
+
     // 🐎 Fetch all horses :
     const { 
         loading: horsesLoading,
         data: horses, 
-        setData: setHorses } = useFetchHorses();
+        setData: setHorses } = useFetchHorses({filters: filters});
 
     // 📅 Fetch all activities :
     const { 
@@ -482,7 +486,6 @@ const DashboardActivityPage = () => {
         horses.map( horse => list[horse.id] = false)
         setHorseList(list);
     }
-
 
 	useEffect(() => {
 		if (eventAdding) {
@@ -891,6 +894,18 @@ const DashboardActivityPage = () => {
                             {horsesLoading && (
                                 <CircularProgress color="info" size='46px' />
                             )}
+
+                            {horses.length < 1 &&
+                                <div className="col-md-6 col-12">
+                                    <Alert
+                                        color='warning'
+                                        isLight
+                                        icon='Info'
+                                    >
+                                    Vous n'avez aucun cheval enregistré.
+                                    </Alert>
+                                </div>
+                            }
 						</div>
                         
 						<div className='row h-100'>
@@ -1586,13 +1601,15 @@ const DashboardActivityPage = () => {
 					</OffCanvasBody>
 				</OffCanvas>
 
-				<CommonRightHorsePanel
+
+				{horses.length > 0 && 
+                <CommonRightHorsePanel
                     setOpen={setToggleRightPanel} 
                     isOpen={toggleRightPanel} 
                     horse={selectedHorse}
                     horses={horses}
                     events={events}
-                />
+                />}
 
                 <Modal
                     isOpen={triggerModal}

@@ -17,11 +17,11 @@ const useFetchHorses = ({
     const API_URL = process.env.REACT_APP_API_URL;
     const HORSES_ROUTE = process.env.REACT_APP_HORSES_ROUTE;
 
-    const query = `${HORSES_ROUTE}?populate=owner.avatar&populate=avatar&populate=health_record.employee.avatar&populate=appointments.employee.avatar&populate=activities${filters}`;
+    const query = `${HORSES_ROUTE}?populate=owner.avatar&populate=owner.role&populate=avatar&populate=health_record.employee.avatar&populate=appointments.employee.avatar&populate=activities${filters}`;
 
     const [data, setData] = useState([]);
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true); //!important
 
     useEffect( () => {
         const fetchData = async () => {

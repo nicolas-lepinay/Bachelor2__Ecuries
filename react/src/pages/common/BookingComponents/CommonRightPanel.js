@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -23,16 +24,30 @@ import Card, {
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import Icon from '../../../components/icon/Icon';
-import Chart from '../../../components/extras/Chart';
-import { sales } from '../../../common/data/chartDummyData';
-import SERVICES from '../../../common/data/serviceDummyData';
+
+import { queryPages, clientQueryPages } from '../../../menu';
+
+import useAuth from '../../../hooks/useAuth';
 import useDarkMode from '../../../hooks/useDarkMode';
-import { irBlack } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
 const CommonRightPanel = ({ setOpen, isOpen, employee, employees, appointments }) => {
 
+    const navigate = useNavigate();
+
     // ⚙️ Strapi's API URL :
     const API_URL = process.env.REACT_APP_API_URL;
+
+    // ⚙️ Role IDs
+    const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; // Id du rôle 'Admin'
+    const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
+    const CLIENT_ID = process.env.REACT_APP_CLIENT_ID; // Id du rôle 'Client'
+
+    // 🦸 User:
+    const auth = useAuth();
+
+    const isAdmin = auth.user && Number(auth.user.role.id) === Number(ADMIN_ID);
+    const isPro = auth.user && Number(auth.user.role.id) === Number(PRO_ID);
+    const isClient = auth.user && Number(auth.user.role.id) === Number(CLIENT_ID);
 
     const now = new Date();
 
@@ -100,12 +115,18 @@ const CommonRightPanel = ({ setOpen, isOpen, employee, employees, appointments }
 					</div>
 				</div>
 				<div className='d-flex justify-content-center mb-3'>
-					<Avatar
-						srcSet={employee?.avatar ? `${API_URL}${employee?.avatar?.url}` : `${defaultAvatar}`}
-                        src={employee?.avatar ? `${API_URL}${employee?.avatar?.url}` : `${defaultAvatar}`}
-						color={employee?.color}
-						shadow='default'
-					/>
+					<Link
+                        to={isAdmin || isPro ? `/${queryPages.professionals.path}/${employee.id}` : `/${clientQueryPages.professionals.path}/${employee.id}`}
+                        style={{cursor: 'pointer'}}
+                    >
+                        <Avatar
+                            srcSet={employee?.avatar ? `${API_URL}${employee?.avatar?.url}` : `${defaultAvatar}`}
+                                                src={employee?.avatar ? `${API_URL}${employee?.avatar?.url}` : `${defaultAvatar}`}
+                            color={employee?.color}
+                            shadow='default'
+                                                //onClick={() => navigate('')}
+                        />
+                    </Link>
 				</div>
 				<div className='d-flex flex-column align-items-center mb-5'>
 					{/* <div className='h2 fw-bold'>{`${USERS.JOHN.name} ${USERS.JOHN.surname}`}</div> */}

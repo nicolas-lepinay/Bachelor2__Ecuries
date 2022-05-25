@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect, useContext } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
@@ -11,6 +11,8 @@ import useFetchHorses from '../../../hooks/useFetchHorses';
 import useFetchEmployees from '../../../hooks/useFetchEmployees';
 import useSortableData from '../../../hooks/useSortableData';
 import useDarkMode from '../../../hooks/useDarkMode';
+
+import ThemeContext from '../../../contexts/themeContext';
 
 import Spinner from '../../../components/bootstrap/Spinner';
 
@@ -97,6 +99,8 @@ function HorsePage() {
     const isAdmin = auth.user && Number(auth.user.role.id) === Number(ADMIN_ID);
     const isPro = auth.user && Number(auth.user.role.id) === Number(PRO_ID);
     const isClient = auth.user && Number(auth.user.role.id) === Number(CLIENT_ID);
+
+    const { setRightPanel } = useContext(ThemeContext);
 
     // 🌈 Liste des couleurs :
     const colorList = [
@@ -239,6 +243,10 @@ function HorsePage() {
         }
     }
 
+    useLayoutEffect(() => {
+		setRightPanel(false);
+	});
+
     useEffect(() => {
         if(!toggleHealthInfoCanvas) {
             formikHealth.setValues({});
@@ -299,7 +307,7 @@ function HorsePage() {
                     <div className="col-xl-9">
                         <div className='pt-3 pb-5 d-flex align-items-center'>
                             <span className='display-4 fw-bold me-3 text-capitalize font-family-playfair'>{horse.name}</span>
-                            <span className={`border border-${horse.color} border-2 text-${horse.color} fw-bold px-3 py-2 rounded`}>
+                            <span className={`border border-${horse.color} border-2 text-${horse.color} fw-bold px-3 py-2 mx-3 rounded`}>
                                 {horse.breed || 'Un noble cheval'}
                             </span>
                         </div>
@@ -350,6 +358,23 @@ function HorsePage() {
 									</div>
 									<div className='col-12'>
 										<div className='row g-2'>
+                                            {horse?.sex &&
+                                            <div className='col-12'>
+												<div className='d-flex align-items-end mb-2'>
+													<div className='flex-shrink-0'>
+														<Icon icon={horse.sex === 'male' ? 'Male' : 'Female'} size='2x' color='info' />
+													</div>
+													<div className='flex-grow-1 ms-3'>
+														<div className='text-muted'>
+															Sexe
+														</div>
+														<div className='fs-5 mb-0 text-capitalize'>
+                                                            {horse.sex === 'male' ? 'Mâle' : 'Femelle'}
+														</div>
+													</div>
+												</div>
+											</div>}
+
                                             <div className='col-12'>
 												<div className='d-flex align-items-end mb-2'>
 													<div className='flex-shrink-0'>
@@ -360,7 +385,7 @@ function HorsePage() {
 															Propriétaire
 														</div>
 														<div className='fw-bold fs-5 mb-0 text-capitalize font-family-playfair'>
-															{horse.owner.data.attributes.name} {horse.owner.data.attributes.surname}
+															{horse?.owner?.data?.attributes.name} {horse?.owner?.data?.attributes.surname}
 														</div>
 													</div>
 												</div>
@@ -392,7 +417,7 @@ function HorsePage() {
 															Téléphone
 														</div>
 														<div className='fw-bold fs-5 mb-0'>
-                                                            {horse.owner.data.attributes.phone || 'Non-renseigné'}  
+                                                            {horse.owner.data.attributes.phone || <i>Non-communiqué</i>}  
 														</div>
 													</div>
 												</div>

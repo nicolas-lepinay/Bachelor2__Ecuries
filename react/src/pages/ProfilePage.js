@@ -1,4 +1,4 @@
-import React, { useContext, useLayoutEffect } from 'react';
+import { useState, useContext, useLayoutEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import moment from 'moment';
@@ -29,6 +29,13 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownToggle,
 } from '../components/bootstrap/Dropdown';
+
+import Modal, {
+    ModalBody,
+    ModalFooter,
+    ModalHeader,
+    ModalTitle } from '../components/bootstrap/Modal'
+
 import Popovers from '../components/bootstrap/Popovers';
 import FormGroup from '../components/bootstrap/forms/FormGroup';
 import Input from '../components/bootstrap/forms/Input';
@@ -71,6 +78,8 @@ const ProfilePage = () => {
         { value: 'light', description: 'Blanc'},
         { value: 'dark', description: 'Noir'},
     ];
+
+    const [triggerNewHorseModal, setTriggerNewHorseModal] = useState(false);
 
     // 🐎 Fetch user's horse(s) :
     const { 
@@ -465,6 +474,15 @@ const ProfilePage = () => {
 									Vous retrouverez ici la liste de vos chevaux.
 								</Alert>
 
+                                <Button
+                                    color='info'
+                                    className='my-4'
+                                    icon='Add'
+                                    onClick={() => setTriggerNewHorseModal(true)}
+                                >
+                                    Ajouter
+                                </Button>
+
                                 <div className='row row-cols-xxl-2 row-cols-lg-1'>
                                     {horses.map((horse) => (
                                         <Link 
@@ -697,25 +715,35 @@ const ProfilePage = () => {
 					</div>
 				</div>
 
-				{/* <Modal setIsOpen={setSelectedImage} isOpen={!!selectedImage} isCentered>
-					<ModalHeader setIsOpen={setSelectedImage}>
-						<ModalTitle id='preview'>Preview</ModalTitle>
-					</ModalHeader>
-					<ModalBody>
-						<img src={selectedImage} alt='eneme' />
-					</ModalBody>
-				</Modal> */}
+                <Modal
+                    isOpen={triggerNewHorseModal}
+                    setIsOpen={setTriggerNewHorseModal}
+                    titleId='confirmationModal'
+                    fullScreen={true} >
+                        <ModalHeader setIsOpen={setTriggerNewHorseModal} className='px-5' >
+                            <ModalTitle id='confirmationModal'>Ajouter un nouveau cheval</ModalTitle>
+                        </ModalHeader>
+                        <ModalBody className='px-5 text-center new-line'>
+                            
+                            
+                        </ModalBody>
+                        <ModalFooter className='px-5'>
+                            <Button
+                                color='light'
+                                className='border-0'
+                                isOutline
+                                onClick={() => setTriggerNewHorseModal(false)} >
+                                Annuler
+                            </Button>
+                            <Button 
+                                color='info' 
+                                icon='Save'
+                            >
+                                Confirmer
+                            </Button>
+                        </ModalFooter>
+                </Modal>
 
-				{/* <Modal
-					setIsOpen={setGallerySeeAll}
-					isOpen={gallerySeeAll}
-					fullScreen
-					titleId='gallery-full'>
-					<ModalHeader setIsOpen={setGallerySeeAll}>
-						<ModalTitle id='gallery-full'>Gallery</ModalTitle>
-					</ModalHeader>
-					<ModalBody>{_gallery}</ModalBody>
-				</Modal> */}
 			</Page>
 		</PageWrapper>
 	);

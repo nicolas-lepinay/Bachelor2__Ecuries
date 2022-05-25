@@ -1,4 +1,4 @@
-import React, { useState, useContext, useLayoutEffect } from 'react';
+import React, { useState, useContext, useEffect, useLayoutEffect } from 'react';
 import { useNavigate, Link  } from 'react-router-dom';
 import classNames from 'classnames';
 import { useFormik } from 'formik';
@@ -22,10 +22,12 @@ import Dropdown, {
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import showNotification from '../../../components/extras/showNotification';
 
+import Alert from '../../../components/bootstrap/Alert';
 import Label from '../../../components/bootstrap/forms/Label';
 import Input from '../../../components/bootstrap/forms/Input';
 import Checks, { ChecksGroup } from '../../../components/bootstrap/forms/Checks';
 import SERVICES from '../../../common/data/serviceDummyData';
+
 import { adminMenu, queryPages, clientQueryPages } from '../../../menu';
 
 // 🛠️ Hooks :
@@ -59,14 +61,28 @@ function HorseList() {
     const isPro = auth.user && Number(auth.user.role.id) === Number(PRO_ID);
     const isClient = auth.user && Number(auth.user.role.id) === Number(CLIENT_ID);
 
+    // Filter owner's horse(s) if user is not admin or pro :
+    const filters = (!isAdmin && !isPro) ? `&filters[owner][id]=${auth.user.id}` : ''
+
     // Fetch clients :
     const { 
         data: horses, 
         setData: setHorses, 
         loading,
-        error } = useFetchHorses();
+        error } = useFetchHorses({filters: filters});
 
     const { setRightPanel } = useContext(ThemeContext);
+
+    const navigateToOwnerProfile = (ownerId) => {
+        let collection = 'users'
+
+        if(Number(ownerId) === Number(PRO_ID) || Number(ownerId) === Number(ADMIN_ID))
+            collection = 'professionals'
+
+        if(isAdmin || isPro) {
+            navigate(`/${queryPages[collection].path}/${ownerId}`)
+        }
+    }
 
     useLayoutEffect(() => {
 		setRightPanel(false);
@@ -75,6 +91,21 @@ function HorseList() {
     // Chargement :
     if(loading)
         return <SkeletonScreen />
+
+    if(horses.length < 1)
+        return(
+            <PageWrapper title={adminMenu.accounts.accounts.subMenu.clients.text}>
+                <Page>
+                <Alert
+                    color='warning'
+                    isLight
+                    icon='Info'
+                >
+                    Vous n'avez aucun cheval enregistré.
+                </Alert>
+                </Page>
+            </PageWrapper>
+        )
 
     return (
         <PageWrapper title={adminMenu.accounts.accounts.subMenu.clients.text}>
@@ -114,25 +145,30 @@ function HorseList() {
                                                 <div className='w-100'>
                                                     <div className='row'>
                                                         <div className='col'>
-                                                            <div className='d-flex align-items-md-center align-items-start mb-3'>
+                                                            <div className='d-flex align-items-center align-items-start mb-3'>
                                                                 <div className='fw-bold fs-5 me-2 font-family-playfair'>
                                                                     {user?.name}
                                                                 </div>
-                                                                {/* <small 
+                                                                <small 
                                                                     className={classNames(
-                                                                        `border-${user.confirmed ? 'success' : 'danger'}`,
-                                                                        `text-${user.confirmed ? 'success' : 'danger'}`,
+                                                                        `border-${user?.color || 'info'}`,
+                                                                        `text-${user?.color || 'info'}`,
                                                                         'border border-2 fw-bold px-3 py-1 rounded-1 text-uppercase mx-2',                                                                        
                                                                     )}>
-                                                                    {user.confirmed ? 'Confirmé' : 'En attente'}
-                                                                </small> */}
+                                                                    {user.breed || 'Un noble cheval'}
+                                                                </small>
+                                                            </div>
+
+                                                            <div className='h5 text-muted opacity-75 font-family-playfair'>
+                                                               {`${user.owner.data.attributes.name} ${user.owner.data.attributes.surname}`}
                                                             </div>
 
                                                             <div className='h6 text-muted opacity-75'>
-                                                                {user?.email}
+                                                                <b>Email : </b> {user.owner.data.attributes.email}
                                                             </div>
+
                                                             <div className='h6 text-muted opacity-75'>
-                                                                {user?.phone}
+                                                                <b>Téléphone : </b> {user.owner.data.attributes.phone || <i>non-communiqué</i>}
                                                             </div>
                                                         </div>
                                                         <div className='col-auto'>
@@ -141,8 +177,11 @@ function HorseList() {
                                                                 src={user.owner?.data.attributes?.avatar?.data ? `${API_URL}${user.owner?.data?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
                                                                 userName={`${user.owner.data.attributes.name} ${user.owner.data.attributes.surname}`}
                                                                 color={user.owner.data.attributes.color}
-                                                                size={32}
-                                                                onClick={() => isAdmin || isPro ? navigate(`/${queryPages.users.path}/${user.owner?.data?.id}`) : {} }
+                                                                size={40}
+                                                                role={isAdmin || isPro ? 'button' : ''} // role = 'button' <==> cursor: pointer
+                                                                onClick={ () => {
+                                                                    navigateToOwnerProfile(user?.owner?.data?.attributes?.role?.data?.id); // owner's id
+                                                                }}
                                                             />
                                                         </div>
                                                     </div>

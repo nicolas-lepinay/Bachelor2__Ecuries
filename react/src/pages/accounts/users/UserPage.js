@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext, useLayoutEffect } from 'react';
 import { useParams, Navigate, useNavigate, Link } from 'react-router-dom';
 import moment from 'moment';
 import 'moment/locale/fr';
@@ -13,6 +13,8 @@ import useAuth from '../../../hooks/useAuth';
 import useFetchClients from '../../../hooks/useFetchClients';
 import useSortableData from '../../../hooks/useSortableData';
 import useDarkMode from '../../../hooks/useDarkMode';
+
+import ThemeContext from '../../../contexts/themeContext';
 
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Page from '../../../layout/Page/Page';
@@ -79,6 +81,8 @@ function UserPage() {
     const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; // Id du rôle 'Admin'
     const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
     const CLIENT_ID = process.env.REACT_APP_CLIENT_ID; // Id du rôle 'Client'
+
+    const { setRightPanel } = useContext(ThemeContext);
 
     // 🦸 User:
     const auth = useAuth();
@@ -173,6 +177,10 @@ function UserPage() {
 			);
         }
     }
+
+    useLayoutEffect(() => {
+		setRightPanel(false);
+	});
 
     useEffect(() => {
         if(user) {
@@ -343,7 +351,7 @@ function UserPage() {
                                                             </Link>
                                                         ))}
                                                         {user?.horses.length < 1 &&
-                                                        <div className='fw-bold fs-5 mb-0'>
+                                                        <div className='fs-5 mb-0'>
                                                             <i>Aucun cheval enregistré.</i>
                                                         </div>
                                                         }
@@ -670,9 +678,13 @@ function UserPage() {
 
 							</CardTabItem>
 
-							<CardTabItem id='password' title='Mot de passe' icon='Lock'>
-							
-							</CardTabItem>
+                            
+                            {isAdmin ?
+                            <CardTabItem id='password' title='Mot de passe' icon='Lock'></CardTabItem>
+                            :
+                            <CardTabItem></CardTabItem>
+                            }
+
 						</Card>
                     </div>
                 </div>

@@ -285,7 +285,7 @@ const professional = [
 const client = [
     {
         path: clientMenu.accounts.accounts.subMenu.horses.path,
-		element: <h1>PROFILS DE MES CHEVAUX</h1>,
+		element: <ACCOUNTS.HORSE_LIST />,
 		exact: true,
     },
     {
