@@ -38,7 +38,7 @@ WizardItem.defaultProps = {
 	title: null,
 };
 
-const Wizard = ({ children, onSubmit, isHeader, color, stretch, ...props }) => {
+const Wizard = ({ children, onSubmit, isHeader, color, stretch, disabled, ...props }) => {
 	const { themeStatus } = useDarkMode();
 	const [activeItemIndex, setActiveItemIndex] = useState(0);
 
@@ -50,7 +50,7 @@ const Wizard = ({ children, onSubmit, isHeader, color, stretch, ...props }) => {
 
 	const prevBtn = !!activeItemIndex && (
 		<Button color={color} isLink onClick={() => setActiveItemIndex(activeItemIndex - 1)}>
-			Previous
+			Précédent
 		</Button>
 	);
 
@@ -61,15 +61,16 @@ const Wizard = ({ children, onSubmit, isHeader, color, stretch, ...props }) => {
 				aria-hidden={childCount === activeItemIndex + 1}
 				color={color}
 				isLight
+                disabled={disabled}
 				onClick={() => setActiveItemIndex(activeItemIndex + 1)}>
-				Next
+				Suivant
 			</Button>
 			<Button
 				className={classNames({ 'd-none': childCount !== activeItemIndex + 1 })}
 				aria-hidden={childCount !== activeItemIndex + 1}
 				type='submit'
 				color={color}>
-				Submit
+				Confirmer
 			</Button>
 		</>
 	);
@@ -132,7 +133,9 @@ const Wizard = ({ children, onSubmit, isHeader, color, stretch, ...props }) => {
 								style={{
 									left: `${(100 / (childCount - 1)) * index}%`,
 								}}
-								onClick={() => setActiveItemIndex(index)}>
+								onClick={() => setActiveItemIndex(index)}
+                                disabled={disabled}
+                                >
 								{index + 1}
 							</button>
 						</Popovers>

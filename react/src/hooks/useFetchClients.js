@@ -26,7 +26,7 @@ const useFetchClients = ({
             setLoading(true);
             try {
                 const res = await axios.get(`${API_URL}${query}`);
-                isUnique ? setData(res.data[0]) : setData(res.data);
+                isUnique ? setData(res.data[0]) : setData(res.data.sort((a, b) => a.username.localeCompare(b.username))); // Tri par ordre alphabétique en fonction du username
             } catch(err) {
                 setError(err)
                 console.log('USE FETCH CLIENTS | ' + query + ' | ' + err)

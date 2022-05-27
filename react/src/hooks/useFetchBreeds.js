@@ -3,20 +3,16 @@ import { useEffect, useState } from 'react';
 // 🅰️ Axios :
 import axios from 'axios';
 
-const useFetchEmployees = ({
+const useFetchBreeds = ({
     filters = '',
     isUnique = false,
     } = {}) => {
 
     // ⚙️ Strapi's URL :
     const API_URL = process.env.REACT_APP_API_URL;
-    const USERS_ROUTE = process.env.REACT_APP_USERS_ROUTE;
+    const BREEDS_ROUTE = process.env.REACT_APP_BREEDS_ROUTE;
 
-    // ⚙️ PRO ID and ADMIN ID :
-    const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
-    const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; // Id du rôle 'Admin'
-
-    const query = `${USERS_ROUTE}?populate=*&filters[role][id]=${PRO_ID}&filters[role][id]=${ADMIN_ID}${filters}`;
+    const query = `${BREEDS_ROUTE}?populate=*${filters}`;
 
     const [data, setData] = useState([]);
     const [error, setError] = useState(null);
@@ -27,10 +23,22 @@ const useFetchEmployees = ({
             setLoading(true);
             try {
                 const res = await axios.get(`${API_URL}${query}`);
-                isUnique ? setData(res.data[0]) : setData(res.data.sort((a, b) => a.username.localeCompare(b.username))); // Tri alphabétique en fonction du username
+                const resData = res.data.data;
+
+                const formattedData = [];
+
+                // Reformat object to simply its structure:
+                resData.map( item => {
+                formattedData.push({ 
+                    id: item.id, 
+                    ...item.attributes
+                    });
+                });
+                
+                isUnique ? setData(formattedData[0]) : setData(formattedData.sort((a, b) => a.name.localeCompare(b.name))); // Tri par ordre alphabétique en fonction du nom
             } catch(err) {
                 setError(err)
-                console.log('USE FETCH EMPLOYEES | ' + query + ' | ' + err)
+                console.log('USE FETCH BREEDS | ' + query + ' | ' + err)
             } finally {
                 setLoading(false);
             }
@@ -46,4 +54,4 @@ const useFetchEmployees = ({
     }
 }
 
-export default useFetchEmployees;
+export default useFetchBreeds;

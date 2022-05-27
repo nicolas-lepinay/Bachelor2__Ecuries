@@ -91,3 +91,8 @@ export const debounce = (func, wait = 1000) => {
 		timeout = setTimeout(later, wait);
 	};
 };
+
+
+export const capitalize = (text) => {
+    return text.split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()).join(' ');
+}

@@ -40,10 +40,10 @@ import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Input from '../../components/bootstrap/forms/Input';
 import Checks, { ChecksGroup } from '../../components/bootstrap/forms/Checks';
 import Select from '../../components/bootstrap/forms/Select';
+import Option from '../../components/bootstrap/Option';
 import Textarea from '../../components/bootstrap/forms/Textarea';
 import InputGroup, { InputGroupText } from '../../components/bootstrap/forms/InputGroup';
 import Popovers from '../../components/bootstrap/Popovers';
-import Option from '../../components/bootstrap/Option';
 
 import Modal, {
     ModalBody,

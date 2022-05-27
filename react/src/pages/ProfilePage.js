@@ -46,7 +46,7 @@ import showNotification from '../components/extras/showNotification';
 import Avatar from '../components/Avatar';
 import defaultAvatar from '../assets/img/wanna/defaultAvatar.webp';
 import defaultHorseAvatar from '../assets/img/horse-avatars/defaultHorseAvatar.webp';
-
+import CommonHorseCreation from './common/CommonHorseCreation';
 import { profilePage, queryPages, clientQueryPages } from '../menu';
 import useDarkMode from '../hooks/useDarkMode';
 
@@ -719,27 +719,22 @@ const ProfilePage = () => {
                     isOpen={triggerNewHorseModal}
                     setIsOpen={setTriggerNewHorseModal}
                     titleId='confirmationModal'
-                    fullScreen={true} >
-                        <ModalHeader setIsOpen={setTriggerNewHorseModal} className='px-5' >
+                    fullScreen
+                    isScrollable
+                    >
+                        <ModalHeader setIsOpen={setTriggerNewHorseModal} className='p-5' >
                             <ModalTitle id='confirmationModal'>Ajouter un nouveau cheval</ModalTitle>
                         </ModalHeader>
                         <ModalBody className='px-5 text-center new-line'>
-                            
-                            
+                            <CommonHorseCreation />
                         </ModalBody>
                         <ModalFooter className='px-5'>
                             <Button
                                 color='light'
-                                className='border-0'
+                                className='border-0 mx-3'
                                 isOutline
                                 onClick={() => setTriggerNewHorseModal(false)} >
                                 Annuler
-                            </Button>
-                            <Button 
-                                color='info' 
-                                icon='Save'
-                            >
-                                Confirmer
                             </Button>
                         </ModalFooter>
                 </Modal>

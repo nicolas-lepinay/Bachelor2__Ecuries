@@ -186,7 +186,7 @@ $border-radius-child: #{$card-border-radius - $card-border-width};
 	background-color: var(--#{$variable-prefix}card-footer-bg);
 	color: $card-footer-color;
 
-	@include media-breakpoint-down(md) {
+	@include media-breakpoint-down(sm) {
 		flex-direction: column;
 		align-items: baseline;
 

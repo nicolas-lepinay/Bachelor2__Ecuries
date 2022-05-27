@@ -38,7 +38,7 @@ const useFetchHorses = ({
                         ...item.attributes
                     });
                 });
-                isUnique ? setData(formattedData[0]) : setData(formattedData);
+                isUnique ? setData(formattedData[0]) : setData(formattedData.sort((a, b) => a.name.localeCompare(b.name))); // Tri alphabétique en fonction du nom
             } catch(err) {
                 setError(err)
                 console.log('USE FETCH HORSES | ' + query + ' | ' + err)
