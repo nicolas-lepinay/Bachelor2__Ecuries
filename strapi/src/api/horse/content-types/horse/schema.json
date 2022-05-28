@@ -39,7 +39,8 @@
       "inversedBy": "horses"
     },
     "color": {
-      "type": "string"
+      "type": "string",
+      "default": "info"
     },
     "breed": {
       "type": "string"

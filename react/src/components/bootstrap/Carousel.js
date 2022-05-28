@@ -29,28 +29,49 @@ const Carousel = forwardRef(
 			rounded,
 			isFluid,
 			height,
+            width,
+            customActiveIndex,
+            setCustomActiveIndex,
 		},
 		ref,
 	) => {
 		const _items = items || children;
+
 		const [activeIndex, setActiveIndex] = useState(activeItemIndex);
+        
 		const [animating, setAnimating] = useState(false);
 
 		const next = () => {
 			if (animating) return;
-			const nextIndex = activeIndex === _items.length - 1 ? 0 : activeIndex + 1;
-			setActiveIndex(nextIndex);
+
+            // const nextIndex = activeIndex === _items.length - 1 ? 0 :  activeIndex + 1;
+
+            let nextIndex = 0;
+            if(customActiveIndex !== null)
+			    nextIndex = customActiveIndex === _items.length - 1 ? 0 : customActiveIndex + 1;
+             else
+			    nextIndex = activeIndex === _items.length - 1 ? 0 :  activeIndex + 1;
+
+			(customActiveIndex !== null && setCustomActiveIndex !== null) ? setCustomActiveIndex(nextIndex) : setActiveIndex(nextIndex);
 		};
 
 		const previous = () => {
 			if (animating) return;
-			const nextIndex = activeIndex === 0 ? _items.length - 1 : activeIndex - 1;
-			setActiveIndex(nextIndex);
+			
+            //const nextIndex = activeIndex === 0 ? _items.length - 1 : activeIndex - 1;
+
+            let nextIndex = 0;
+            if(customActiveIndex !== null)
+                nextIndex = customActiveIndex === 0 ? _items.length - 1 : customActiveIndex - 1;
+            else
+                nextIndex = activeIndex === 0 ? _items.length - 1 : activeIndex - 1;
+
+			(customActiveIndex !== null && setCustomActiveIndex !== null) ? setCustomActiveIndex(nextIndex) : setActiveIndex(nextIndex);
 		};
 
 		const goToIndex = (newIndex) => {
 			if (animating) return;
-			setActiveIndex(newIndex);
+			(customActiveIndex !== null && setCustomActiveIndex !== null) ? setCustomActiveIndex(newIndex) : setActiveIndex(newIndex);
 		};
 
 		const getSlideContent = (_item) => {
@@ -88,7 +109,7 @@ const Carousel = forwardRef(
 			<CarouselContainer
 				ref={ref}
 				id={id}
-				activeIndex={activeIndex}
+				activeIndex={customActiveIndex || activeIndex}
 				next={next}
 				previous={previous}
 				keyboard={isKeyboardControl}
@@ -103,6 +124,7 @@ const Carousel = forwardRef(
 				isFluid={isFluid}
 				hasChildren={!!children}
 				height={height}
+                width={width}
 				enableTouch={isEnableTouch}
 				fade={isFade}
 				rounded={rounded}>
@@ -201,6 +223,7 @@ Carousel.propTypes = {
 	rounded: PropTypes.oneOf([0, 1, 2, 3]),
 	isFluid: PropTypes.bool,
 	height: PropTypes.number,
+    width: PropTypes.number,
 };
 Carousel.defaultProps = {
 	id: null,
@@ -223,6 +246,7 @@ Carousel.defaultProps = {
 	rounded: null,
 	isFluid: false,
 	height: null,
+    width: null,
 };
 
 export default Carousel;

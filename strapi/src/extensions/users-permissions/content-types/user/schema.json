@@ -96,7 +96,7 @@
     },
     "color": {
       "type": "string",
-      "default": "info"
+      "default": "primary"
     },
     "horses": {
       "type": "relation",

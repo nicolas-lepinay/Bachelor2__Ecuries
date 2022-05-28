@@ -112,6 +112,23 @@ const ProfilePage = () => {
 		},
 	});
 
+    const formikColor = useFormik({
+		initialValues: {
+            color: auth.user?.color,
+		},
+		onSubmit: (values) => {
+            // Update user :
+            auth.updateUser(values);
+
+            // Success or error message :
+            showNotification(
+                'Mise à jour.', // title
+				auth.error ? auth.error.message : 'La couleur du profil a été mise à jour.', // message
+                auth.error ? 'danger' : 'success' // type
+			);
+		},
+	});
+
     const formikAddress = useFormik({
 		initialValues: {
             id: auth.user?.address?.id,
@@ -204,7 +221,7 @@ const ProfilePage = () => {
 												<Avatar
 													srcSet={auth.user?.avatar ? `${API_URL}${auth.user?.avatar?.url}` : `${defaultAvatar}`}
 													src={auth.user?.avatar ? `${API_URL}${auth.user?.avatar?.url}` : `${defaultAvatar}`}
-                                                    color={auth.user?.color}
+                                                    color={formikColor.values.color}
 													className='rounded-circle'
                                                     size={200}
 												/>
@@ -268,27 +285,38 @@ const ProfilePage = () => {
                                     {auth.user.biography || 'Dites-en nous plus à votre sujet.'}
                                 </p>
                                 <div className='col-auto pt-3'>
-                                    <Dropdown>
-                                        <DropdownToggle hasIcon={false}>
-                                            <Button color='dark' isLink isActive icon='MoreHoriz'></Button>
-                                        </DropdownToggle>
-                                        <DropdownMenu>
-                                        <DropdownItem isHeader>Couleur du profil</DropdownItem>
-                                        {colorList.map(
-                                            (color) => (
-                                                <DropdownItem key={color.value}>
-                                                    <div>
-                                                        <Icon
-                                                            icon='Circle'
-                                                            color={color.value}
-                                                        />
-                                                        {color.description}
-                                                    </div>
-                                                </DropdownItem>
-                                            )
-                                        )}
-                                        </DropdownMenu>
-                                    </Dropdown>
+                                    <FormGroup id='color'>
+                                        <Dropdown>
+                                            <DropdownToggle hasIcon={false}>
+                                                <Button color='dark' isLink isActive icon='MoreHoriz'></Button>
+                                            </DropdownToggle>
+                                            <DropdownMenu>
+                                                <DropdownItem isHeader>Couleur du profil</DropdownItem>
+                                                {colorList.map(
+                                                    (color) => (
+                                                        <DropdownItem key={color.value} onClick={() => formikColor.setFieldValue('color', color.value)}>
+                                                            <div>
+                                                                <Icon
+                                                                    icon='Circle'
+                                                                    color={color.value}
+                                                                />
+                                                                {color.description}
+                                                            </div>
+                                                        </DropdownItem>
+                                                    )
+                                                )}
+                                                <Button 
+                                                    onClick={formikColor.handleSubmit} 
+                                                    color='info' 
+                                                    isLink isOutline 
+                                                    icon='Save' 
+                                                    className='mx-3 my-3'
+                                                >
+                                                    Appliquer
+                                                </Button>
+                                            </DropdownMenu>
+                                        </Dropdown>
+                                    </FormGroup>
 								</div>
 							</CardBody>
 						</Card>
@@ -312,7 +340,6 @@ const ProfilePage = () => {
 									</CardHeader>
 									<CardBody>
 										<div className='row g-4'>
-
 											<FormGroup
 												className='col-md-3'
 												id='name'

@@ -184,7 +184,7 @@ class CarouselContainer extends React.Component {
 	}
 
 	render() {
-		const { id, slide, className, dark, fade, rounded, isFluid, hasChildren, height } =
+		const { id, slide, className, dark, fade, rounded, isFluid, hasChildren, height, width } =
 			this.props;
 		const outerClasses = classNames(className, 'carousel', {
 			'carousel-fade': fade,
@@ -210,7 +210,7 @@ class CarouselContainer extends React.Component {
 		if (slidesOnly) {
 			return (
 				<div
-					style={{ height }}
+					style={{ height, width }}
 					className={outerClasses}
 					onMouseEnter={this.hoverStart}
 					onMouseLeave={this.hoverEnd}>
@@ -227,7 +227,7 @@ class CarouselContainer extends React.Component {
 
 			return (
 				<div
-					style={{ height }}
+					style={{ height, width }}
 					className={outerClasses}
 					onMouseEnter={this.hoverStart}
 					onMouseLeave={this.hoverEnd}>
@@ -258,7 +258,7 @@ class CarouselContainer extends React.Component {
 				ref={this.props.innerRef}
 				id={id}
 				className={outerClasses}
-				style={{ height }}
+				style={{ height, width }}
 				// eslint-disable-next-line react/destructuring-assignment
 				data-bs-ride={this.props.ride === 'carousel' ? 'carousel' : null}
 				// eslint-disable-next-line react/destructuring-assignment
@@ -303,6 +303,7 @@ CarouselContainer.propTypes = {
 	isFluid: PropTypes.bool,
 	hasChildren: PropTypes.bool,
 	height: PropTypes.number,
+    width: PropTypes.number,
 };
 CarouselContainer.defaultProps = {
 	interval: 5000,
@@ -321,6 +322,7 @@ CarouselContainer.defaultProps = {
 	isFluid: false,
 	hasChildren: false,
 	height: null,
+    width: null,
 };
 CarouselContainer.childContextTypes = {
 	direction: PropTypes.string,

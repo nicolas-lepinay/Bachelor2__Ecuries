@@ -26,6 +26,11 @@ input:-webkit-autofill:focus {
     -webkit-text-fill-color: rgb(0, 0, 0)!important;
 }
 
+.mx-2-5 {
+    margin-left: $spacer * 0.75;
+    margin-right: $spacer * 0.75;
+}
+
 .mr-1 {
     margin-right: $spacer * 0.25;
 }
@@ -34,13 +39,28 @@ input:-webkit-autofill:focus {
     margin-right: $spacer * 0.5;
 }
 
-.mx-2-5 {
-    margin-left: $spacer * 0.75;
-    margin-right: $spacer * 0.75;
-}
-
 .mr-3 {
     margin-right: $spacer * 1;
+}
+
+.ml-1 {
+    margin-left: $spacer * 0.25;
+}
+
+.ml-2 {
+    margin-left: $spacer * 0.5;
+}
+
+.ml-3 {
+    margin-left: $spacer * 1;
+}
+
+.ml-4 {
+    margin-left: $spacer * 1.25;
+}
+
+.ml-5 {
+    margin-left: $spacer * 1.5;
 }
 
 .flex-gap-1 {

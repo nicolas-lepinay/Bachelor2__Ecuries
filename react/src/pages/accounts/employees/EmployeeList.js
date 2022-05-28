@@ -147,7 +147,8 @@ function EmployeeList() {
                                                                 <div className='fw-bold fs-5 me-2 font-family-playfair'>
                                                                     {`${user?.name} ${user?.surname}`}
                                                                 </div>
-                                                                {(isAdmin || isPro) && <Dropdown>
+                                                                {(isAdmin || isPro) && 
+                                                                <Dropdown>
                                                                     <DropdownToggle hasIcon={false}>
                                                                         {Number(user.role.id) === Number(ADMIN_ID) ?
                                                                         <Button 

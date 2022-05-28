@@ -12,6 +12,8 @@ import { capitalize } from '../../helpers/helpers';
 import useAuth from '../../hooks/useAuth';
 import useFetchClients from '../../hooks/useFetchClients';
 import useFetchBreeds from '../../hooks/useFetchBreeds';
+import useFetchHorseAvatars from '../../hooks/useFetchHorseAvatars';
+import useDarkMode from '../../hooks/useDarkMode';
 
 import Button from '../../components/bootstrap/Button';
 import Page from '../../layout/Page/Page';
@@ -43,12 +45,18 @@ import InputGroup, { InputGroupText } from '../../components/bootstrap/forms/Inp
 import Icon from '../../components/icon/Icon';
 import Alert from '../../components/bootstrap/Alert';
 import showNotification from '../../components/extras/showNotification';
+import Carousel from '../../components/bootstrap/Carousel';
+import CarouselSlide from '../../components/bootstrap/CarouselSlide';
+import CarouselCaption from '../../components/bootstrap/CarouselCaption';
+
 import Avatar from '../../components/Avatar';
 import defaultAvatar from '../../assets/img/wanna/defaultAvatar.webp';
 import defaultHorseAvatar from '../../assets/img/horse-avatars/defaultHorseAvatar.webp';
 
 
 const CommonHorseCreation = ({ isAdmin }) => {
+
+    const { darkModeStatus } = useDarkMode();
 
     // ⚙️ Strapi's API URL
     const API_URL = process.env.REACT_APP_API_URL;
@@ -66,6 +74,24 @@ const CommonHorseCreation = ({ isAdmin }) => {
         data: breeds, 
         setData: setBreeds } = useFetchBreeds();
 
+    // 🐴 Fetch horse avatars :
+    const { 
+        data: horseAvatars, 
+        setData: setHorseAvatars } = useFetchHorseAvatars();
+
+    const [carouselIndex, setCarouselIndex] = useState(0);
+
+    const colorList = [
+        { value: 'info', description: 'Bleu'},
+        { value: 'primary', description: 'Violet'},
+        { value: 'secondary', description: 'Rose'},
+        { value: 'success', description: 'Vert'},
+        { value: 'warning', description: 'Jaune'},
+        { value: 'danger', description: 'Rouge'},
+        { value: 'light', description: 'Blanc'},
+        { value: 'dark', description: 'Noir'},
+    ];
+
     const formik = useFormik({
 		initialValues: {
 			name: ``,
@@ -76,6 +102,7 @@ const CommonHorseCreation = ({ isAdmin }) => {
             image: {
                 id: '',
             },
+            color: 'info',
             breedId: '',
 		},
 		onSubmit: (values) => {
@@ -319,6 +346,90 @@ const CommonHorseCreation = ({ isAdmin }) => {
                     <div className='h1 mx-auto my-5 pt-5'>
                         Choisir un avatar pour <span className='font-family-playfair fw-bold'>{formik.values.name}</span>
                     </div>
+
+                    <div className='position-relative mx-auto' style={{margin: '60px 0', width: '250px'}} >
+
+                        {/* SLIDER DES AVATARS */}
+                        <Carousel
+                            isKeyboardControl
+                            isEnableTouch
+                            isIndicators={false}
+                            interval={false}
+                            rounded={0}
+                            height={250}
+                            width={250}
+                            isDark={!darkModeStatus}
+                            customActiveIndex={carouselIndex}
+                            setCustomActiveIndex={setCarouselIndex}
+                            className={classNames(
+                                `bg-l${darkModeStatus ? 'o' : ''}25-${formik.values.color}`,
+                            )}
+                        >
+                            {horseAvatars.map(image => (
+                                <CarouselSlide
+                                    background={`${API_URL}${image?.attributes?.url}`}>
+                                </CarouselSlide>
+                            ))}
+                        </Carousel>
+
+                        {/* BOUTON DE NAVIGATION DU SLIDER */}
+                        <div className='position-absolute top-0 end-0' style={{marginRight: '-50px', marginTop: '-15px'}}>
+                            <Dropdown>
+                                <DropdownToggle hasIcon={false}>
+                                    <Button 
+                                        color='light' 
+                                        size='sm' 
+                                    >
+                                        {`${carouselIndex < 9 ? '0' : ''}${carouselIndex + 1} / ${horseAvatars.length}`}
+                                    </Button>
+                                </DropdownToggle>
+                                <DropdownMenu>
+                                <DropdownItem isHeader>Aller à...</DropdownItem>
+                                    <DropdownItem>
+                                        <Input
+                                            placeholder='Numéro...'
+                                            type='Number'
+                                            min={1}
+                                            max={horseAvatars.length}
+                                            size='sm'
+                                            onChange={(e) => (e.target.value >= 1 && e.target.value < horseAvatars.length + 1) && setCarouselIndex(e.target.value - 1)}
+                                            defaultValue={carouselIndex + 1}
+                                        />
+                                    </DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
+                        </div>
+
+                        {/* BOUTON DE CHOIX DE LA COULEUR */}
+                        <div className='position-absolute bottom-0 start-0' style={{marginBottom: '-13px'}}>
+                            <FormGroup 
+                                id='color'
+                            >
+                                <Dropdown>
+                                    <DropdownToggle hasIcon={false}>
+                                        <Button color={formik.values.color} icon='Palette' size='sm'>Couleur</Button>
+                                    </DropdownToggle>
+                                    <DropdownMenu>
+                                    <DropdownItem isHeader>Couleur du profil</DropdownItem>
+                                    {colorList.map(
+                                        (color) => (
+                                            <DropdownItem key={color.value} onClick={() => formik.setFieldValue('color', color.value)}>
+                                                <div>
+                                                    <Icon
+                                                        icon='Circle'
+                                                        color={color.value}
+                                                    />
+                                                    {color.description}
+                                                </div>
+                                            </DropdownItem>
+                                        )
+                                    )}
+                                    </DropdownMenu>
+                                </Dropdown>
+                            </FormGroup>
+                        </div>
+                    </div>
+                        
                 </div>
             </WizardItem>
 
