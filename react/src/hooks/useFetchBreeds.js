@@ -38,7 +38,7 @@ const useFetchBreeds = ({
                 isUnique ? setData(formattedData[0]) : setData(formattedData.sort((a, b) => a.name.localeCompare(b.name))); // Tri par ordre alphabétique en fonction du nom
             } catch(err) {
                 setError(err)
-                console.log('USE FETCH BREEDS | ' + query + ' | ' + err)
+                console.log('USE FETCH BREEDS | ' + err)
             } finally {
                 setLoading(false);
             }

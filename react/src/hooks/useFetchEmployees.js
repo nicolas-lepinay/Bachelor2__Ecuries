@@ -30,7 +30,7 @@ const useFetchEmployees = ({
                 isUnique ? setData(res.data[0]) : setData(res.data.sort((a, b) => a.username.localeCompare(b.username))); // Tri alphabétique en fonction du username
             } catch(err) {
                 setError(err)
-                console.log('USE FETCH EMPLOYEES | ' + query + ' | ' + err)
+                console.log('USE FETCH EMPLOYEES | ' + err)
             } finally {
                 setLoading(false);
             }

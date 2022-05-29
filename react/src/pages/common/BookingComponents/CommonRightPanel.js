@@ -114,25 +114,27 @@ const CommonRightPanel = ({ setOpen, isOpen, employee, employees, appointments }
                         </Button>
 					</div>
 				</div>
-				<div className='d-flex justify-content-center mb-3'>
 					<Link
                         to={isAdmin || isPro ? `/${queryPages.professionals.path}/${employee.id}` : `/${clientQueryPages.professionals.path}/${employee.id}`}
-                        style={{cursor: 'pointer'}}
+                        className='text-decoration-none'
+                        style={{color: 'inherit', cursor: 'pointer'}}
                     >
-                        <Avatar
-                            srcSet={employee?.avatar ? `${API_URL}${employee?.avatar?.url}` : `${defaultAvatar}`}
-                                                src={employee?.avatar ? `${API_URL}${employee?.avatar?.url}` : `${defaultAvatar}`}
-                            color={employee?.color}
-                            shadow='default'
-                                                //onClick={() => navigate('')}
-                        />
+                        <div className='d-flex justify-content-center mb-3'>
+                            <Avatar
+                                srcSet={employee?.avatar ? `${API_URL}${employee?.avatar?.url}` : `${defaultAvatar}`}
+                                src={employee?.avatar ? `${API_URL}${employee?.avatar?.url}` : `${defaultAvatar}`}
+                                color={employee?.color}
+                                shadow='default'
+                            />
+                        </div>
+
+                        <div className='d-flex flex-column align-items-center mb-5'>
+                            <div className='h2 fw-bold text-capitalize link-hover'>{`${employee?.name} ${employee?.surname}`}</div>
+                            <div className='h5 text-muted opacity-50 mb-4'>{employee?.occupation || 'Professionel(le)'}</div>
+                            <div className='h6 text-muted opacity-50'>{employee?.email}</div>
+                            <div className='h6 text-muted opacity-50'>{employee?.phone}</div>
+                        </div>
                     </Link>
-				</div>
-				<div className='d-flex flex-column align-items-center mb-5'>
-					{/* <div className='h2 fw-bold'>{`${USERS.JOHN.name} ${USERS.JOHN.surname}`}</div> */}
-                    <div className='h2 fw-bold text-capitalize'>{`${employee?.name} ${employee?.surname}`}</div>
-					<div className='h5 text-muted opacity-50'>{employee?.occupation || 'Professionel(le)'}</div>
-				</div>
 				<div
 					className={classNames('rounded-3', {
 						'shadow-3d-dark': !darkModeStatus,

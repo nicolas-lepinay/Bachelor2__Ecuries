@@ -58,6 +58,16 @@
     },
     "sex": {
       "type": "string"
+    },
+    "age": {
+      "type": "integer"
+    },
+    "image": {
+      "allowedTypes": [
+        "images"
+      ],
+      "type": "media",
+      "multiple": false
     }
   }
 }

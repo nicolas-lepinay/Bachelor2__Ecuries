@@ -1173,7 +1173,8 @@ const DashboardActivityPage = () => {
 												{horses.filter( horse => !selectedHorses.some(h => h.id == horse.id)).map( horse => (
                                                     <Option
                                                         key={horse.name}
-                                                        value={`${horse.id};${horse.name}`}>
+                                                        value={`${horse.id};${horse.name}`}
+                                                    >
                                                         {horse.name}
                                                     </Option>
 												))

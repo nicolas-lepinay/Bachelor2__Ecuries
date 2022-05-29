@@ -57,7 +57,7 @@ function UserList() {
     const isPro = auth.user && Number(auth.user.role.id) === Number(PRO_ID);
     const isClient = auth.user && Number(auth.user.role.id) === Number(CLIENT_ID);
 
-    // Fetch clients :
+    // 🧑‍🤝‍🧑 Fetch clients :
     const { 
         data: clients, 
         setData: setClients, 
@@ -193,10 +193,10 @@ function UserList() {
                                                             </div>
 
                                                             <div className='h6 text-muted opacity-75'>
-                                                                {user?.email}
+                                                                <b>Email : </b>{user?.email}
                                                             </div>
                                                             <div className='h6 text-muted opacity-75'>
-                                                                {user?.phone}
+                                                                <b>Téléphone : </b>{user?.phone || <i>non-communiqué</i>}
                                                             </div>
                                                         </div>
                                                         <div className='col-auto'>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useLayoutEffect, useContext } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { Link, useParams, Navigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
 import moment from 'moment';
@@ -18,11 +18,7 @@ import Spinner from '../../../components/bootstrap/Spinner';
 
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Page from '../../../layout/Page/Page';
-import SubHeader, {
-	SubHeaderLeft,
-	SubHeaderRight,
-	SubheaderSeparator,
-} from '../../../layout/SubHeader/SubHeader';
+
 import Card, {
 	CardActions,
 	CardBody,
@@ -32,12 +28,9 @@ import Card, {
 } from '../../../components/bootstrap/Card';
 
 import Alert from '../../../components/bootstrap/Alert';
-import Label from '../../../components/bootstrap/forms/Label';
 import Button from '../../../components/bootstrap/Button';
-import Accordion, { AccordionItem } from '../../../components/bootstrap/Accordion';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
-import Checks, { ChecksGroup } from '../../../components/bootstrap/forms/Checks';
 import Select from '../../../components/bootstrap/forms/Select';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import InputGroup, { InputGroupText } from '../../../components/bootstrap/forms/InputGroup';
@@ -54,8 +47,8 @@ import defaultHorseAvatar from '../../../assets/img/horse-avatars/defaultHorseAv
 import defaultAvatar from '../../../assets/img/wanna/defaultAvatar.webp';
 
 import Icon from '../../../components/icon/Icon';
-import { demoPages } from '../../../menu';
-import Badge from '../../../components/bootstrap/Badge';
+import { queryPages } from '../../../menu';
+
 import Dropdown, {
 	DropdownItem,
 	DropdownMenu,
@@ -356,8 +349,26 @@ function HorsePage() {
                                             size={160}
 										/>
 									</div>
+
 									<div className='col-12'>
 										<div className='row g-2'>
+                                            {horse?.breed &&
+                                            <div className='col-12'>
+                                                <div className='d-flex align-items-end mb-2'>
+                                                    <div className='flex-shrink-0'>
+                                                        <Icon icon='HorseVariant' size='2x' color='info' />
+                                                    </div>
+                                                    <div className='flex-grow-1 ms-3'>
+                                                        <div className='text-muted'>
+                                                            Race
+                                                        </div>
+                                                        <div className='fs-5 mb-0 text-capitalize'>
+                                                            {horse.breed}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>}
+
                                             {horse?.sex &&
                                             <div className='col-12'>
 												<div className='d-flex align-items-end mb-2'>
@@ -375,6 +386,23 @@ function HorsePage() {
 												</div>
 											</div>}
 
+                                            {horse?.age != null &&
+                                            <div className='col-12'>
+												<div className='d-flex align-items-end mb-2'>
+													<div className='flex-shrink-0'>
+														<Icon icon='Today' size='2x' color='info' />
+													</div>
+													<div className='flex-grow-1 ms-3'>
+														<div className='text-muted'>
+															Âge
+														</div>
+														<div className='fs-5 mb-0'>
+                                                            {horse.age === 0 ? "Moins d'un an" : `${horse.age} ans`}
+														</div>
+													</div>
+												</div>
+											</div>}
+
                                             <div className='col-12'>
 												<div className='d-flex align-items-end mb-2'>
 													<div className='flex-shrink-0'>
@@ -384,9 +412,16 @@ function HorsePage() {
 														<div className='text-muted'>
 															Propriétaire
 														</div>
-														<div className='fw-bold fs-5 mb-0 text-capitalize font-family-playfair'>
-															{horse?.owner?.data?.attributes.name} {horse?.owner?.data?.attributes.surname}
-														</div>
+
+                                                        <Link 
+                                                            to={`/${queryPages.users.path}/${horse?.owner?.data?.id}`}
+                                                            className='text-decoration-none' 
+                                                            style={(isAdmin || isPro) ? {color: 'inherit', cursor: 'pointer'} : {color: 'inherit', pointerEvents: 'none'}}
+                                                        >
+                                                            <div className='fw-bold fs-5 mb-0 text-capitalize font-family-playfair link-hover'>
+                                                                {horse?.owner?.data?.attributes.name} {horse?.owner?.data?.attributes.surname}
+                                                            </div>
+                                                        </Link>
 													</div>
 												</div>
 											</div>
@@ -401,23 +436,13 @@ function HorsePage() {
 															Adresse e-mail
 														</div>
 														<div className='fw-bold fs-5 mb-0'>
-                                                            {horse.owner.data.attributes.email || 'Non-renseigné'}
-														</div>
-													</div>
-												</div>
-											</div>
-
-											<div className='col-12'>
-												<div className='d-flex align-items-end mb-2'>
-													<div className='flex-shrink-0'>
-														<Icon icon='PhoneIphone' size='2x' color='info' />
-													</div>
-													<div className='flex-grow-1 ms-3'>
-														<div className='text-muted'>
-															Téléphone
-														</div>
-														<div className='fw-bold fs-5 mb-0'>
-                                                            {horse.owner.data.attributes.phone || <i>Non-communiqué</i>}  
+                                                            <a 
+                                                                href={`mailto:${horse.owner.data.attributes.email}`}
+                                                                className='text-decoration-none'
+                                                                style={{color: 'inherit'}}
+                                                            >
+                                                                {horse.owner.data.attributes.email}
+                                                            </a>
 														</div>
 													</div>
 												</div>
@@ -429,47 +454,19 @@ function HorsePage() {
 							</CardBody>
 						</Card>
 
+                        {horse?.image?.data &&
                         <Card>
 							<CardHeader>
 								<CardLabel icon='AutoAwesome' iconColor='warning'>
-									<CardTitle>Apprentissage</CardTitle>
+									<CardTitle>Robe</CardTitle>
 								</CardLabel>
 							</CardHeader>
-							<CardBody>
-								{data.services ? (
-									<div className='row g-2'>
-										{data?.services.map((service) => (
-											<div key={service.name} className='col-auto'>
-												<Badge
-													isLight
-													color={service.color}
-													className='px-3 py-2'>
-													<Icon
-														icon={service.icon}
-														size='lg'
-														className='me-1'
-													/>
-													{service.name}
-												</Badge>
-											</div>
-										))}
-									</div>
-								) : (
-									<div className='row'>
-										<div className='col'>
-											<Alert
-												color='warning'
-												isLight
-												icon='Report'
-												className='mb-0'>
-												No results to show
-											</Alert>
-										</div>
-									</div>
-								)}
+							<CardBody className='mx-auto'>
+								<img 
+                                    src={`${API_URL}${horse.image?.data?.attributes?.url}`}
+                                />
 							</CardBody>
-						</Card>
-
+						</Card>}
 					</div>
 
 					<div className='col-xl-7'>
@@ -671,7 +668,6 @@ function HorsePage() {
                                                 </td>
 
                                                 <td>
-                                                    {/* {item.attributes.employee.data.attributes.username} */}
                                                     <div className='d-flex'>
                                                         <div className='flex-shrink-0'>
                                                             <Avatar

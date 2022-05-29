@@ -369,7 +369,13 @@ function UserPage() {
                                                             Adresse e-mail
                                                         </div>
                                                         <div className='fw-bold fs-5 mb-0'>
-                                                            {user?.email || 'Non-renseigné'}
+                                                            <a 
+                                                                href={`mailto:${user?.email}`}
+                                                                className='text-decoration-none'
+                                                                style={{color: 'inherit'}}
+                                                            >
+                                                                {user?.email}
+                                                            </a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -653,9 +659,23 @@ function UserPage() {
                                                                                     </small>
                                                                                     }
                                                                                 </div>
-                                                                                <div className='h6 text-muted opacity-50 mt-2'>
-                                                                                    {user.name} {user.surname}
+                                                                                {horse?.sex &&
+                                                                                <div className='d-flex align-items-center mt-3'>
+                                                                                    <Icon icon={horse.sex === 'male' ? 'Male' : 'Female'} size='lg' color={darkModeStatus ? 'light' : 'dark'} className='opacity-25 mr-2 mb-1' />
+                                                                                    <div className='h6 text-muted opacity-50'>
+                                                                                        {horse.sex === 'male' ? 'Mâle' : 'Femelle'}
+                                                                                    </div>
                                                                                 </div>
+                                                                                }
+
+                                                                                {horse?.age != null &&
+                                                                                <div className='d-flex align-items-center mt-2'>
+                                                                                    <Icon icon='Today' size='lg' color={darkModeStatus ? 'light' : 'dark'} className='opacity-25 mr-2 mb-1' />
+                                                                                    <div className='h6 text-muted opacity-50'>
+                                                                                        {horse.age === 0 ? "Moins d'un an" : `${horse.age} ans`}
+                                                                                    </div>
+                                                                                </div>
+                                                                                }
                                                                             </div>
                                                                         </div>
                                                                         

@@ -40,7 +40,7 @@ const useFetchActivities = () => {
                 setData(formattedData);
             } catch(err) {
                 setError(err)
-                console.log('USE FETCH ACTIVITIES | ' + query + ' | ' + err)
+                console.log('USE FETCH ACTIVITIES | ' + err)
             } finally {
                 setLoading(false);
             }

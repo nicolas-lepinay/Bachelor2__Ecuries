@@ -10,6 +10,7 @@ import ThemeContext from '../contexts/themeContext';
 // 🛠️ Hooks :
 import useAuth from '../hooks/useAuth';
 import useFetchHorses from '../hooks/useFetchHorses';
+import useDarkMode from '../hooks/useDarkMode';
 
 import Button from '../components/bootstrap/Button';
 import Page from '../layout/Page/Page';
@@ -47,11 +48,10 @@ import Avatar from '../components/Avatar';
 import defaultAvatar from '../assets/img/wanna/defaultAvatar.webp';
 import defaultHorseAvatar from '../assets/img/horse-avatars/defaultHorseAvatar.webp';
 import CommonHorseCreation from './common/CommonHorseCreation';
-import { profilePage, queryPages, clientQueryPages } from '../menu';
-import useDarkMode from '../hooks/useDarkMode';
+import { profilePage, queryPages, clientQueryPages, loginPage } from '../menu';
+import Textarea from '../components/bootstrap/forms/Textarea';
 
 const ProfilePage = () => {
-	const { darkModeStatus } = useDarkMode();
 
     // ⚙️ Strapi's API URL :
     const API_URL = process.env.REACT_APP_API_URL;
@@ -90,9 +90,10 @@ const ProfilePage = () => {
 		initialValues: {
 			name: auth.user.name,
 			surname: auth.user.surname,
-			occupation: auth.user.occupation,
+			occupation: auth.user?.occupation,
 			email: auth.user.email,
-			phone: auth.user.phone,
+			phone: auth.user?.phone,
+            biography: auth.user?.biography,
 		},
 		onSubmit: (values) => {
             // Delete empty fields :
@@ -202,6 +203,8 @@ const ProfilePage = () => {
     const [ref, { height }] = useMeasure();
 
     const { setRightPanel } = useContext(ThemeContext);
+
+    const { darkModeStatus } = useDarkMode();
 
     useLayoutEffect(() => {
 		setRightPanel(false);
@@ -411,6 +414,18 @@ const ProfilePage = () => {
 													value={formikProfile.values.phone}
 												/>
 											</FormGroup>
+
+                                            <FormGroup
+												className='col-12'
+												id='biography'
+												label='Biographie'>
+												<Textarea
+													placeholder='Dites-en nous plus à votre sujet...'
+                                                    style={{minHeight: '120px'}}
+                                                    onChange={formikProfile.handleChange}
+													value={formikProfile.values.biography}
+												/>
+											</FormGroup>
 										</div>
 									</CardBody>
 									<CardFooter>
@@ -548,16 +563,32 @@ const ProfilePage = () => {
                                                                         <div className='row'>
                                                                             <div className='col'>
                                                                                 <div className='d-flex align-items-center'>
-                                                                                    <div className='fw-bold fs-5 me-2 font-family-playfair'>
+                                                                                    <div className='fw-bold fs-5 me-3 font-family-playfair'>
                                                                                         {horse.name}
                                                                                     </div>
+                                                                                    {horse?.breed &&
                                                                                     <small className={`border border-${horse?.color} border-2 text-${horse?.color} fw-bold px-2 py-1 rounded-1`}>
-                                                                                        {horse.breed || 'Un noble cheval'}
-                                                                                    </small>
+                                                                                        {horse?.breed}
+                                                                                    </small>}
                                                                                 </div>
-                                                                                <div className='h6 text-muted opacity-50 mt-2'>
-                                                                                    {horse.owner.data.attributes.name} {horse.owner.data.attributes.surname}
+
+                                                                                {horse?.sex &&
+                                                                                <div className='d-flex align-items-center mt-3'>
+                                                                                    <Icon icon={horse.sex === 'male' ? 'Male' : 'Female'} size='lg' color={darkModeStatus ? 'light' : 'dark'} className='opacity-25 mr-2 mb-1' />
+                                                                                    <div className='h6 text-muted opacity-50'>
+                                                                                        {horse.sex === 'male' ? 'Mâle' : 'Femelle'}
+                                                                                    </div>
                                                                                 </div>
+                                                                                }
+
+                                                                                {horse?.age != null &&
+                                                                                <div className='d-flex align-items-center mt-2'>
+                                                                                    <Icon icon='Today' size='lg' color={darkModeStatus ? 'light' : 'dark'} className='opacity-25 mr-2 mb-1' />
+                                                                                    <div className='h6 text-muted opacity-50'>
+                                                                                        {horse.age === 0 ? "Moins d'un an" : `${horse.age} ans`}
+                                                                                    </div>
+                                                                                </div>
+                                                                                }
                                                                             </div>
                                                                         </div>
                                                                         
@@ -577,7 +608,23 @@ const ProfilePage = () => {
                                     Vous n'avez aucun cheval enregistré.
                                 </Alert>
                                 }
+							</CardTabItem>
 
+                            <CardTabItem id='invoices' title='Factures' icon='StickyNote2'>
+								<Card
+									className='rounded-2'
+									tag='form'
+									//</CardTabItem>onSubmit={formikPassword.handleSubmit}
+                                >
+									<CardHeader>
+										<CardLabel icon='StickyNote2'>
+											<CardTitle>Mes factures</CardTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody>
+										
+									</CardBody>
+								</Card>
 							</CardTabItem>
 
 							<CardTabItem id='password' title='Mot de passe' icon='Lock'>
@@ -753,7 +800,10 @@ const ProfilePage = () => {
                             <ModalTitle id='confirmationModal'>Ajouter un nouveau cheval</ModalTitle>
                         </ModalHeader>
                         <ModalBody className='px-5 text-center new-line'>
-                            <CommonHorseCreation />
+                            <CommonHorseCreation 
+                                setIsOpen={setTriggerNewHorseModal} 
+                                setHorses={setHorses}
+                            />
                         </ModalBody>
                         <ModalFooter className='px-5'>
                             <Button

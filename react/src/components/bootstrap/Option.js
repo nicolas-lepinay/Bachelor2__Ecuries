@@ -22,12 +22,13 @@ Options.defaultProps = {
 	list: null,
 };
 
-const Option = ({ children, value, disabled, ariaLabelledby, ...props }) => {
+const Option = ({ children, value, disabled, ariaLabelledby, selected, ...props }) => {
 	return (
 		<option
 			value={value}
 			disabled={disabled}
 			aria-labelledby={ariaLabelledby || children}
+            selected={selected}
 			// eslint-disable-next-line react/jsx-props-no-spreading
 			{...props}>
 			{children}
@@ -39,11 +40,13 @@ Option.propTypes = {
 	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 	disabled: PropTypes.bool,
 	ariaLabelledby: PropTypes.string,
+    selected: PropTypes.bool,
 };
 Option.defaultProps = {
 	value: null,
 	disabled: false,
 	ariaLabelledby: null,
+    selected: false,
 };
 
 export default Option;

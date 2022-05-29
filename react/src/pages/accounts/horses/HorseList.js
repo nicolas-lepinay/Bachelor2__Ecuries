@@ -1,9 +1,7 @@
 import React, { useState, useContext, useEffect, useLayoutEffect } from 'react';
 import { useNavigate, Link  } from 'react-router-dom';
 import classNames from 'classnames';
-import { useFormik } from 'formik';
 import ThemeContext from '../../../contexts/themeContext';
-import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../../layout/SubHeader/SubHeader';
 import Icon from '../../../components/icon/Icon';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -12,7 +10,6 @@ import SkeletonScreen from '../../../components/SkeletonScreeen';
 
 import Card, { CardBody } from '../../../components/bootstrap/Card';
 import Avatar, { AvatarGroup } from '../../../components/Avatar';
-import Badge from '../../../components/bootstrap/Badge';
 import Button from '../../../components/bootstrap/Button';
 import Dropdown, {
 	DropdownItem,
@@ -20,14 +17,16 @@ import Dropdown, {
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
-import showNotification from '../../../components/extras/showNotification';
+
+import Modal, {
+    ModalBody,
+    ModalFooter,
+    ModalHeader,
+    ModalTitle } from '../../../components/bootstrap/Modal'
 
 import Alert from '../../../components/bootstrap/Alert';
-import Label from '../../../components/bootstrap/forms/Label';
-import Input from '../../../components/bootstrap/forms/Input';
-import Checks, { ChecksGroup } from '../../../components/bootstrap/forms/Checks';
-import SERVICES from '../../../common/data/serviceDummyData';
 
+import CommonHorseCreation from '../../common/CommonHorseCreation';
 import { adminMenu, queryPages, clientQueryPages } from '../../../menu';
 
 // 🛠️ Hooks :
@@ -37,17 +36,12 @@ import useFetchHorses from '../../../hooks/useFetchHorses'
 import defaultAvatar from '../../../assets/img/wanna/defaultAvatar.webp';
 import defaultHorseAvatar from '../../../assets/img/horse-avatars/defaultHorseAvatar.webp';
 
-import axios from 'axios';
-import data from '../../../common/data/dummyEventsData';
-
 function HorseList() {
 
     const navigate = useNavigate();
 
     // ⚙️ Strapi's API ROUTES :
     const API_URL = process.env.REACT_APP_API_URL;
-    const USERS_ROUTE = process.env.REACT_APP_USERS_ROUTE;
-    const HORSES_ROUTE = process.env.REACT_APP_HORSES_ROUTE;
 
     // ⚙️ Role IDs
     const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; // Id du rôle 'Admin'
@@ -70,6 +64,8 @@ function HorseList() {
         setData: setHorses, 
         loading,
         error } = useFetchHorses({filters: filters});
+
+    const [triggerNewHorseModal, setTriggerNewHorseModal] = useState(false);
 
     const { setRightPanel } = useContext(ThemeContext);
 
@@ -108,9 +104,22 @@ function HorseList() {
         )
 
     return (
-        <PageWrapper title={adminMenu.accounts.accounts.subMenu.clients.text}>
+        <PageWrapper title={adminMenu.accounts.accounts.subMenu.horses.text}>
             <Page >
-                <div className='h1 font-family-playfair d-flex justify-content-center mb-5'>Liste des chevaux</div>
+                <div className='h1 font-family-playfair d-flex justify-content-center mb-5'>{isAdmin || isPro ? 'Liste des chevaux' : 'Mes chevaux'}</div>
+
+                {isAdmin && 
+                <div style={{marginRight: '0', marginLeft: 'auto'}}>
+                    <Button
+                        color='info'
+                        className='my-3'
+                        icon='Add'
+                        onClick={() => setTriggerNewHorseModal(true)}
+                    >
+                        Ajouter
+                    </Button>
+                </div>}
+
                 <div className='row row-cols-lg-2 row-cols-1 mt-5'>
                     {horses.map((user) => (
                         <div key={user.name} className='col mx-auto'>
@@ -145,18 +154,19 @@ function HorseList() {
                                                 <div className='w-100'>
                                                     <div className='row'>
                                                         <div className='col'>
-                                                            <div className='d-flex align-items-center align-items-start mb-3'>
+                                                            <div className='d-flex align-items-center align-items-start mb-2'>
                                                                 <div className='fw-bold fs-5 me-2 font-family-playfair'>
                                                                     {user?.name}
                                                                 </div>
+                                                                {user?.breed && 
                                                                 <small 
                                                                     className={classNames(
                                                                         `border-${user?.color || 'info'}`,
                                                                         `text-${user?.color || 'info'}`,
                                                                         'border border-2 fw-bold px-3 py-1 rounded-1 text-uppercase mx-2',                                                                        
                                                                     )}>
-                                                                    {user.breed || 'Un noble cheval'}
-                                                                </small>
+                                                                    {user?.breed}
+                                                                </small>}
                                                             </div>
 
                                                             <div className='h5 text-muted opacity-75 font-family-playfair'>
@@ -194,6 +204,35 @@ function HorseList() {
                         </div>
                     ))}
                 </div>
+
+                <Modal
+                    isOpen={triggerNewHorseModal}
+                    setIsOpen={setTriggerNewHorseModal}
+                    titleId='confirmationModal'
+                    fullScreen
+                    isScrollable
+                    >
+                        <ModalHeader setIsOpen={setTriggerNewHorseModal} className='p-5' >
+                            <ModalTitle id='confirmationModal'>Ajouter un nouveau cheval</ModalTitle>
+                        </ModalHeader>
+                        <ModalBody className='px-5 text-center new-line'>
+                            <CommonHorseCreation 
+                                isAdmin={isAdmin}
+                                setIsOpen={setTriggerNewHorseModal} 
+                                setHorses={setHorses}
+                            />
+                        </ModalBody>
+                        <ModalFooter className='px-5'>
+                            <Button
+                                color='light'
+                                className='border-0 mx-3'
+                                isOutline
+                                onClick={() => setTriggerNewHorseModal(false)} >
+                                Annuler
+                            </Button>
+                        </ModalFooter>
+                </Modal>
+
             </Page>
         </PageWrapper>
 );

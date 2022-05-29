@@ -224,6 +224,8 @@ Carousel.propTypes = {
 	isFluid: PropTypes.bool,
 	height: PropTypes.number,
     width: PropTypes.number,
+    customActiveIndex: PropTypes.number,
+    setCustomActiveIndex: PropTypes.func,
 };
 Carousel.defaultProps = {
 	id: null,
@@ -247,6 +249,8 @@ Carousel.defaultProps = {
 	isFluid: false,
 	height: null,
     width: null,
+    customActiveIndex: null,
+    setCustomActiveIndex: null,
 };
 
 export default Carousel;

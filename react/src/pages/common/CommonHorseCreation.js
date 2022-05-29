@@ -1,6 +1,9 @@
-import { useState, useContext, useLayoutEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+
+// 📚 Librairies :
 import { useFormik } from 'formik';
+import PropTypes from 'prop-types';
 import moment from 'moment';
 import classNames from 'classnames';
 import { useMeasure } from 'react-use';
@@ -15,6 +18,7 @@ import useFetchBreeds from '../../hooks/useFetchBreeds';
 import useFetchHorseAvatars from '../../hooks/useFetchHorseAvatars';
 import useDarkMode from '../../hooks/useDarkMode';
 
+// 🅱️ Bootstrap components :
 import Button from '../../components/bootstrap/Button';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -34,10 +38,8 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownToggle,
 } from '../../components/bootstrap/Dropdown';
-
 import Select from '../../components/bootstrap/forms/Select';
 import Option from '../../components/bootstrap/Option';
-
 import Popovers from '../../components/bootstrap/Popovers';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Input from '../../components/bootstrap/forms/Input';
@@ -53,13 +55,60 @@ import Avatar from '../../components/Avatar';
 import defaultAvatar from '../../assets/img/wanna/defaultAvatar.webp';
 import defaultHorseAvatar from '../../assets/img/horse-avatars/defaultHorseAvatar.webp';
 
+// 🅰️ Axios :
+import axios from 'axios';
 
-const CommonHorseCreation = ({ isAdmin }) => {
+const PreviewItem = ({ title, value }) => {
+	return (
+		<div className='row'>
+			<div className='col-4 text-end'>{title}</div>
+			<div className='col-8 text-start fw-bold'>{value || '-'}</div>
+		</div>
+	);
+};
+
+const PreviewImageItem = ({ title, src }) => {
+	return (
+		<div className='row d-flex align-items-center my-3'>
+			<div className='col-4 text-end'>
+                {title}
+            </div>
+
+			<div className='col-8 text-start'>
+                <img src={src} width={50} />
+            </div>
+		</div>
+	);
+};
+
+const PreviewAvatarItem = ({ title, src, color }) => {
+    const { themeStatus } = useDarkMode();
+
+	return (
+		<div className='row d-flex align-items-center my-3'>
+			<div className='col-4 text-end'>
+                {title}
+            </div>
+
+			<div className='col-8 text-start'>
+                <Avatar
+                    src={src}
+                    color={color}
+                    size={54}
+                    border={3}
+                />
+            </div>
+		</div>
+	);
+};
+
+const CommonHorseCreation = ({ isAdmin, setIsOpen, setHorses }) => {
 
     const { darkModeStatus } = useDarkMode();
 
     // ⚙️ Strapi's API URL
     const API_URL = process.env.REACT_APP_API_URL;
+    const HORSES_ROUTE = process.env.REACT_APP_HORSES_ROUTE;
 
     // ⚙️ Role IDs
     const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; // Id du rôle 'Admin'
@@ -69,15 +118,23 @@ const CommonHorseCreation = ({ isAdmin }) => {
     // 🦸 User
     const auth = useAuth();
 
-    // 🐎 Fetch user's horse(s) :
-    const { 
-        data: breeds, 
-        setData: setBreeds } = useFetchBreeds();
+    // 🧑‍🤝‍🧑 Fetch clients :
+    const { data: clients } = useFetchClients();
+
+    // 🐎 Fetch list of breeds and images :
+    const { data: breeds } = useFetchBreeds();
 
     // 🐴 Fetch horse avatars :
-    const { 
-        data: horseAvatars, 
-        setData: setHorseAvatars } = useFetchHorseAvatars();
+    const { data: horseAvatars } = useFetchHorseAvatars();
+
+    // Horse's owner (on last WizardItem) :
+    const [selectedOwner, setSelectedOwner] = useState(null);
+
+    // Horse's coat image :
+    const [imageURL, setImageURL] = useState('');
+
+    // Horse's avatar :
+    const [avatarURL, setAvatarURL] = useState('');
 
     const [carouselIndex, setCarouselIndex] = useState(0);
 
@@ -95,33 +152,92 @@ const CommonHorseCreation = ({ isAdmin }) => {
     const formik = useFormik({
 		initialValues: {
 			name: ``,
+            owner: isAdmin ? null : auth.user,
 			sex: '',
             age: '',
-			owner: auth.user.id,
 			breed: '',
             image: {
                 id: '',
             },
+            avatar: {
+                id: '',
+            },
             color: 'info',
-            breedId: '',
+            breedId: '', // To delete on submission
 		},
 		onSubmit: (values) => {
             // Delete empty fields :
             for (const key in values) {
-                if (values[key] === '' || !values[key]) {
+                if (values[key] === '') {
                   delete values[key];
                 }
             }
-            // Update user :
-            auth.updateUser(values);
+            values.image.id === '' && delete values.image
+            values.avatar.id === '' && delete values.avatar
 
-            showNotification(
-                'Mise à jour.', // title
-				auth.error ? auth.error.message : 'Vos informations ont été mises à jour.', // message
-                auth.error ? 'danger' : 'success' // type
-			);
-		},
+            // Delete breedId:
+            delete values.breedId;
+
+            // Return if no owner:
+            if(values?.owner?.id === '' || values?.owner?.id == null)
+                return
+
+            // Only keep user's id :
+            values.owner = { id: values.owner.id }
+
+            // Create horse :
+            handlePost(values);
+		}
 	});
+
+    const handlePost = async (newData) => {
+        try {
+            const filters = '?populate=owner.avatar&populate=owner.role&populate=avatar&populate=image&populate=health_record.employee.avatar&populate=appointments.employee.avatar&populate=activities';
+            const res = await axios.post(`${API_URL}${HORSES_ROUTE}${filters}`, { data: newData });
+            const resData = res.data.data;
+
+            // Close modal :
+            setIsOpen(false);
+
+            // Callback (add new horse to horses list) :
+            setHorses && setHorses(old => [ ...old, { id: resData.id, ...resData.attributes } ])
+
+            // Success :
+            showNotification(
+                'Nouveau cheval', // title
+				`Le profil ${resData?.attributes?.name} a été créé.`, // message
+                'success' // type
+			);
+        } catch(err) {
+            console.log("POST | Horse | Le cheval n'a pas pu être créé dans la base de données. | " + err);
+            showNotification(
+                'Nouveau cheval', // title
+				"Oops ! Une erreur s'est produite. Le cheval n'a pas pu être ajouté à la base de données.", // message
+                'danger' // type
+			);
+        }
+    }
+
+    useEffect(() => {
+        if(horseAvatars) {
+            formik.setValues({
+                ...formik.values,
+                avatar: {
+                    id: horseAvatars[carouselIndex]?.id,
+                },
+            });
+        }
+    
+    return () => {};
+    }, [horseAvatars, carouselIndex]);
+
+
+    useEffect( () => {
+        setAvatarURL('');
+        horseAvatars.filter(avatar => (avatar.id === formik.values.avatar.id) && setAvatarURL(avatar.attributes.url))
+
+        return () => {};
+    }, [formik.values.avatar.id])
 
     return (
         <Wizard
@@ -129,13 +245,13 @@ const CommonHorseCreation = ({ isAdmin }) => {
             stretch
             color='primary'
             noValidate
-            disabled={formik.values.name === ''}
-            //onSubmit={formik.handleSubmit}
+            disabled={formik.values.name === '' || !formik.values.owner}
+            onSubmit={formik.handleSubmit}
             className='shadow-none'>
-            <WizardItem id='step1' title='Nom'>
+            <WizardItem id='step1' title={isAdmin ? 'Nom et propriétaire' : 'Nom'}>
                 <div className='row g-4'>
                     <div className='h1 mx-auto my-5 py-5'>
-                        {isAdmin ? 'Quel est le nom du cheval ?' : 'Quel est le nom de votre cheval ?'}
+                        {isAdmin ? 'Quel est le nom et le propriétaire du cheval ?' : 'Quel est le nom de votre cheval ?'}
                     </div>
                     <div className='col-xl-3 col-lg-5 col-md-7 col-12 mx-auto my-5'>
                         <FormGroup
@@ -150,9 +266,36 @@ const CommonHorseCreation = ({ isAdmin }) => {
                                 onBlur={formik.handleBlur}
                             />
                         </FormGroup>
+
+                        {isAdmin &&
+                        <FormGroup id='owner' className='my-5'>
+                            <Select
+                                id='owner'
+                                name='owner'
+                                placeholder='Choisissez un(e) propriétaire...'
+                                onChange={ (e) => {
+                                    const owner = { 
+                                        id: e.target.value.split(';')[0], 
+                                        name: e.target.value.split(';')[1], 
+                                        surname: e.target.value.split(';')[2], 
+                                    };
+                                    setSelectedOwner(owner)
+                                    formik.setFieldValue("owner", owner)
+                                }}
+                            >
+                                {clients.map( user => (
+                                    <Option
+                                        key={user.username}
+                                        //value={user.id}
+                                        value={`${user.id};${user.name};${user.surname}`}
+                                    >
+                                        {`${user.name} ${user.surname} ${!user.confirmed ? '(en attente de confirmation)' : ''}`}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </FormGroup>}
                     </div>
                 </div>
-
             </WizardItem>
 
             <WizardItem id='step2' title='Sexe'>
@@ -301,8 +444,11 @@ const CommonHorseCreation = ({ isAdmin }) => {
                                 className='mx-5'
                                 isLight
                                 //isActive={formik.values.image.id === ''}
-                                onClick={() => formik.setFieldValue('image.id', '')}
-                                >
+                                onClick={() => {
+                                    formik.setFieldValue('image.id', '');
+                                    setImageURL('');
+                                }}
+                            >
                                 Ne pas ajouter de robe
                             </Button>
                         </FormGroup>
@@ -328,7 +474,10 @@ const CommonHorseCreation = ({ isAdmin }) => {
                                                 className='my-3'
                                                 isLight
                                                 isActive={Number(formik.values.image.id) === Number(image.id)}
-                                                onClick={() => formik.setFieldValue('image.id', image.id)}
+                                                onClick={() => {
+                                                    formik.setFieldValue('image.id', image.id);
+                                                    setImageURL(image?.attributes?.url);
+                                                }}
                                             >
                                             </Button>
                                         </FormGroup>                                    
@@ -429,16 +578,108 @@ const CommonHorseCreation = ({ isAdmin }) => {
                             </FormGroup>
                         </div>
                     </div>
+
+                    <div className='d-flex align-items-center justify-content-center my-5'>
+                        <Button 
+                            color='light' 
+                            icon='Help' 
+                            size='md'
+                            isLight
+                            isActive={formik.values.avatar.id === ''}
+                            onClick={() => formik.setFieldValue('avatar.id', '')}
+                        >
+                            Ne pas ajouter d'avatar
+                        </Button>
+                    </div>
                         
                 </div>
             </WizardItem>
 
             <WizardItem id='step7' title='Résumé'>
-            </WizardItem>
+                <div className='row g-3 my-4'>
+                    <div className='col-xl-3 col-lg-5 col-md-7 col-11 mx-auto'>
+                        <div className='col-8 offset-3'>
+                            <h3 className='mb-5'>Résumé</h3>
+                            <h4 className='mt-5 mb-4'>Propriétaire</h4>
+                        </div>
+                        <PreviewItem
+                            title='Prénom'
+                            value={formik.values?.owner?.name}
+                        />
+                        <PreviewItem
+                            title='Nom'
+                            value={formik.values?.owner?.surname}
+                        />
 
+                        <div className='col-8 offset-3'>
+                            <h4 className='mt-5 mb-4'>Informations</h4>
+                        </div>
+                        <PreviewItem
+                            title='Nom du cheval'
+                            value={formik.values.name}
+                        />
+                        <PreviewItem
+                            title='Sexe'
+                            value={formik.values.sex === 'male' ? 'Mâle' : formik.values.sex === 'female' ? 'Femelle' : null}
+                        />
+                        <PreviewItem
+                            title='Âge'
+                            value={formik.values.age === 0 ? "Moins d'un an" : formik.values.age > 0 ? `${formik.values.age} ans` : null}
+                        />
+                        <PreviewItem
+                            title='Race'
+                            value={formik.values.breed}
+                        />
+
+                        <div className='col-8 offset-3'>
+                            <h4 className='mt-5 mb-4'>Personnalisation</h4>
+                        </div>
+
+                        {formik.values.image.id === '' ?
+                        <PreviewItem
+                            title='Robe'
+                            value={null}
+                        />
+                        :
+                        <PreviewImageItem
+                            title='Robe'
+                            src={`${API_URL}${imageURL}`}
+                        />
+                        }
+
+                        {formik.values.avatar.id === '' ?
+                        <PreviewAvatarItem
+                            title='Avatar (par défaut)'
+                            src={defaultHorseAvatar}
+                            color={formik.values.color}
+                        />
+                        :
+                        <PreviewAvatarItem
+                            title='Avatar'
+                            src={`${API_URL}${avatarURL}`}
+                            color={formik.values.color}
+                        />
+                        }
+                        <PreviewItem
+                            title='Couleur du profil'
+                            value={colorList.filter(color => color.value === formik.values.color)[0].description}
+                        />
+                    </div>
+                </div>
+            </WizardItem>
 
         </Wizard>
     );
 }
+
+CommonHorseCreation.propTypes = {
+	isAdmin: PropTypes.bool,
+    setIsOpen: PropTypes.func.isRequired,
+    setIsOpen: PropTypes.func,
+};
+CommonHorseCreation.defaultProps = {
+	isAdmin: false,
+    setIsOpen: null,
+};
 
 export default CommonHorseCreation;

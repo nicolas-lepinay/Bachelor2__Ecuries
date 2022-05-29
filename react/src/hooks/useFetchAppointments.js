@@ -40,7 +40,7 @@ const useFetchAppointments = () => {
                 setData(formattedData);
             } catch(err) {
                 setError(err)
-                console.log('USE FETCH APPOINTMENTS | ' + query + ' | ' + err)
+                console.log('USE FETCH APPOINTMENTS | ' + err)
             } finally {
                 setLoading(false);
             }

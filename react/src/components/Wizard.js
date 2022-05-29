@@ -69,6 +69,7 @@ const Wizard = ({ children, onSubmit, isHeader, color, stretch, disabled, ...pro
 				className={classNames({ 'd-none': childCount !== activeItemIndex + 1 })}
 				aria-hidden={childCount !== activeItemIndex + 1}
 				type='submit'
+                disabled={disabled}
 				color={color}>
 				Confirmer
 			</Button>

@@ -29,7 +29,7 @@ const useFetchHorseAvatars = ({
 
             } catch(err) {
                 setError(err)
-                console.log('USE FETCH HORSE AVATARS | ' + query + ' | ' + err)
+                console.log('USE FETCH HORSE AVATARS | ' + err)
             } finally {
                 setLoading(false);
             }

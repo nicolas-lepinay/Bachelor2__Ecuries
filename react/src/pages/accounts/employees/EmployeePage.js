@@ -369,7 +369,13 @@ function EmployeePage() {
                                                             Adresse e-mail
                                                         </div>
                                                         <div className='fw-bold fs-5 mb-0'>
-                                                            {user?.email || <i>Non-communiqué</i>}
+                                                            <a 
+                                                                href={`mailto:${user?.email}`}
+                                                                className='text-decoration-none'
+                                                                style={{color: 'inherit'}}
+                                                            >
+                                                                {user?.email}
+                                                            </a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -529,7 +535,7 @@ function EmployeePage() {
 							</CardTabItem>
 
 							<CardTabItem id='address' title='Adresse' icon='HolidayVillage'>
-                            <Card
+                                <Card
 									className='rounded-2'
 									tag='form'
 									onSubmit={formikAddress.handleSubmit}>
@@ -680,9 +686,23 @@ function EmployeePage() {
 
 							</CardTabItem>
 
-                            
                             {isAdmin ?
-                            <CardTabItem id='password' title='Mot de passe' icon='Lock'></CardTabItem>
+                            <CardTabItem id='password' title='Mot de passe' icon='Lock'>
+                                <Card className='rounded-2'>
+                                    <CardHeader>
+										<CardLabel icon='Lock'>
+											<CardTitle>Mot de passe</CardTitle>
+										</CardLabel>
+									</CardHeader>
+
+                                    <CardBody>
+                                        <Alert isLight className='border-0' shadow='md' icon='Report' color='warning'>
+                                            En cours de construction.
+                                        </Alert>
+                                    </CardBody>
+                                </Card>
+
+                            </CardTabItem>
                             :
                             <CardTabItem></CardTabItem>
                             }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import moment from 'moment';
@@ -11,7 +12,6 @@ import Avatar, { AvatarGroup } from '../../../components/Avatar';
 import defaultAvatar from '../../../assets/img/wanna/defaultAvatar.webp';
 import defaultHorseAvatar from '../../../assets/img/horse-avatars/defaultHorseAvatar.webp';
 
-import USERS from '../../../common/data/userDummyData';
 import Dropdown, {
 	DropdownItem,
 	DropdownMenu,
@@ -25,11 +25,10 @@ import Card, {
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import Icon from '../../../components/icon/Icon';
-import Chart from '../../../components/extras/Chart';
-import { sales } from '../../../common/data/chartDummyData';
-import SERVICES from '../../../common/data/serviceDummyData';
+import { queryPages } from '../../../menu';
+
+import useAuth from '../../../hooks/useAuth';
 import useDarkMode from '../../../hooks/useDarkMode';
-import { irBlack } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
 const convert = require('convert-seconds');
 
@@ -37,6 +36,18 @@ const CommonRightPanel = ({ setOpen, isOpen, horse, horses, events }) => {
 
     // ⚙️ Strapi's API URL :
     const API_URL = process.env.REACT_APP_API_URL;
+
+    // ⚙️ Role IDs
+    const ADMIN_ID = process.env.REACT_APP_ADMIN_ID; // Id du rôle 'Admin'
+    const PRO_ID = process.env.REACT_APP_PRO_ID; // Id du rôle 'Professionnel'
+    const CLIENT_ID = process.env.REACT_APP_CLIENT_ID; // Id du rôle 'Client'
+
+    // 🦸 User:
+    const auth = useAuth();
+
+    const isAdmin = auth.user && Number(auth.user.role.id) === Number(ADMIN_ID);
+    const isPro = auth.user && Number(auth.user.role.id) === Number(PRO_ID);
+    const isClient = auth.user && Number(auth.user.role.id) === Number(CLIENT_ID);
 
     const now = new Date();
     const yesterday = moment().startOf('day').subtract(1, 'days')._d;
@@ -106,19 +117,31 @@ const CommonRightPanel = ({ setOpen, isOpen, horse, horses, events }) => {
                         </Button>
 					</div>
 				</div>
-				<div className='d-flex justify-content-center mb-3'>
-					<Avatar
-                        srcSet={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.url}` : `${defaultHorseAvatar}`}
-                        src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.url}` : `${defaultHorseAvatar}`}
-                        color={horse?.color}
-						shadow='default'
-					/>
-				</div>
-				<div className='d-flex flex-column align-items-center mb-5'>
-                    <div className='h2 fw-bold'>{horse?.name}</div>
-					{/* <div className='h5 text-muted opacity-50'>{horse?.breed || 'Un noble cheval'}</div> */}
-                    <div className='h5 text-muted opacity-50'>{horse?.owner?.data?.attributes?.name} {horse?.owner?.data?.attributes?.surname}</div>
-				</div>
+                    <Link
+                        to={`${queryPages.horses.path}/${horse.id}`}
+                        className='text-decoration-none'
+                        style={(isAdmin || isPro) ? {color: 'inherit', cursor: 'pointer'} : {color: 'inherit', pointerEvents: 'none'}}
+                    >
+                        <div className='d-flex justify-content-center mb-3'>
+                            <Avatar
+                                srcSet={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.url}` : `${defaultHorseAvatar}`}
+                                src={horse?.avatar ? `${API_URL}${horse?.avatar?.data?.attributes?.url}` : `${defaultHorseAvatar}`}
+                                color={horse?.color}
+                                shadow='default'
+                            />
+                        </div>
+                        <div className='d-flex flex-column align-items-center mb-5'>
+                            <div className='h2 fw-bold'>{horse?.name}</div>
+                            {horse?.breed && <div className='h5 text-muted opacity-75'>{horse?.breed}</div>}
+                            <Link
+                                to={`/${queryPages.users.path}/${horse?.owner?.data?.id}`}
+                                className='text-decoration-none'
+                                style={(isAdmin || isPro) ? {color: 'inherit', cursor: 'pointer'} : {color: 'inherit', pointerEvents: 'none'}}
+                            >
+                                <div className='h5 text-muted opacity-50 my-2'>{horse?.owner?.data?.attributes?.name} {horse?.owner?.data?.attributes?.surname}</div>
+                            </Link>
+                        </div>
+                    </Link>
 				<div
 					className={classNames('rounded-3', {
 						'shadow-3d-dark': !darkModeStatus,

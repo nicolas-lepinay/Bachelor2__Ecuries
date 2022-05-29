@@ -82,12 +82,13 @@ const User = () => {
 						<div
 							role='presentation'
 							className='navigation-item cursor-pointer'
-							onClick={() =>
-								navigate(
-									`../${demoPages.appointment.subMenu.employeeID.path}/${USERS.JOHN.id}`,
-									handleItem(),
-								)
-							}>
+							// onClick={() =>
+							// 	navigate(
+							// 		`/`,
+							// 		handleItem(),
+							// 	)
+							// }
+                            >
 							<span className='navigation-link navigation-link-pill'>
 								<span className='navigation-link-info'>
 									<Icon icon='AccountBox' className='navigation-icon' />

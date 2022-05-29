@@ -59,7 +59,7 @@ function EmployeeList() {
     const isPro = auth.user && Number(auth.user.role.id) === Number(PRO_ID);
     const isClient = auth.user && Number(auth.user.role.id) === Number(CLIENT_ID);
 
-    // Fetch employees :
+    // 🧑‍🤝‍🧑 Fetch employees :
     const { 
         data: employees, 
         setData: setEmployees, 
