@@ -1112,19 +1112,38 @@ const accounts_for_clients = {
     }
 }
 
+// Messagerie :
+
+const chat = {
+    title: {
+        id: 'chats',
+        text: 'Messagerie',
+        icon: 'Extension',
+    },
+    messenger: {
+        id: 'chat',
+        text: 'Messages',
+        path: 'mes-messages',
+        icon: 'Forum',
+    }
+}
+
 export const adminMenu = {
     dashboards,
     accounts,
+    chat,
 }
 
 export const professionalMenu = {
     dashboards,
     accounts,
+    chat,
 }
 
 export const clientMenu = {
     dashboards,
     accounts: accounts_for_clients,
+    chat,
 }
 
 export const loginPage = {

@@ -77,15 +77,22 @@ const Aside = () => {
                     <NavigationLine />
 
                     <Navigation 
-                        id='aside-admin-dashboards' 
+                        id='aside-dashboards' 
                         menu={isAdmin ? adminMenu.dashboards : isPro ? professionalMenu.dashboards : clientMenu.dashboards} 
                     />
 
                     <NavigationLine />
 
                     <Navigation 
-                        id='aside-admin-accounts' 
+                        id='aside-accounts' 
                         menu={isAdmin ? adminMenu.accounts : isPro ? professionalMenu.accounts : clientMenu.accounts} 
+                    />
+
+                    <NavigationLine />
+
+                    <Navigation 
+                        id='aside-chats' 
+                        menu={isAdmin ? adminMenu.chat : isPro ? professionalMenu.chat : clientMenu.chat} 
                     />
 
 					{/* <Navigation menu={dashboardMenu} id='aside-dashboard' /> */}

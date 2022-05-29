@@ -208,8 +208,6 @@ const MyWeekEvent = (data) => {
 };
 
 const DashboardActivityPage = () => {
-
-
     
     // 🛠️ Hooks :
     const auth = useAuth(); // 🦸

@@ -622,7 +622,13 @@ const ProfilePage = () => {
 										</CardLabel>
 									</CardHeader>
 									<CardBody>
-										
+                                        <Alert isLight className='border-0' shadow='md' icon='LocalPolice' color='info'>
+                                            Vous retrouverez ici la liste de vos factures.
+                                        </Alert>
+
+                                        <Alert isLight className='border-0' shadow='md' icon='Info' color='warning'>
+                                            Vous n'avez aucune facture enregistrée.
+                                        </Alert>
 									</CardBody>
 								</Card>
 							</CardTabItem>

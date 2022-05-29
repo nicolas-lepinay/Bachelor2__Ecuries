@@ -28,7 +28,10 @@ const PageWrapper = forwardRef(({ title, description, className, isLoginPage, ch
     const isAdmin = auth.user ? Number(auth.user.role.id) === Number(ADMIN_ID) : false;
 
     // 👨 Fetch up-to-date user from database to check if their account has been disabled or not :
-    const { data: user } = useFetchClients({ filters: `&filters[role][id]=${PRO_ID}&filters[id]=${auth?.user?.id || 0}`, isUnique: true });
+    const { 
+        data: user,
+        error,
+    } = useFetchClients({ filters: `&filters[role][id]=${PRO_ID}&filters[id]=${auth?.user?.id || 0}`, isUnique: true });
 
 	useLayoutEffect(() => {
 		// document.getElementsByTagName('TITLE')[0].text = `${title ? `${title} | ` : ''}${
@@ -50,7 +53,7 @@ const PageWrapper = forwardRef(({ title, description, className, isLoginPage, ch
     }
 
     // If user's account has been disabled -> logout and go to Login Page :
-    if(!isAdmin && user?.confirmed === false) {
+    if((!isAdmin && user?.confirmed === false) || error) {
         auth.logout();
         return <Navigate replace to={loginPage.login.path} />
     }

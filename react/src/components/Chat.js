@@ -1,8 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import moment from 'moment';
+import 'moment/locale/fr';
 import Avatar from './Avatar';
+import defaultAvatar from '../assets/img/wanna/defaultAvatar.webp';
 import useDarkMode from '../hooks/useDarkMode';
+
+// ⚙️ Strapi's API URL :
+const API_URL = process.env.REACT_APP_API_URL;
 
 export const ChatListItem = ({
 	src,
@@ -43,11 +49,11 @@ export const ChatListItem = ({
 					unreadMessage={unreadMessage}
 					color={color}
 					size={size}
-					className='me-3'
+					className='me-2'
 				/>
 				<div className='d-grid'>
 					<div className='d-flex flex-wrap d-xxl-block'>
-						<span className='fw-bold fs-5 me-3'>{`${name} ${surname}`}</span>
+						<span className='fw-bold fs-6 me-3'>{`${name} ${surname}`}</span>
 						{lastSeenTime && (
 							<small
 								className={classNames(
@@ -96,7 +102,7 @@ ChatListItem.defaultProps = {
 export const ChatHeader = ({ to }) => {
 	return (
 		<>
-			<strong className='me-2'>To:</strong>
+			<strong className='me-2'>Avec :</strong>
 			{to}
 		</>
 	);
@@ -110,10 +116,11 @@ export const ChatMessages = ({ messages, isReply, ...props }) => {
 		// eslint-disable-next-line react/jsx-props-no-spreading
 		<div className='chat-messages' {...props}>
 			{messages.map((i) => (
-				<div
-					key={i.id}
-					className={classNames('chat-message', { 'chat-message-reply': isReply })}>
+				<div key={i.id} className={classNames('chat-message', { 'chat-message-reply': isReply })} >
 					{i.message}
+                    <div className='d-flex justify-content-end mt-3' style={{fontSize: '90%'}} >
+                        {moment(i.date).fromNow()}
+                    </div>
 				</div>
 			))}
 		</div>
@@ -186,13 +193,13 @@ ChatAvatar.defaultProps = {
 export const ChatGroup = ({ isReply, messages, isOnline, color, user, ...props }) => {
 	const _Avatar = (
 		<ChatAvatar
-			src={user.src}
-			srcSet={user.srcSet}
-			username={user.username}
-			name={user.name}
-			surname={user.surname}
-			isOnline={user.isOnline}
-			color={user.color}
+			src={user?.attributes?.avatar ? `${API_URL}${user?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
+            srcSet={user?.attributes?.avatar ? `${API_URL}${user?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
+			username={user.attributes.username}
+			name={user.attributes.name}
+			surname={user.attributes.surname}
+			//isOnline={user.isOnline}
+			color={user.attributes.color}
 		/>
 	);
 	return (

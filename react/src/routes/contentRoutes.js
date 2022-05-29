@@ -216,6 +216,10 @@ const ACCOUNTS = {
 	USER_PAGE: lazy(() => import('../pages/accounts/users/UserPage')),
 }
 
+const CHAT = {
+    MESSENGER: lazy(() => import('../pages/chat/ChatPage_v2')),
+}
+
 const admin = [
     {
 		path: adminMenu.accounts.accounts.subMenu.horses.path,
@@ -324,6 +328,11 @@ const common = [
     {
 		path: clientMenu.dashboards.dashboards.subMenu.dashboardBooking.path,
 		element: <DASHBOARDS.DASHBOARD_BOOKING />,
+		exact: true,
+	},
+    {
+		path: clientMenu.chat.messenger.path,
+		element: <CHAT.MESSENGER />,
 		exact: true,
 	},
 ];

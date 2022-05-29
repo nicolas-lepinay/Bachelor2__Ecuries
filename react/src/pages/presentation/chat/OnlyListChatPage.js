@@ -210,8 +210,8 @@ const OnlyListChatPage = () => {
 					isOpen={canvasStatus}
 					setOpen={setCanvasStatus}
 					placement='end'
-					isModalStyle
-					isBackdrop={false}
+					//isModalStyle
+					isBackdrop={true}
 					isBodyScroll>
 					<OffCanvasHeader setOpen={setCanvasStatus} className='fs-5'>
 						<ChatHeader
