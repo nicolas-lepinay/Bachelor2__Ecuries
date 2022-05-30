@@ -58,9 +58,6 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
-import PaginationButtons, { dataPagination, PER_COUNT } from '../../../components/PaginationButtons';
-
-import EVENT_STATUS from '../../../common/data/enumEventStatus';
 
 import axios from 'axios';
 
@@ -116,6 +113,7 @@ function EmployeePage() {
             surname: '',
             email: '',
             phone: '',
+            occupation: '',
             role: {
                 id: ''
             }
@@ -157,6 +155,17 @@ function EmployeePage() {
 		},
 	});
 
+    const formikColor = useFormik({
+		initialValues: {
+            id: '',
+            color: '',
+		},
+		onSubmit: (values) => {
+            // Update user:
+            handleUpdate(values);
+		},
+	});
+
     const handleUpdate = async (newData) => {
         try {
             await axios.put(`${API_URL}${USERS_ROUTE}/${newData.id}?populate=*`, newData); // Update
@@ -191,6 +200,7 @@ function EmployeePage() {
                 surname: user.surname,
                 email: user.email,
                 phone: user.phone,
+                occupation: user?.occupation,
                 role: {
                     id: user?.role?.id
                 }
@@ -202,6 +212,11 @@ function EmployeePage() {
                 city: user?.address?.city,
                 country: user?.address?.country,
                 zipcode: user?.address?.zipcode,
+            });
+            formikColor.setValues({
+                ...formikColor.values,
+                id: user.id,
+                color: user?.color,
             });
         }
         
@@ -298,7 +313,10 @@ function EmployeePage() {
                                         <DropdownItem isHeader>Couleur du profil</DropdownItem>
                                         {colorList.map(
                                             (color) => (
-                                                <DropdownItem key={color.value}>
+                                                <DropdownItem 
+                                                    key={color.value}
+                                                    onClick={() => formikColor.setFieldValue('color', color.value)}
+                                                >
                                                     <div>
                                                         <Icon
                                                             icon='Circle'
@@ -310,7 +328,15 @@ function EmployeePage() {
                                             )
                                         )}
                                         {(isAdmin || isPro) &&
-                                        <Button type='submit' color='info' isLink isOutline icon='Save' className='mx-3 my-3' disabled={!isAdmin}>
+                                        <Button 
+                                            type='submit' 
+                                            color='info' 
+                                            isLink isOutline 
+                                            icon='Save' 
+                                            className='mx-3 my-3' 
+                                            disabled={!isAdmin}
+                                            onClick={formikColor.handleSubmit}
+                                        >
 											Appliquer
 										</Button>}
                                         </DropdownMenu>
@@ -323,7 +349,7 @@ function EmployeePage() {
                                         <Avatar
                                             src={user?.avatar ? `${API_URL}${user?.avatar?.url}` : `${defaultAvatar}`}
                                             srcSet={user?.avatar ? `${API_URL}${user?.avatar?.url}` : `${defaultAvatar}`}
-                                            color={user?.color}
+                                            color={formikColor.values.color}
                                             size={200}
                                         />
                                     </div>
@@ -497,6 +523,20 @@ function EmployeePage() {
                                                         mask='+99 9 99 99 99 99'
                                                         onChange={formikProfile.handleChange}
                                                         value={formikProfile.values.phone}
+                                                    />
+                                                </InputGroup>
+											</FormGroup>
+
+                                            <FormGroup
+												className='col-md-5'
+												>
+                                                <InputGroup>
+                                                    <InputGroupText id='occupation'>Profession</InputGroupText>
+                                                    <Input
+                                                        id='occupation'
+                                                        placeholder='Profession'
+                                                        onChange={formikProfile.handleChange}
+                                                        value={formikProfile.values.occupation}
                                                     />
                                                 </InputGroup>
 											</FormGroup>

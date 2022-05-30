@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import 'moment/locale/fr';
@@ -83,52 +83,34 @@ const ChatPage = () => {
             sender: {
                 id: auth.user.id,
             },
+            receiver: {
+                id: '',
+            },
         },
         onSubmit: (values) => {
             // Create new date :
             values.date = new Date();
 
+            // Si le chat n'existe pas encore (nouvelle conversation), je set l'id de l'interlocuteur :
+            if(!activeChat)
+                values.receiver.id = selectedUser.id;
+
             // Update chat :
             activeChat && handleUpdateChat(values);
+
+            // Create a new chat :
+            !activeChat && handlePostNewChat(values);
 
             // Clear textarea :
             formik.setFieldValue('text', '');
         },
     });
 
-	const TABS = {
-		CHLOE: USERS.CHLOE,
-		GRACE: USERS.GRACE,
-		JANE: USERS.JANE,
-		RYAN: USERS.RYAN,
-		ELLA: USERS.ELLA,
-		SAM: USERS.SAM,
-	};
-	const [activeTab, setActiveTab] = useState(TABS.CHLOE);
+    const { setRightPanel } = useContext(ThemeContext);
+
     const [activeChat, setActiveChat] = useState(chats ? chats[0] : null);
+    const [selectedUser, setSelectedUser] = useState(null);
 
-	function getMessages(ACTIVE_TAB) {
-		if (ACTIVE_TAB === USERS.CHLOE) {
-			return CHATS.CHLOE_VS_JOHN;
-		}
-		if (ACTIVE_TAB === USERS.GRACE) {
-			return CHATS.GRACE_VS_JOHN;
-		}
-		if (ACTIVE_TAB === USERS.JANE) {
-			return CHATS.JANE_VS_JOHN;
-		}
-		if (ACTIVE_TAB === USERS.RYAN) {
-			return CHATS.RYAN_VS_JOHN;
-		}
-
-		if (ACTIVE_TAB === USERS.ELLA) {
-			return CHATS.ELLA_VS_JOHN;
-		}
-		if (ACTIVE_TAB === USERS.SAM) {
-			return CHATS.SAM_VS_JOHN;
-		}
-		return null;
-	}
     const getChatMessages = (chat) => {
         return chat?.messages || [];
     }
@@ -136,12 +118,6 @@ const ChatPage = () => {
 	const { mobileDesign } = useContext(ThemeContext);
 	const [listShow, setListShow] = useState(true);
 
-	const getListShow = (TAB_NAME) => {
-		setActiveTab(TAB_NAME);
-		if (mobileDesign) {
-			setListShow(false);
-		}
-	};
     const showChat = (chatId) => {
         setActiveChat(chats.filter(chat => chat.id === chatId)[0]);
 
@@ -178,7 +154,8 @@ const ChatPage = () => {
                 // 👇️ otherwise return object as is
                 return chat;
               });
-              setChats(updatedChats);
+              console.log(updatedChats.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)))
+              setChats(updatedChats.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)));
 
         } catch(err) {
             console.log(`UPDATE | CHAT | Le message n'a pas pu être envoyé. | ` + err);
@@ -190,76 +167,65 @@ const ChatPage = () => {
         }
     }
 
-    const createNewChat = (user) => {
-        const newChat = {
-            id: '',
-            messages: [],
-            users: {
-                data: []
-            }
-        }
-        const authUser = {
-            id: '',
-            attributes: {
-                name: '',
-                surname: '',
-                color: '',
-                avatar: {
-                    data: {
-                        id: '',
-                        attributes: {
-                            url: ''
-                        }
+    const handlePostNewChat = async (newData) => {
+        const dataToSend = {
+            users: [ 
+                {id: newData.sender.id }, 
+                {id: newData.receiver.id },
+            ],
+            messages: [
+                {
+                    text: newData.text,
+                    date: newData.date,
+                    sender: {
+                        id: newData.sender.id,
                     }
                 }
-            }
-        }
-        const otherUser = {
-            id: '',
-            attributes: {
-                name: '',
-                surname: '',
-                color: '',
-                avatar: {
-                    data: {
-                        id: '',
-                        attributes: {
-                            url: ''
-                        }
-                    }
-                }
-            }
+            ]
         }
 
-        authUser.id = auth.user.id
-        authUser.attributes.name = auth.user.name
-        authUser.attributes.surname = auth.user.surname
-        authUser.attributes.color = auth?.user?.color || 'info'
-        authUser.attributes.avatar.data.id = auth.user.avatar.id
-        authUser.attributes.avatar.data.attributes.url = auth.user.avatar.url
+        try {
+            const res = await axios.post(`${API_URL}${CHATS_ROUTE}?populate=users.avatar&populate=messages.sender.avatar`, { data: dataToSend });
+            const resData = res.data.data;
 
-        otherUser.id = user.id
-        otherUser.attributes.name = user.name
-        otherUser.attributes.surname = user.surname
-        otherUser.attributes.color = user?.color || 'info'
-        otherUser.attributes.avatar.data.id = user?.avatar?.id || null;
-        otherUser.attributes.avatar.data.attributes.url = user?.avatar?.url || null;
+            // Set activeChat :
+            setActiveChat({id: resData.id, ...resData.attributes});
 
-        newChat.users.data.push(authUser)
-        newChat.users.data.push(otherUser)
+            // Update all chats to add the new chat :
+            setChats(old => [ { id: resData.id, ...resData.attributes }, ...old ] ); // Push new chat at the BEGINNING of the array
 
-        return newChat;
+        } catch(err) {
+            console.log(`POST | CHAT | La conversation n'a pas pu être créée. | ` + err);
+            showNotification(
+                'Messagerie.', // title
+				"Oops ! Une erreur s'est produite. Le message n'a pas pu être envoyé.", // message
+                'danger' // type
+			);
+        }
     }
 
     useEffect(() => {
         // Clear textarea :
         formik.setFieldValue('text', '');
 
-        chats && setActiveChat(chats[0]);
+        chats && setActiveChat(chats[0]); // Set chats[0] as active chat by default
 
-		
 		return () => {};
 	}, [chats]);
+
+    useEffect(() => {
+        if(chats) {
+            const usersInChats = [];
+            chats.map(chat => chat.users.data.map(user => user.id !== auth.user.id && usersInChats.push(user)));
+            setEmployees(employees.filter(employee => !usersInChats.some(user => user.id === employee.id)));
+            setClients(clients.filter(client => !usersInChats.some(user => user.id === client.id)));
+        }
+		return () => {};
+	}, [chats]);
+
+    useLayoutEffect(() => {
+		setRightPanel(false);
+	});
 
 	return (
 		<PageWrapper title={clientMenu.chat.title.text}>
@@ -325,7 +291,8 @@ const ChatPage = () => {
                                                     <ChatListItem
                                                         onClick={() => {
                                                             mobileDesign && setListShow(false);
-                                                            setActiveChat(createNewChat(user));
+                                                            setActiveChat(null);
+                                                            setSelectedUser(user);
                                                         }}
                                                         //isActive={activeChat?.id === ''}
                                                         src={user?.avatar ? `${API_URL}${user?.avatar?.url}` : `${defaultAvatar}`}
@@ -351,7 +318,8 @@ const ChatPage = () => {
                                                     <ChatListItem
                                                         onClick={() => {
                                                             mobileDesign && setListShow(false);
-                                                            setActiveChat(createNewChat(user));
+                                                            setActiveChat(null);
+                                                            setSelectedUser(user);
                                                         }}
                                                         //isActive={activeChat?.id === ''}
                                                         src={user?.avatar ? `${API_URL}${user?.avatar?.url}` : `${defaultAvatar}`}
@@ -373,7 +341,8 @@ const ChatPage = () => {
 							<Card stretch>
 								<CardHeader>
 									<CardActions>
-										<div className='d-flex align-items-center'>
+										{activeChat && 
+                                        <div className='d-flex align-items-center'>
 											<ChatAvatar
                                                 src={activeChat && activeChat.users.data.filter(user => user.id !== auth.user.id)[0]?.attributes?.avatar ? `${API_URL}${activeChat.users.data.filter(user => user.id !== auth.user.id)[0]?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
                                                 srcSet={activeChat && activeChat.users.data.filter(user => user.id !== auth.user.id)[0]?.attributes?.avatar ? `${API_URL}${activeChat.users.data.filter(user => user.id !== auth.user.id)[0]?.attributes?.avatar?.data?.attributes?.url}` : `${defaultAvatar}`}
@@ -383,7 +352,20 @@ const ChatPage = () => {
 											<div className='fw-bold'>
                                                 {activeChat ? `${activeChat.users.data.filter(user => user.id !== auth.user.id)[0]?.attributes?.name} ${activeChat.users.data.filter(user => user.id !== auth.user.id)[0]?.attributes?.surname}` : null}
 											</div>
-										</div>
+										</div>}
+
+                                        {(!activeChat && selectedUser) && 
+                                        <div className='d-flex align-items-center'>
+											<ChatAvatar
+                                                src={selectedUser?.avatar ? `${API_URL}${selectedUser?.avatar?.url}` : `${defaultAvatar}`}
+                                                srcSet={selectedUser?.avatar ? `${API_URL}${selectedUser?.avatar?.url}` : `${defaultAvatar}`}
+                                                color={selectedUser?.color}
+												className='me-3'
+											/>
+											<div className='fw-bold'>
+                                                {selectedUser?.name} {selectedUser?.surname}
+											</div>
+										</div>}
 									</CardActions>
 								</CardHeader>
 								<CardBody isScrollable>
@@ -397,12 +379,17 @@ const ChatPage = () => {
                                             />
                                         ))
                                     }
-                                    {activeChat && getChatMessages(activeChat).length === 0 &&
+                                    {/* {activeChat && getChatMessages(activeChat).length === 0 &&
                                         // <Alert isLight className='border-0' shadow='md' icon='Group' color='success'>
                                         //     Commencez à discuter avec {activeChat.users.data.filter(user => user.id !== auth.user.id)[0]?.attributes?.name}.
                                         // </Alert>
                                         <div className='display-6 text-muted mx-auto my-5 text-center p-4'>
                                             Commencez à discuter avec {activeChat.users.data.filter(user => user.id !== auth.user.id)[0]?.attributes?.name}.
+                                        </div>
+                                    } */}
+                                    {(!activeChat && selectedUser) &&
+                                        <div className='display-6 text-muted mx-auto my-5 text-center p-4'>
+                                            Commencez à discuter avec {selectedUser?.name} {selectedUser?.surname}.
                                         </div>
                                     }
 									</Chat>

@@ -297,7 +297,10 @@ const ProfilePage = () => {
                                                 <DropdownItem isHeader>Couleur du profil</DropdownItem>
                                                 {colorList.map(
                                                     (color) => (
-                                                        <DropdownItem key={color.value} onClick={() => formikColor.setFieldValue('color', color.value)}>
+                                                        <DropdownItem 
+                                                            key={color.value} 
+                                                            onClick={() => formikColor.setFieldValue('color', color.value)}
+                                                        >
                                                             <div>
                                                                 <Icon
                                                                     icon='Circle'

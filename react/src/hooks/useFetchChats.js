@@ -35,7 +35,7 @@ const useFetchBreeds = ({
                     });
                 });
                 
-                isUnique ? setData(formattedData[0]) : setData(formattedData);
+                isUnique ? setData(formattedData[0]) : setData(formattedData.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)));
             } catch(err) {
                 setError(err)
                 console.log('USE FETCH CHATS | ' + err)
