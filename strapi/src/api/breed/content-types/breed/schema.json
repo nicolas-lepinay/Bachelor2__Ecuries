@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "breeds",
+  "info": {
+    "singularName": "breed",
+    "pluralName": "breeds",
+    "displayName": "Breed"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "images": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": true
+    }
+  }
+}

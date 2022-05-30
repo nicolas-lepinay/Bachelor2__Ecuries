@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_address_addresses",
+  "info": {
+    "displayName": "Address",
+    "icon": "house-damage"
+  },
+  "options": {},
+  "attributes": {
+    "street": {
+      "type": "text"
+    },
+    "city": {
+      "type": "string"
+    },
+    "zipcode": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    }
+  }
+}

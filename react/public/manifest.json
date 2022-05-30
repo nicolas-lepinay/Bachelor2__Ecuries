@@ -1,0 +1,15 @@
+{
+	"short_name": "Écuries",
+	"name": "Écuries de Persévère",
+	"icons": [
+		{
+			"src": "favicon.ico",
+			"sizes": "100x100",
+			"type": "image/x-icon"
+		}
+	],
+	"start_url": ".",
+	"display": "standalone",
+	"theme_color": "#1f2128",
+	"background_color": "#ffffff"
+}

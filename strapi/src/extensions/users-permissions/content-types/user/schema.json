@@ -63,20 +63,55 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "posts": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::post.post",
-      "mappedBy": "User"
-    },
-    "comments": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::comment.comment",
-      "mappedBy": "user"
-    },
-    "status": {
+    "name": {
       "type": "string"
+    },
+    "surname": {
+      "type": "string"
+    },
+    "occupation": {
+      "type": "string"
+    },
+    "avatar": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "phone": {
+      "type": "string"
+    },
+    "address": {
+      "type": "component",
+      "repeatable": false,
+      "component": "address.address"
+    },
+    "appointments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::appointment.appointment",
+      "mappedBy": "employee"
+    },
+    "color": {
+      "type": "string",
+      "default": "primary"
+    },
+    "horses": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::horse.horse",
+      "mappedBy": "owner"
+    },
+    "activities": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::activity.activity",
+      "mappedBy": "employee"
+    },
+    "biography": {
+      "type": "text"
     }
   }
 }

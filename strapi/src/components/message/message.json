@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_message_messages",
+  "info": {
+    "displayName": "Message",
+    "icon": "envelope",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "sender": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "text": {
+      "type": "text"
+    },
+    "date": {
+      "type": "datetime"
+    },
+    "seen": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

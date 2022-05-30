@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_health_record_health_records",
+  "info": {
+    "displayName": "Health Record",
+    "icon": "address-book",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "employee": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "message": {
+      "type": "text"
+    },
+    "field": {
+      "type": "string"
+    },
+    "date": {
+      "type": "date"
+    },
+    "icon": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string",
+      "default": "success"
+    }
+  }
+}

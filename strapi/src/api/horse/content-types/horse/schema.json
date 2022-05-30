@@ -1,0 +1,73 @@
+{
+  "kind": "collectionType",
+  "collectionName": "horses",
+  "info": {
+    "singularName": "horse",
+    "pluralName": "horses",
+    "displayName": "Horse",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "owner": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "horses"
+    },
+    "name": {
+      "type": "string"
+    },
+    "appointments": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::appointment.appointment",
+      "inversedBy": "horses"
+    },
+    "health_record": {
+      "type": "component",
+      "repeatable": true,
+      "component": "health-record.health-record"
+    },
+    "activities": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::activity.activity",
+      "inversedBy": "horses"
+    },
+    "color": {
+      "type": "string",
+      "default": "info"
+    },
+    "breed": {
+      "type": "string"
+    },
+    "avatar": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "sex": {
+      "type": "string"
+    },
+    "age": {
+      "type": "integer"
+    },
+    "image": {
+      "allowedTypes": [
+        "images"
+      ],
+      "type": "media",
+      "multiple": false
+    }
+  }
+}
