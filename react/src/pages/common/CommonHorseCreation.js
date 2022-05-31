@@ -195,13 +195,13 @@ const CommonHorseCreation = ({ isAdmin, setIsOpen, setHorses }) => {
             const filters = '?populate=owner.avatar&populate=owner.role&populate=avatar&populate=image&populate=health_record.employee.avatar&populate=appointments.employee.avatar&populate=activities';
             const res = await axios.post(`${API_URL}${HORSES_ROUTE}${filters}`, { data: newData });
             const resData = res.data.data;
-
-            // Close modal :
-            setIsOpen(false);
-
+            
             // Callback (add new horse to horses list) :
             setHorses && setHorses(old => [ ...old, { id: resData.id, ...resData.attributes } ])
-
+            
+            // Close modal :
+            setIsOpen(false);
+            
             // Success :
             showNotification(
                 'Nouveau cheval', // title
@@ -412,7 +412,7 @@ const CommonHorseCreation = ({ isAdmin, setIsOpen, setHorses }) => {
             </WizardItem>
 
             <WizardItem id='step5' title='Robe'>
-            <div className='row g-4'>
+                <div className='row g-4'>
                     <div className='h1 mx-auto my-5 pt-5'>
                         Choisir une robe pour <span className='font-family-playfair fw-bold'>{formik.values.name}</span>
                     </div>
@@ -675,7 +675,6 @@ const CommonHorseCreation = ({ isAdmin, setIsOpen, setHorses }) => {
 CommonHorseCreation.propTypes = {
 	isAdmin: PropTypes.bool,
     setIsOpen: PropTypes.func.isRequired,
-    setIsOpen: PropTypes.func,
 };
 CommonHorseCreation.defaultProps = {
 	isAdmin: false,

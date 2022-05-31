@@ -38,7 +38,7 @@ WizardItem.defaultProps = {
 	title: null,
 };
 
-const Wizard = ({ children, onSubmit, isHeader, color, stretch, disabled, ...props }) => {
+const Wizard = ({ children, onSubmit, isHeader, color, stretch, disabled, noProgressBar, disabledProgressBar, ...props }) => {
 	const { themeStatus } = useDarkMode();
 	const [activeItemIndex, setActiveItemIndex] = useState(0);
 
@@ -99,7 +99,11 @@ const Wizard = ({ children, onSubmit, isHeader, color, stretch, disabled, ...pro
 				</CardHeader>
 			)}
 			<CardBody isScrollable={!!stretch}>
-				<div className='wizard-progress position-relative'>
+				<div 
+                    className={classNames('wizard-progress position-relative', {
+                        'd-none': noProgressBar,
+                    })}
+                >
 					<div className='progress'>
 						<div
 							className={classNames('progress-bar', {
@@ -134,8 +138,8 @@ const Wizard = ({ children, onSubmit, isHeader, color, stretch, disabled, ...pro
 								style={{
 									left: `${(100 / (childCount - 1)) * index}%`,
 								}}
-								onClick={() => setActiveItemIndex(index)}
-                                disabled={disabled}
+								onClick={() => disabledProgressBar ? {} : setActiveItemIndex(index)}
+                                disabled={!disabledProgressBar && disabled}
                                 >
 								{index + 1}
 							</button>

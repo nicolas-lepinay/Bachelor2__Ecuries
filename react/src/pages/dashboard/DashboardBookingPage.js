@@ -762,9 +762,9 @@ const DashboardBookingPage = () => {
 											toolbar={false}
 											localizer={localizer}
                                             events={isClient ? appointments.filter(
-												(appointment) => employeeList[appointment.employee.data.id] && appointment.end > now && appointment.confirmed,
+												(appointment) => employeeList[appointment?.employee?.data?.id] && appointment.end > now && appointment.confirmed,
 											) : appointments.filter(
-												(appointment) => employeeList[appointment.employee.data.id],
+												(appointment) => employeeList[appointment?.employee?.data?.id],
 											)}
 											defaultView={Views.WEEK}
 											views={views}

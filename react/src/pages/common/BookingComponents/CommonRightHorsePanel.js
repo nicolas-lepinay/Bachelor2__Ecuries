@@ -250,6 +250,7 @@ const CommonRightPanel = ({ setOpen, isOpen, horse, horses, events }) => {
 													'bg-lo25-info': darkModeStatus,
 												},
 											)}>
+                                            {event?.horses?.data?.length === 1 && '1 cheval'}
 											{event?.horses?.data?.length > 1 && `${event?.horses?.data?.length} chevaux`}
 										</div>
 									</div>
