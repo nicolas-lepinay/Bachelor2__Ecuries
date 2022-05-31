@@ -41,15 +41,16 @@ import Popovers from '../components/bootstrap/Popovers';
 import FormGroup from '../components/bootstrap/forms/FormGroup';
 import Input from '../components/bootstrap/forms/Input';
 import InputGroup, { InputGroupText } from '../components/bootstrap/forms/InputGroup';
+import Textarea from '../components/bootstrap/forms/Textarea';
 import Icon from '../components/icon/Icon';
 import Alert from '../components/bootstrap/Alert';
 import showNotification from '../components/extras/showNotification';
 import Avatar from '../components/Avatar';
+import CommonHorseCreation from './common/CommonHorseCreation';
+import CommonAvatarCreation from './common/CommonAvatarCreation';
 import defaultAvatar from '../assets/img/wanna/defaultAvatar.webp';
 import defaultHorseAvatar from '../assets/img/horse-avatars/defaultHorseAvatar.webp';
-import CommonHorseCreation from './common/CommonHorseCreation';
 import { profilePage, queryPages, clientQueryPages, loginPage } from '../menu';
-import Textarea from '../components/bootstrap/forms/Textarea';
 
 const ProfilePage = () => {
 
@@ -80,6 +81,7 @@ const ProfilePage = () => {
     ];
 
     const [triggerNewHorseModal, setTriggerNewHorseModal] = useState(false);
+    const [triggerNewAvatarModal, setTriggerNewAvatarModal] = useState(false);
 
     // 🐎 Fetch user's horse(s) :
     const { 
@@ -227,6 +229,7 @@ const ProfilePage = () => {
                                                     color={formikColor.values.color}
 													className='rounded-circle'
                                                     size={200}
+                                                    onClick={setTriggerNewAvatarModal}
 												/>
 											</div>
 											<div className='flex-grow-1 ms-3'>
@@ -705,7 +708,8 @@ const ProfilePage = () => {
 						</Card>
 
 
-                        {isAdmin && <Card>
+                        {isAdmin && 
+                        <Card>
 							<CardHeader>
 								<CardLabel icon='ShowChart' iconColor='secondary'>
 									<CardTitle>Statistiques</CardTitle>
@@ -801,12 +805,12 @@ const ProfilePage = () => {
                 <Modal
                     isOpen={triggerNewHorseModal}
                     setIsOpen={setTriggerNewHorseModal}
-                    titleId='confirmationModal'
+                    titleId='new-horse-modal'
                     fullScreen
                     isScrollable
                     >
                         <ModalHeader setIsOpen={setTriggerNewHorseModal} className='p-5' >
-                            <ModalTitle id='confirmationModal'>Ajouter un nouveau cheval</ModalTitle>
+                            <ModalTitle id='new-horse-modal'>Ajouter un nouveau cheval</ModalTitle>
                         </ModalHeader>
                         <ModalBody className='px-5 text-center new-line'>
                             <CommonHorseCreation 
@@ -823,6 +827,32 @@ const ProfilePage = () => {
                                 Annuler
                             </Button>
                         </ModalFooter>
+                </Modal>
+
+                <Modal
+                    isOpen={triggerNewAvatarModal}
+                    setIsOpen={setTriggerNewAvatarModal}
+                    titleId='new-avatar-modal'
+                    fullScreen
+                    isScrollable
+                >
+                    <ModalHeader setIsOpen={setTriggerNewAvatarModal} className='p-5' >
+                        <ModalTitle id='new-avatar-modal'>Créer son avatar</ModalTitle>
+                    </ModalHeader>
+                    <ModalBody className='px-5 text-center new-line'>
+                        <CommonAvatarCreation 
+                            setIsOpen={setTriggerNewAvatarModal} 
+                        />
+                    </ModalBody>
+                    {/* <ModalFooter className='px-5'>
+                        <Button
+                            color='light'
+                            className='border-0 mx-3'
+                            isOutline
+                            onClick={() => setTriggerNewAvatarModal(false)} >
+                            Annuler
+                        </Button>
+                    </ModalFooter> */}
                 </Modal>
 
 			</Page>

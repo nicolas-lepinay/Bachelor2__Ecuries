@@ -395,6 +395,7 @@ const ChatPage = () => {
 									</Chat>
 								</CardBody>
 								<CardFooter className='d-block'>
+                                    {(activeChat ||selectedUser) &&
                                     <InputGroup id='text'>
                                         <Textarea 
                                             id='text'
@@ -413,7 +414,7 @@ const ChatPage = () => {
                                         >
                                             <span></span>
                                         </Button>
-                                    </InputGroup>
+                                    </InputGroup>}
 								</CardFooter>
 							</Card>
 						</div>
