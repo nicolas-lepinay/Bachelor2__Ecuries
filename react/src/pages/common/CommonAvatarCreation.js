@@ -197,28 +197,28 @@ const CommonAvatarCreation = ({ setIsOpen }) => {
 		},
 		onSubmit: (values) => {
 
-            //handlePost(values);
+            // On ne garde que l'avatarId :
+            values = { 
+                avatar: { 
+                    id: values.avatar.id,
+                } 
+            }
+            // Validation check :
+            if(values.avatar.id === '') {
+                showNotification(
+                    'Nouvel avatar', // title
+                    "Veuillez choisir un avatar pour pouvoir continuer.", // message
+                    'danger' // type
+                );
+                return;
+            }
+            // Update user :
+            auth.updateUser(values);
+
+            // Close modal :
+            setIsOpen(false);
 		}
 	});
-
-    const handlePost = async (newData) => {
-        try {
-
-        } catch(err) {
-            console.log("POST | Horse | Le cheval n'a pas pu être créé dans la base de données. | " + err);
-            showNotification(
-                'Nouvel avatar', // title
-				"Oops ! Une erreur s'est produite. L'avatar n'a pas pu être ajouté à la base de données.", // message
-                'danger' // type
-			);
-        }
-    }
-
-
-    useEffect( () => {
-
-        return () => {};
-    }, [])
 
     return (
         <Wizard
@@ -381,7 +381,7 @@ const CommonAvatarCreation = ({ setIsOpen }) => {
                 </div>
 
                 <div className="row d-flex align-items-center justify-content-center">
-                    <div className='row col-lg-9 col-11 row-cols-lg-2 row-cols-md-1 my-5 gy-5'>
+                    <div className='row col-lg-9 col-11 row-cols-xl-2 row-cols-1 my-5 gy-5'>
                         {avatars.filter(avatar => {
                             return avatar.attributes.name.includes(
                                 `${formik.values.skin}-${formik.values.eyes}-${formik.values.hair}-${formik.values.hairstyle}-${formik.values.sex}`

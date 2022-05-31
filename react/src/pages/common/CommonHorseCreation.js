@@ -195,13 +195,13 @@ const CommonHorseCreation = ({ isAdmin, setIsOpen, setHorses }) => {
             const filters = '?populate=owner.avatar&populate=owner.role&populate=avatar&populate=image&populate=health_record.employee.avatar&populate=appointments.employee.avatar&populate=activities';
             const res = await axios.post(`${API_URL}${HORSES_ROUTE}${filters}`, { data: newData });
             const resData = res.data.data;
-
-            // Close modal :
-            setIsOpen(false);
-
+            
             // Callback (add new horse to horses list) :
             setHorses && setHorses(old => [ ...old, { id: resData.id, ...resData.attributes } ])
-
+            
+            // Close modal :
+            setIsOpen(false);
+            
             // Success :
             showNotification(
                 'Nouveau cheval', // title

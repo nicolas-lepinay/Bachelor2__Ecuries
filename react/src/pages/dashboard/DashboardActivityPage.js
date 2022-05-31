@@ -1263,7 +1263,7 @@ const DashboardActivityPage = () => {
 						}}
 						className='p-4'>
 						<OffCanvasTitle id='canvas-title' tag='h3'>
-							Modifier l'évènement
+							Modifier le rendez-vous
 						</OffCanvasTitle>
 					</OffCanvasHeader>
 

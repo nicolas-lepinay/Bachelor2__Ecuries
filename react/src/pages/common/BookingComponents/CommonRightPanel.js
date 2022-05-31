@@ -68,8 +68,8 @@ const CommonRightPanel = ({ setOpen, isOpen, employee, employees, appointments }
     // Filter only this employee's appointments :
     appointments = appointments.filter(
         (appointment) =>
-            appointment?.employee?.data.id ===
-            employee.id,
+            appointment?.employee?.data?.id ===
+            employee?.id,
     )
 
     if(!employee.id)

@@ -227,8 +227,10 @@ const ProfilePage = () => {
 													srcSet={auth.user?.avatar ? `${API_URL}${auth.user?.avatar?.url}` : `${defaultAvatar}`}
 													src={auth.user?.avatar ? `${API_URL}${auth.user?.avatar?.url}` : `${defaultAvatar}`}
                                                     color={formikColor.values.color}
-													className='rounded-circle'
+													className='rounded-circle transition-base bg-l25-info-hover'
                                                     size={200}
+                                                    role='button'
+                                                    title='Modifier son avatar'
                                                     onClick={setTriggerNewAvatarModal}
 												/>
 											</div>
