@@ -108,7 +108,7 @@ function HorseList() {
             <Page >
                 <div className='h1 font-family-playfair d-flex justify-content-center mb-5'>{isAdmin || isPro ? 'Liste des chevaux' : 'Mes chevaux'}</div>
 
-                {isAdmin && 
+                {!isPro && 
                 <div style={{marginRight: '0', marginLeft: 'auto'}}>
                     <Button
                         color='info'

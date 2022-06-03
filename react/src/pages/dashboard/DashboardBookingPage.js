@@ -1219,6 +1219,7 @@ const DashboardBookingPage = () => {
                                 </Alert>
                             </div>
                             :
+                            eventItem?.maximum_horses &&
                             <InputGroup className='mb-2'>
                                 <InputGroupText>Places restantes</InputGroupText>
                                 <Input
@@ -1267,7 +1268,7 @@ const DashboardBookingPage = () => {
 												//value={registeredHorses}
                                                 id='horses'
                                                 name='horses'
-                                                disabled={registeredHorses.length >= eventItem?.maximum_horses}
+                                                disabled={eventItem?.maximum_horses && registeredHorses.length >= eventItem?.maximum_horses}
                                                 onChange={ (e) => {
                                                     const newHorse = { 
                                                         id: e.target.value.split(';')[0], 

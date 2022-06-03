@@ -57,6 +57,7 @@ function useProvideAuth() {
                 setUser(user);
                 localStorage.setItem("persevere_user", JSON.stringify(user)); // Send user to local storage
                 //localStorage.setItem("persevere_user", JSON.stringify({ id: user.id })); // Send user's id to local storage
+                setError(null);
                 console.log(`CONNEXION | Connexion réussie. Bienvenue, ${user?.name} ${user?.surname}.`);
             } else {
                 console.log("CONNEXION | Ce compte n'a pas encore été confirmé par un administrateur.");
@@ -92,7 +93,8 @@ function useProvideAuth() {
             setSuccess({
                 action: 'register', 
                 message: 'Votre inscription a été prise en compte.\nVotre compte doit être validé par un administrateur.'
-            })
+            });
+            setError(null);
         } catch(err) {
             console.log("INSCRIPTION | Une erreur est survenue lors de la tentative d'inscription. | " + err)
             setError({ 
@@ -110,6 +112,7 @@ function useProvideAuth() {
         setUser(null);
         localStorage.removeItem("persevere_user");
         setLoading(false);
+        setError(null);
     }
 
     // UPDATE USER
@@ -124,7 +127,8 @@ function useProvideAuth() {
             setSuccess({
                 action: 'update', 
                 message: "L'utilisateur a été mis à jour.",
-            })
+            });
+            setError(null);
             console.log("MISE A JOUR | L'utilisateur a été mis à jour.")
         } catch(err) {
             setError({ 

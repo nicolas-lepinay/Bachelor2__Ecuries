@@ -8,6 +8,8 @@ import useDarkMode from '../../hooks/useDarkMode';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Spinner from '../../components/bootstrap/Spinner'
 
+import Input from '../../components/bootstrap/forms/Input';
+
 // 💖 FontAwesome :
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faLock, faPhone } from "@fortawesome/free-solid-svg-icons";
@@ -115,7 +117,8 @@ function Login() {
                                         type="text"
                                         placeholder="Numéro de téléphone"
                                         onChange={ (e) => setSignupPhone(e.target.value)}
-                                        maxLength="12"
+                                        //maxLength="12"
+                                        //mask='+99 9 99 99 99 99'
                                         required
                                     />
                                 </div>
