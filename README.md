@@ -1,6 +1,6 @@
 # 𝐄𝐪𝐮𝐞𝐬𝐭𝐫𝐢𝐚
 
-![equestria_logo](https://user-images.githubusercontent.com/87578863/184404635-7551c5ed-f985-4b31-bfe1-0f955513f6ea.png)
+![equestria_logo](https://user-images.githubusercontent.com/87578863/184410411-be2f2e4f-ca12-4d9c-be0b-217a08be0dcc.png)
 
 
 🦄 𝐄𝐪𝐮𝐞𝐬𝐭𝐫𝐢𝐚 : une application de gestion pour propriétaires et pensionnaires d'écurie, avec :\
