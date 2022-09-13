@@ -20,7 +20,7 @@
 
 ![003](https://user-images.githubusercontent.com/87578863/184409082-52402981-8384-4de4-86be-56f38227b88b.jpg)
 
-![004](https://user-images.githubusercontent.com/87578863/184409087-5b2dbaa9-c3c6-4ae4-99be-2dada9d3e0de.jpg)
+![planning](https://user-images.githubusercontent.com/87578863/189902099-0fe88873-b61c-4317-960d-018587f9d9da.gif)
 
 ![005](https://user-images.githubusercontent.com/87578863/184409091-82920ba0-0914-44fa-96fc-f0040a6eddc3.jpg)
 
