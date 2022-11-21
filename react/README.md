@@ -1,5 +1,3 @@
-# Facit | React Admin Dashboard Template V2.2.3
-
 #### Required files (Checked ones should definitely be in your project)
 - [ ] .storybook
 - [x] public[^1]
