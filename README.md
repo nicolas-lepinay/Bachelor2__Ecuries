@@ -32,6 +32,6 @@
 
 ![008](https://user-images.githubusercontent.com/87578863/184409097-b840fd0a-64e8-478f-9f01-11399a900c2a.jpg)
 
-🐴 Site portfolio annexe pour les Écuries de Persévère :
+🐴 Site vitrine annexe pour les Écuries de Persévère :
 
 ![009](https://user-images.githubusercontent.com/87578863/236697353-f0a452c1-b35a-44d9-8706-c9399c613db6.png)
