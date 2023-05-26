@@ -55,6 +55,3 @@ Runs the app in development mode.<br>
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 
-### Detailed information on how to use it is given at [facit.omtanke.studio](https://facit.omtanke.studio/) or [facit-story.omtanke.studio](https://facit-story.omtanke.studio/). If you have questions, you can get support from us 24/7.
-
-
