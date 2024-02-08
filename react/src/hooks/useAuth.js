@@ -51,7 +51,7 @@ function useProvideAuth() {
             const data = await res.data;
             if(data.user.confirmed === true) {
                 let user = { ...data.user, jwt: data.jwt };
-                const fullUser = await axios.get(`${API_URL}${USERS_ROUTE}?filters[id]=${user.id}`); // Get all fields (avatar, role, adress, horses, etc.)
+                const fullUser = await axios.get(`${API_URL}${USERS_ROUTE}?populate=*&filters[id]=${user.id}`); // Get all fields (avatar, role, address, horses, etc.)
                 const fullUserData = fullUser.data[0];
                 user = { ...user, ...fullUserData};
                 setUser(user);
