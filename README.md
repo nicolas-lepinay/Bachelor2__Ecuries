@@ -22,6 +22,8 @@
 
 ![planning](https://user-images.githubusercontent.com/87578863/189902099-0fe88873-b61c-4317-960d-018587f9d9da.gif)
 
+![Planning Professionnels-2](https://github.com/nicolas-lepinay/Bachelor2__Ecuries/assets/87578863/86ac720c-30b7-4e5c-ad65-e3c90b85c80b)
+
 ![005](https://user-images.githubusercontent.com/87578863/184409091-82920ba0-0914-44fa-96fc-f0040a6eddc3.jpg)
 
 ![horsepage](https://user-images.githubusercontent.com/87578863/189904723-c997fdfd-5740-41ff-8582-607e26541afa.gif)
